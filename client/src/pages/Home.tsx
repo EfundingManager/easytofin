@@ -9,6 +9,8 @@ import { Link } from "wouter";
 import { ArrowRight, Shield, TrendingUp, Heart, Home as HomeIcon, Building2, BarChart3, CheckCircle2, Star, Phone } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
 
 const HERO_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/hero-banner-DQ43hiRTQkWyHmsrFp5TGz.webp";
 const TEAM_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/about-team-Y4XQMAH63T64YtEXuxPddb.webp";
@@ -119,6 +121,7 @@ const testimonials = [
 ];
 
 export default function Home() {
+  const { language } = useLanguage();
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />

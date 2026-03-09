@@ -1,26 +1,30 @@
 /* 
- * EasyToFin Navbar — "Warm Expertise" design
+ * EasyToFin Navbar — "Warm Expertise" design with bilingual support
  * Deep teal primary, clean white background, Outfit font
- * Sticky top nav with dropdown for services
+ * Sticky top nav with dropdown for services + language switcher
  */
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown, Phone, Mail } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, Mail, Globe } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
 
-const services = [
-  { label: "Protection", href: "/protection", desc: "Life, illness & income cover" },
-  { label: "Pensions", href: "/pensions", desc: "Plan your retirement" },
-  { label: "Health Insurance", href: "/health-insurance", desc: "Private medical cover" },
-  { label: "General Insurance", href: "/general-insurance", desc: "Home, car & business" },
-  { label: "Mortgages", href: "/mortgages", desc: "Buy your home" },
-  { label: "Investments", href: "/investments", desc: "Grow your wealth" },
+const getServices = (lang: 'en' | 'zh') => [
+  { label: t(lang, 'services.protection'), href: "/protection", desc: t(lang, 'serviceDesc.protection') },
+  { label: t(lang, 'services.pensions'), href: "/pensions", desc: t(lang, 'serviceDesc.pensions') },
+  { label: t(lang, 'services.healthInsurance'), href: "/health-insurance", desc: t(lang, 'serviceDesc.healthInsurance') },
+  { label: t(lang, 'services.generalInsurance'), href: "/general-insurance", desc: t(lang, 'serviceDesc.generalInsurance') },
+  { label: t(lang, 'services.mortgages'), href: "/mortgages", desc: t(lang, 'serviceDesc.mortgages') },
+  { label: t(lang, 'services.investments'), href: "/investments", desc: t(lang, 'serviceDesc.investments') },
 ];
 
 export default function Navbar() {
+  const { language, toggleLanguage } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
+  const services = getServices(language);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -38,7 +42,7 @@ export default function Navbar() {
       {/* Top bar */}
       <div className="bg-[oklch(0.32_0.09_195)] text-white text-sm py-2 hidden md:block">
         <div className="container flex justify-between items-center">
-          <span className="text-white/80 font-inter text-xs">Regulated by the Central Bank of Ireland</span>
+          <span className="text-white/80 font-inter text-xs">{t(language, 'footer.regulatedCB')}</span>
           <div className="flex items-center gap-6">
             <a href="tel:+35312345678" className="flex items-center gap-1.5 text-white/90 hover:text-white transition-colors">
               <Phone size={13} />
@@ -77,7 +81,7 @@ export default function Navbar() {
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1">
             <Link href="/" className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.97_0.003_240)] transition-colors">
-              Home
+              {t(language, 'nav.home')}
             </Link>
             
             {/* Services dropdown */}
@@ -87,7 +91,7 @@ export default function Navbar() {
               onMouseLeave={() => setServicesOpen(false)}
             >
               <button className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.97_0.003_240)] transition-colors flex items-center gap-1">
-                Services
+                {t(language, 'nav.services')}
                 <ChevronDown size={15} className={`transition-transform duration-200 ${servicesOpen ? "rotate-180" : ""}`} />
               </button>
               
@@ -110,17 +114,25 @@ export default function Navbar() {
             </div>
 
             <Link href="/about" className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.97_0.003_240)] transition-colors">
-              About Us
+              {t(language, 'nav.aboutUs')}
             </Link>
             <Link href="/contact" className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.97_0.003_240)] transition-colors">
-              Contact
+              {t(language, 'nav.contact')}
             </Link>
           </div>
 
-          {/* CTA */}
+          {/* CTA + Language Switcher */}
           <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-[Outfit] font-600 text-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.93_0.04_195)] transition-colors"
+              title={language === 'en' ? 'Switch to Chinese' : 'Switch to English'}
+            >
+              <Globe size={16} />
+              <span className="text-xs">{language === 'en' ? '中文' : 'EN'}</span>
+            </button>
             <Link href="/contact" className="btn-amber text-sm px-5 py-2.5">
-              Get a Quote
+              {t(language, 'nav.getQuote')}
             </Link>
           </div>
 
@@ -138,10 +150,10 @@ export default function Navbar() {
         {mobileOpen && (
           <div className="md:hidden bg-white border-t border-[oklch(0.88_0.008_240)] px-4 py-4 space-y-1">
             <Link href="/" className="block px-3 py-2.5 rounded-lg text-[oklch(0.18_0.015_240)] font-[Outfit] font-500 hover:bg-[oklch(0.97_0.003_240)] transition-colors">
-              Home
+              {t(language, 'nav.home')}
             </Link>
             <div className="px-3 py-1.5 text-xs font-600 font-[Outfit] text-[oklch(0.52_0.015_240)] uppercase tracking-wider">
-              Services
+              {t(language, 'nav.services')}
             </div>
             {services.map((s) => (
               <Link
@@ -153,17 +165,24 @@ export default function Navbar() {
               </Link>
             ))}
             <Link href="/about" className="block px-3 py-2.5 rounded-lg text-[oklch(0.18_0.015_240)] font-[Outfit] font-500 hover:bg-[oklch(0.97_0.003_240)] transition-colors">
-              About Us
+              {t(language, 'nav.aboutUs')}
             </Link>
             <Link href="/contact" className="block px-3 py-2.5 rounded-lg text-[oklch(0.18_0.015_240)] font-[Outfit] font-500 hover:bg-[oklch(0.97_0.003_240)] transition-colors">
-              Contact
+              {t(language, 'nav.contact')}
             </Link>
             <div className="pt-2">
               <Link href="/contact" className="btn-amber w-full justify-center text-sm">
-                Get a Quote
+                {t(language, 'nav.getQuote')}
               </Link>
             </div>
             <div className="pt-2 border-t border-[oklch(0.88_0.008_240)] space-y-1">
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-[Outfit] font-600 text-[oklch(0.40_0.11_195)] w-full rounded-lg hover:bg-[oklch(0.93_0.04_195)] transition-colors"
+              >
+                <Globe size={16} />
+                {language === 'en' ? '中文' : 'EN'}
+              </button>
               <a href="tel:+35312345678" className="flex items-center gap-2 px-3 py-2 text-sm text-[oklch(0.52_0.015_240)]">
                 <Phone size={14} /> +353 1 234 5678
               </a>

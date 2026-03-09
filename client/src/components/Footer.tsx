@@ -1,25 +1,31 @@
 /* 
- * EasyToFin Footer — "Warm Expertise" design
+ * EasyToFin Footer — "Warm Expertise" design with bilingual support
  * Dark teal background, clean layout, regulatory info
  */
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, Facebook, Linkedin, Twitter } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
 
-const services = [
-  { label: "Protection", href: "/protection" },
-  { label: "Pensions", href: "/pensions" },
-  { label: "Health Insurance", href: "/health-insurance" },
-  { label: "General Insurance", href: "/general-insurance" },
-  { label: "Mortgages", href: "/mortgages" },
-  { label: "Investments", href: "/investments" },
+const getServices = (lang: 'en' | 'zh') => [
+  { label: t(lang, 'services.protection'), href: "/protection" },
+  { label: t(lang, 'services.pensions'), href: "/pensions" },
+  { label: t(lang, 'services.healthInsurance'), href: "/health-insurance" },
+  { label: t(lang, 'services.generalInsurance'), href: "/general-insurance" },
+  { label: t(lang, 'services.mortgages'), href: "/mortgages" },
+  { label: t(lang, 'services.investments'), href: "/investments" },
 ];
 
-const company = [
-  { label: "About Us", href: "/about" },
-  { label: "Contact Us", href: "/contact" },
+const getCompany = (lang: 'en' | 'zh') => [
+  { label: t(lang, 'nav.aboutUs'), href: "/about" },
+  { label: t(lang, 'common.contactUs'), href: "/contact" },
 ];
 
 export default function Footer() {
+  const { language } = useLanguage();
+  const services = getServices(language);
+  const company = getCompany(language);
+
   return (
     <footer className="bg-[oklch(0.22_0.07_195)] text-white">
       {/* Main footer */}
@@ -36,7 +42,7 @@ export default function Footer() {
             </div>
           </Link>
           <p className="text-white/70 text-sm leading-relaxed mb-5">
-            Expert financial advice tailored to your needs. Protecting and planning for your future since day one.
+            {t(language, 'footer.tagline')}
           </p>
           <div className="flex gap-3">
             <a href="#" aria-label="Facebook" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[oklch(0.76_0.19_75)] hover:text-[oklch(0.15_0.02_30)] transition-colors">
@@ -53,7 +59,7 @@ export default function Footer() {
 
         {/* Services */}
         <div>
-          <h4 className="font-[Outfit] font-600 text-white text-sm uppercase tracking-wider mb-4">Our Services</h4>
+          <h4 className="font-[Outfit] font-600 text-white text-sm uppercase tracking-wider mb-4">{t(language, 'footer.ourServices')}</h4>
           <ul className="space-y-2.5">
             {services.map((s) => (
               <li key={s.href}>
@@ -67,7 +73,7 @@ export default function Footer() {
 
         {/* Company */}
         <div>
-          <h4 className="font-[Outfit] font-600 text-white text-sm uppercase tracking-wider mb-4">Company</h4>
+          <h4 className="font-[Outfit] font-600 text-white text-sm uppercase tracking-wider mb-4">{t(language, 'footer.company')}</h4>
           <ul className="space-y-2.5">
             {company.map((c) => (
               <li key={c.href}>
@@ -78,12 +84,12 @@ export default function Footer() {
             ))}
             <li>
               <a href="#" className="text-white/65 text-sm hover:text-[oklch(0.76_0.19_75)] transition-colors">
-                Privacy Policy
+                {t(language, 'footer.privacyPolicy')}
               </a>
             </li>
             <li>
               <a href="#" className="text-white/65 text-sm hover:text-[oklch(0.76_0.19_75)] transition-colors">
-                Terms of Business
+                {t(language, 'footer.termsOfBusiness')}
               </a>
             </li>
           </ul>
@@ -91,7 +97,7 @@ export default function Footer() {
 
         {/* Contact */}
         <div>
-          <h4 className="font-[Outfit] font-600 text-white text-sm uppercase tracking-wider mb-4">Contact Us</h4>
+          <h4 className="font-[Outfit] font-600 text-white text-sm uppercase tracking-wider mb-4">{t(language, 'footer.contactUs')}</h4>
           <ul className="space-y-3">
             <li className="flex items-start gap-2.5 text-white/70 text-sm">
               <MapPin size={15} className="mt-0.5 shrink-0 text-[oklch(0.76_0.19_75)]" />
@@ -112,7 +118,7 @@ export default function Footer() {
           </ul>
           <div className="mt-5">
             <Link href="/contact" className="btn-amber text-sm px-5 py-2.5 inline-flex">
-              Get a Quote
+              {t(language, 'nav.getQuote')}
             </Link>
           </div>
         </div>
@@ -121,9 +127,9 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/10">
         <div className="container py-5 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-white/50">
-          <p>© {new Date().getFullYear()} EasyToFin Financial Services Limited. All rights reserved.</p>
+          <p>{t(language, 'footer.copyright').replace('{year}', new Date().getFullYear().toString())}</p>
           <p className="text-center md:text-right">
-            EasyToFin Financial Services Limited is regulated by the Central Bank of Ireland.
+            {t(language, 'footer.regulatedCB')}
           </p>
         </div>
       </div>
