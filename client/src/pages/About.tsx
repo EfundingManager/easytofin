@@ -46,7 +46,7 @@ export default function About() {
       <section className="teal-gradient text-white py-16 md:py-20">
         <div className="container">
           <div className="max-w-3xl">
-            <span className="inline-block bg-white/15 text-white/90 text-xs font-[Outfit] font-600 uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
+            <span className="inline-block bg-white/15 text-white/90 text-xs font-[Outfit] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
               {t(language, 'about.aboutEasyToFin')}
             </span>
             <h1 className="font-[Outfit] font-800 text-4xl md:text-5xl text-white mb-4 leading-tight">

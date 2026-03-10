@@ -44,7 +44,7 @@ export default function Contact() {
       <section className="teal-gradient text-white py-16 md:py-20">
         <div className="container">
           <div className="max-w-3xl">
-            <span className="inline-block bg-white/15 text-white/90 text-xs font-[Outfit] font-600 uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
+            <span className="inline-block bg-white/15 text-white/90 text-xs font-[Outfit] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
               {t(language, 'nav.contact')}
             </span>
             <h1 className="font-[Outfit] font-800 text-4xl md:text-5xl text-white mb-4 leading-tight">
@@ -133,7 +133,7 @@ export default function Contact() {
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                      <label className="block text-sm font-[Outfit] font-600 text-[oklch(0.18_0.015_240)] mb-2">
+                      <label className="block text-sm font-[Outfit] font-semibold text-[oklch(0.18_0.015_240)] mb-2">
                         {t(language, 'contact.fullName')}
                       </label>
                       <input
@@ -149,7 +149,7 @@ export default function Contact() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-[Outfit] font-600 text-[oklch(0.18_0.015_240)] mb-2">
+                        <label className="block text-sm font-[Outfit] font-semibold text-[oklch(0.18_0.015_240)] mb-2">
                           {t(language, 'contact.emailAddress')}
                         </label>
                         <input
@@ -163,7 +163,7 @@ export default function Contact() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-[Outfit] font-600 text-[oklch(0.18_0.015_240)] mb-2">
+                        <label className="block text-sm font-[Outfit] font-semibold text-[oklch(0.18_0.015_240)] mb-2">
                           {t(language, 'contact.phoneNumber')}
                         </label>
                         <input
@@ -178,7 +178,7 @@ export default function Contact() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-[Outfit] font-600 text-[oklch(0.18_0.015_240)] mb-2">
+                      <label className="block text-sm font-[Outfit] font-semibold text-[oklch(0.18_0.015_240)] mb-2">
                         {t(language, 'contact.serviceInterested')}
                       </label>
                       <select
@@ -198,7 +198,7 @@ export default function Contact() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-[Outfit] font-600 text-[oklch(0.18_0.015_240)] mb-2">
+                      <label className="block text-sm font-[Outfit] font-semibold text-[oklch(0.18_0.015_240)] mb-2">
                         {t(language, 'contact.message')}
                       </label>
                       <textarea

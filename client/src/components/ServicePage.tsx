@@ -60,7 +60,7 @@ export default function ServicePage({
               <div className="w-12 h-12 rounded-lg bg-white/15 flex items-center justify-center text-white">
                 {icon}
               </div>
-              <span className="inline-block bg-white/15 text-white/90 text-xs font-[Outfit] font-600 uppercase tracking-wider px-3 py-1.5 rounded-full">
+              <span className="inline-block bg-white/15 text-white/90 text-xs font-[Outfit] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full">
                 {language === 'en' ? 'Service' : '服务'}
               </span>
             </div>
@@ -137,7 +137,7 @@ export default function ServicePage({
                   className="p-4 rounded-lg border border-[oklch(0.88_0.008_240)] hover:border-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.97_0.003_240)] transition-all group"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-[Outfit] font-600 text-[oklch(0.18_0.015_240)] group-hover:text-[oklch(0.40_0.11_195)] transition-colors">
+                    <span className="font-[Outfit] font-semibold text-[oklch(0.18_0.015_240)] group-hover:text-[oklch(0.40_0.11_195)] transition-colors">
                       {service.label}
                     </span>
                     <ArrowRight size={16} className="text-[oklch(0.40_0.11_195)] opacity-0 group-hover:opacity-100 transition-opacity" />

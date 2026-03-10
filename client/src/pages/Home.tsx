@@ -20,48 +20,48 @@ const getServices = (lang: 'en' | 'zh') => [
     title: t(lang, 'services.protection'),
     desc: t(lang, 'home.protection') || "Life assurance, serious illness cover, income protection and more — safeguard what matters most.",
     href: "/protection",
-    color: "oklch(0.93_0.04_195)",
-    iconColor: "oklch(0.40_0.11_195)",
+    color: "oklch(0.92_0.02_160)",
+    iconColor: "oklch(0.40_0.10_160)",
   },
   {
     icon: <TrendingUp size={26} />,
     title: t(lang, 'services.pensions'),
     desc: t(lang, 'home.pensions') || "Personal pensions, occupational schemes, ARFs, PRSAs — plan the retirement you deserve.",
     href: "/pensions",
-    color: "oklch(0.95_0.03_155)",
-    iconColor: "oklch(0.38_0.12_155)",
+    color: "oklch(0.92_0.02_160)",
+    iconColor: "oklch(0.40_0.10_160)",
   },
   {
     icon: <Heart size={26} />,
     title: t(lang, 'services.healthInsurance'),
     desc: t(lang, 'home.healthInsurance') || "Private medical insurance plans for individuals, families and businesses across all budgets.",
     href: "/health-insurance",
-    color: "oklch(0.95_0.03_25)",
-    iconColor: "oklch(0.55_0.18_25)",
+    color: "oklch(0.92_0.02_160)",
+    iconColor: "oklch(0.40_0.10_160)",
   },
   {
     icon: <Building2 size={26} />,
     title: t(lang, 'services.generalInsurance'),
     desc: t(lang, 'home.generalInsurance') || "Home, motor, business and liability insurance — comprehensive cover at competitive rates.",
     href: "/general-insurance",
-    color: "oklch(0.95_0.03_280)",
-    iconColor: "oklch(0.45_0.14_280)",
+    color: "oklch(0.92_0.02_160)",
+    iconColor: "oklch(0.40_0.10_160)",
   },
   {
     icon: <HomeIcon size={26} />,
     title: t(lang, 'services.mortgages'),
     desc: t(lang, 'home.mortgages') || "First-time buyer, mover or remortgage — we guide you from application to drawdown.",
     href: "/mortgages",
-    color: "oklch(0.95_0.04_75)",
-    iconColor: "oklch(0.55_0.16_75)",
+    color: "oklch(0.92_0.02_160)",
+    iconColor: "oklch(0.40_0.10_160)",
   },
   {
     icon: <BarChart3 size={26} />,
     title: t(lang, 'services.investments'),
     desc: t(lang, 'home.investments') || "Savings plans, investment bonds and portfolio management to grow your wealth over time.",
     href: "/investments",
-    color: "oklch(0.95_0.03_195)",
-    iconColor: "oklch(0.40_0.11_195)",
+    color: "oklch(0.92_0.02_160)",
+    iconColor: "oklch(0.40_0.10_160)",
   },
 ];
 
@@ -140,21 +140,21 @@ export default function Home() {
         <div className="relative container py-20">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
-              <span className="w-2 h-2 rounded-full bg-[oklch(0.76_0.19_75)]"></span>
+              <span className="w-2 h-2 rounded-full bg-[oklch(0.82_0.17_70)]"></span>
               <span className="text-white/90 text-sm font-inter">{t(language, 'home.regulated')}</span>
             </div>
             <h1 className="font-[Outfit] font-800 text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-5">
               {language === 'en' ? (
-                <>Your Financial<br /><span className="text-[oklch(0.76_0.19_75)]">Future, Simplified.</span></>
+                <>Your Financial<br /><span className="text-[oklch(0.82_0.17_70)]">Future, Simplified.</span></>
               ) : (
-                <>您的财务<br /><span className="text-[oklch(0.76_0.19_75)]">未来，简单明了。</span></>
+                <>您的财务<br /><span className="text-[oklch(0.82_0.17_70)]">未来，简单明了。</span></>
               )}
             </h1>
             <p className="text-white/80 text-lg leading-relaxed mb-8 font-inter max-w-xl">
               {t(language, 'home.description')}
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/contact" className="btn-amber text-sm px-6 py-3.5 flex items-center gap-2">
+              <Link href="/contact" className="btn-gold text-sm px-6 py-3.5 flex items-center gap-2">
                 {t(language, 'home.learnMore')} <ArrowRight size={16} />
               </Link>
               <a href="tel:+35312345678" className="btn-white text-sm px-6 py-3.5 flex items-center gap-2">
@@ -166,19 +166,19 @@ export default function Home() {
       </section>
 
       {/* Stats */}
-      <section className="bg-white py-12 border-b border-[oklch(0.88_0.008_240)]">
+      <section className="bg-white py-12 border-b border-[oklch(0.92_0.02_160)]">
         <div className="container grid grid-cols-3 gap-8 text-center">
           <div>
-            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.11_195)] mb-2">20+</div>
-            <div className="text-sm text-[oklch(0.52_0.015_240)] font-inter">{t(language, 'home.yearsExp')}</div>
+            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_160)] mb-2">20+</div>
+            <div className="text-sm text-[oklch(0.52_0.015_160)] font-inter">{t(language, 'home.yearsExp')}</div>
           </div>
           <div>
-            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.11_195)] mb-2">5,000+</div>
-            <div className="text-sm text-[oklch(0.52_0.015_240)] font-inter">{t(language, 'home.happyClients')}</div>
+            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_160)] mb-2">5,000+</div>
+            <div className="text-sm text-[oklch(0.52_0.015_160)] font-inter">{t(language, 'home.happyClients')}</div>
           </div>
           <div>
-            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.11_195)] mb-2">100%</div>
-            <div className="text-sm text-[oklch(0.52_0.015_240)] font-inter">{t(language, 'home.independentAdvice')}</div>
+            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_160)] mb-2">100%</div>
+            <div className="text-sm text-[oklch(0.52_0.015_160)] font-inter">{t(language, 'home.independentAdvice')}</div>
           </div>
         </div>
       </section>
@@ -214,7 +214,7 @@ export default function Home() {
                 <p className="text-sm text-[oklch(0.52_0.015_240)] font-inter leading-relaxed mb-4">
                   {s.desc}
                 </p>
-                <div className="flex items-center gap-2 text-[oklch(0.40_0.11_195)] font-[Outfit] font-600 text-sm group-hover:gap-3 transition-all">
+                <div className="flex items-center gap-2 text-[oklch(0.40_0.11_195)] font-[Outfit] font-semibold text-sm group-hover:gap-3 transition-all">
                   {language === 'en' ? 'Learn more' : '了解更多'} <ArrowRight size={14} />
                 </div>
               </Link>
@@ -274,7 +274,7 @@ export default function Home() {
                   "{testi.text}"
                 </p>
                 <div>
-                  <div className="font-[Outfit] font-600 text-[oklch(0.18_0.015_240)]">
+                  <div className="font-[Outfit] font-semibold text-[oklch(0.18_0.015_240)]">
                     {testi.author}
                   </div>
                   <div className="text-xs text-[oklch(0.52_0.015_240)] font-inter">

@@ -59,7 +59,7 @@ export default function Footer() {
 
         {/* Services */}
         <div>
-          <h4 className="font-[Outfit] font-600 text-white text-sm uppercase tracking-wider mb-4">{t(language, 'footer.ourServices')}</h4>
+          <h4 className="font-[Outfit] font-semibold text-white text-sm uppercase tracking-wider mb-4">{t(language, 'footer.ourServices')}</h4>
           <ul className="space-y-2.5">
             {services.map((s) => (
               <li key={s.href}>
@@ -73,7 +73,7 @@ export default function Footer() {
 
         {/* Company */}
         <div>
-          <h4 className="font-[Outfit] font-600 text-white text-sm uppercase tracking-wider mb-4">{t(language, 'footer.company')}</h4>
+          <h4 className="font-[Outfit] font-semibold text-white text-sm uppercase tracking-wider mb-4">{t(language, 'footer.company')}</h4>
           <ul className="space-y-2.5">
             {company.map((c) => (
               <li key={c.href}>
@@ -97,7 +97,7 @@ export default function Footer() {
 
         {/* Contact */}
         <div>
-          <h4 className="font-[Outfit] font-600 text-white text-sm uppercase tracking-wider mb-4">{t(language, 'footer.contactUs')}</h4>
+          <h4 className="font-[Outfit] font-semibold text-white text-sm uppercase tracking-wider mb-4">{t(language, 'footer.contactUs')}</h4>
           <ul className="space-y-3">
             <li className="flex items-start gap-2.5 text-white/70 text-sm">
               <MapPin size={15} className="mt-0.5 shrink-0 text-[oklch(0.76_0.19_75)]" />
