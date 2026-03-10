@@ -42,7 +42,7 @@ export default function Navbar() {
   return (
     <>
       {/* Top bar */}
-      <div className="bg-[oklch(0.40_0.10_160)] text-white text-sm py-2 hidden md:block">
+      <div className="bg-[oklch(0.40_0.10_155)] text-white text-sm py-2 hidden md:block">
         <div className="container flex justify-between items-center">
           <span className="text-white/80 font-inter text-xs">{t(language, 'footer.regulatedCB')}</span>
           <div className="flex items-center gap-6">
@@ -61,7 +61,7 @@ export default function Navbar() {
       {/* Main nav */}
       <nav
         className={`sticky top-0 z-50 bg-white transition-all duration-300 ${
-          scrolled ? "shadow-md" : "border-b border-[oklch(0.92_0.02_160)]"
+          scrolled ? "shadow-md" : "border-b border-[oklch(0.92_0.02_155)]"
         }`}
       >
         <div className="container flex items-center justify-between h-16 md:h-18">
@@ -73,10 +73,9 @@ export default function Navbar() {
               className="h-10 w-auto object-contain group-hover:opacity-80 transition-opacity"
             />
             <div>
-              <div className="font-[Outfit] font-bold text-[oklch(0.25_0.06_160)] text-lg leading-tight">
-                EasyToFin
+             <div className="font-[Outfit] font-semibold text-[oklch(0.25_0.06_155)] text-lg leading-tight">              EasyToFin
               </div>
-              <div className="text-[10px] text-[oklch(0.52_0.015_160)] leading-tight tracking-wide uppercase font-inter">
+              <div className="text-[10px] text-[oklch(0.52_0.015_155)] leading-tight tracking-wide uppercase font-inter">
                 Financial Services
               </div>
             </div>
@@ -84,7 +83,7 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1">
-            <Link href="/" className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.96_0.01_160)] transition-colors">
+            <Link href="/" className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.96_0.01_155)] transition-colors">
               {t(language, 'nav.home')}
             </Link>
             
@@ -94,33 +93,33 @@ export default function Navbar() {
               onMouseEnter={() => setServicesOpen(true)}
               onMouseLeave={() => setServicesOpen(false)}
             >
-              <button className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.96_0.01_160)] transition-colors flex items-center gap-1">
+              <button className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.96_0.01_155)] transition-colors flex items-center gap-1">
                 {t(language, 'nav.services')}
                 <ChevronDown size={15} className={`transition-transform duration-200 ${servicesOpen ? "rotate-180" : ""}`} />
               </button>
               
               {servicesOpen && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[520px] bg-white rounded-xl shadow-xl border border-[oklch(0.92_0.02_160)] p-4 grid grid-cols-2 gap-2 z-50">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[520px] bg-white rounded-xl shadow-xl border border-[oklch(0.92_0.02_155)] p-4 grid grid-cols-2 gap-2 z-50">
                   {services.map((s) => (
                     <Link
                       key={s.href}
                       href={s.href}
-                      className="flex flex-col p-3 rounded-lg hover:bg-[oklch(0.96_0.01_160)] transition-colors group"
+                      className="flex flex-col p-3 rounded-lg hover:bg-[oklch(0.96_0.01_155)] transition-colors group"
                     >
-                      <span className="font-[Outfit] font-semibold text-[oklch(0.25_0.06_160)] text-sm group-hover:text-[oklch(0.40_0.10_160)] transition-colors">
+                      <span className="font-[Outfit] font-semibold text-[oklch(0.25_0.06_155)] text-sm group-hover:text-[oklch(0.40_0.10_155)] transition-colors">
                         {s.label}
                       </span>
-                      <span className="text-xs text-[oklch(0.52_0.015_160)] mt-0.5">{s.desc}</span>
+                      <span className="text-xs text-[oklch(0.52_0.015_155)] mt-0.5">{s.desc}</span>
                     </Link>
                   ))}
                 </div>
               )}
             </div>
 
-            <Link href="/about" className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.96_0.01_160)] transition-colors">
+            <Link href="/about" className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.96_0.01_155)] transition-colors">
               {t(language, 'nav.aboutUs')}
             </Link>
-            <Link href="/contact" className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.96_0.01_160)] transition-colors">
+            <Link href="/contact" className="nav-link px-3 py-2 rounded-md hover:bg-[oklch(0.96_0.01_155)] transition-colors">
               {t(language, 'nav.contact')}
             </Link>
           </div>
@@ -129,7 +128,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-[Outfit] font-semibold text-[oklch(0.40_0.10_160)] hover:bg-[oklch(0.92_0.02_160)] transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-[Outfit] font-semibold text-[oklch(0.40_0.10_155)] hover:bg-[oklch(0.92_0.02_155)] transition-colors"
               title={language === 'en' ? 'Switch to Chinese' : 'Switch to English'}
             >
               <Globe size={16} />
@@ -142,7 +141,7 @@ export default function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden p-2 rounded-md text-[oklch(0.25_0.06_160)] hover:bg-[oklch(0.96_0.01_160)] transition-colors"
+            className="md:hidden p-2 rounded-md text-[oklch(0.25_0.06_155)] hover:bg-[oklch(0.96_0.01_155)] transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -152,26 +151,26 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="md:hidden bg-white border-t border-[oklch(0.92_0.02_160)] px-4 py-4 space-y-1">
-            <Link href="/" className="block px-3 py-2.5 rounded-lg text-[oklch(0.25_0.06_160)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_160)] transition-colors">
+          <div className="md:hidden bg-white border-t border-[oklch(0.92_0.02_155)] px-4 py-4 space-y-1">
+            <Link href="/" className="block px-3 py-2.5 rounded-lg text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors">
               {t(language, 'nav.home')}
             </Link>
-            <div className="px-3 py-1.5 text-xs font-semibold font-[Outfit] text-[oklch(0.52_0.015_160)] uppercase tracking-wider">
+            <div className="px-3 py-1.5 text-xs font-semibold font-[Outfit] text-[oklch(0.52_0.015_155)] uppercase tracking-wider">
               {t(language, 'nav.services')}
             </div>
             {services.map((s) => (
               <Link
                 key={s.href}
                 href={s.href}
-                className="block px-5 py-2 rounded-lg text-[oklch(0.25_0.06_160)] font-inter text-sm hover:bg-[oklch(0.96_0.01_160)] hover:text-[oklch(0.40_0.10_160)] transition-colors"
+                className="block px-5 py-2 rounded-lg text-[oklch(0.25_0.06_155)] font-inter text-sm hover:bg-[oklch(0.96_0.01_155)] hover:text-[oklch(0.40_0.10_155)] transition-colors"
               >
                 {s.label}
               </Link>
             ))}
-            <Link href="/about" className="block px-3 py-2.5 rounded-lg text-[oklch(0.25_0.06_160)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_160)] transition-colors">
+            <Link href="/about" className="block px-3 py-2.5 rounded-lg text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors">
               {t(language, 'nav.aboutUs')}
             </Link>
-            <Link href="/contact" className="block px-3 py-2.5 rounded-lg text-[oklch(0.25_0.06_160)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_160)] transition-colors">
+            <Link href="/contact" className="block px-3 py-2.5 rounded-lg text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors">
               {t(language, 'nav.contact')}
             </Link>
             <div className="pt-2">
@@ -179,18 +178,18 @@ export default function Navbar() {
                 {t(language, 'nav.getQuote')}
               </Link>
             </div>
-            <div className="pt-2 border-t border-[oklch(0.92_0.02_160)] space-y-1">
+            <div className="pt-2 border-t border-[oklch(0.92_0.02_155)] space-y-1">
               <button
                 onClick={toggleLanguage}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-[Outfit] font-semibold text-[oklch(0.40_0.10_160)] w-full rounded-lg hover:bg-[oklch(0.92_0.02_160)] transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-sm font-[Outfit] font-semibold text-[oklch(0.40_0.10_155)] w-full rounded-lg hover:bg-[oklch(0.92_0.02_155)] transition-colors"
               >
                 <Globe size={16} />
                 {language === 'en' ? '中文' : 'EN'}
               </button>
-              <a href="tel:+35312345678" className="flex items-center gap-2 px-3 py-2 text-sm text-[oklch(0.52_0.015_160)]">
+              <a href="tel:+35312345678" className="flex items-center gap-2 px-3 py-2 text-sm text-[oklch(0.52_0.015_155)]">
                 <Phone size={14} /> +353 1 234 5678
               </a>
-              <a href="mailto:info@easytofin.ie" className="flex items-center gap-2 px-3 py-2 text-sm text-[oklch(0.52_0.015_160)]">
+              <a href="mailto:info@easytofin.ie" className="flex items-center gap-2 px-3 py-2 text-sm text-[oklch(0.52_0.015_155)]">
                 <Mail size={14} /> info@easytofin.ie
               </a>
             </div>

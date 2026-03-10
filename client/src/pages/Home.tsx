@@ -20,48 +20,48 @@ const getServices = (lang: 'en' | 'zh') => [
     title: t(lang, 'services.protection'),
     desc: t(lang, 'home.protection') || "Life assurance, serious illness cover, income protection and more — safeguard what matters most.",
     href: "/protection",
-    color: "oklch(0.92_0.02_160)",
-    iconColor: "oklch(0.40_0.10_160)",
+    color: "oklch(0.92_0.02_155)",
+    iconColor: "oklch(0.40_0.10_155)",
   },
   {
     icon: <TrendingUp size={26} />,
     title: t(lang, 'services.pensions'),
     desc: t(lang, 'home.pensions') || "Personal pensions, occupational schemes, ARFs, PRSAs — plan the retirement you deserve.",
     href: "/pensions",
-    color: "oklch(0.92_0.02_160)",
-    iconColor: "oklch(0.40_0.10_160)",
+    color: "oklch(0.92_0.02_155)",
+    iconColor: "oklch(0.40_0.10_155)",
   },
   {
     icon: <Heart size={26} />,
     title: t(lang, 'services.healthInsurance'),
     desc: t(lang, 'home.healthInsurance') || "Private medical insurance plans for individuals, families and businesses across all budgets.",
     href: "/health-insurance",
-    color: "oklch(0.92_0.02_160)",
-    iconColor: "oklch(0.40_0.10_160)",
+    color: "oklch(0.92_0.02_155)",
+    iconColor: "oklch(0.40_0.10_155)",
   },
   {
     icon: <Building2 size={26} />,
     title: t(lang, 'services.generalInsurance'),
     desc: t(lang, 'home.generalInsurance') || "Home, motor, business and liability insurance — comprehensive cover at competitive rates.",
     href: "/general-insurance",
-    color: "oklch(0.92_0.02_160)",
-    iconColor: "oklch(0.40_0.10_160)",
+    color: "oklch(0.92_0.02_155)",
+    iconColor: "oklch(0.40_0.10_155)",
   },
   {
     icon: <HomeIcon size={26} />,
     title: t(lang, 'services.mortgages'),
     desc: t(lang, 'home.mortgages') || "First-time buyer, mover or remortgage — we guide you from application to drawdown.",
     href: "/mortgages",
-    color: "oklch(0.92_0.02_160)",
-    iconColor: "oklch(0.40_0.10_160)",
+    color: "oklch(0.92_0.02_155)",
+    iconColor: "oklch(0.40_0.10_155)",
   },
   {
     icon: <BarChart3 size={26} />,
     title: t(lang, 'services.investments'),
     desc: t(lang, 'home.investments') || "Savings plans, investment bonds and portfolio management to grow your wealth over time.",
     href: "/investments",
-    color: "oklch(0.92_0.02_160)",
-    iconColor: "oklch(0.40_0.10_160)",
+    color: "oklch(0.92_0.02_155)",
+    iconColor: "oklch(0.40_0.10_155)",
   },
 ];
 
@@ -166,19 +166,19 @@ export default function Home() {
       </section>
 
       {/* Stats */}
-      <section className="bg-white py-12 border-b border-[oklch(0.92_0.02_160)]">
+      <section className="bg-white py-12 border-b border-[oklch(0.92_0.02_155)]">
         <div className="container grid grid-cols-3 gap-8 text-center">
           <div>
-            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_160)] mb-2">20+</div>
-            <div className="text-sm text-[oklch(0.52_0.015_160)] font-inter">{t(language, 'home.yearsExp')}</div>
+            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_155)] mb-2">20+</div>
+            <div className="text-sm text-[oklch(0.52_0.015_155)] font-inter">{t(language, 'home.yearsExp')}</div>
           </div>
           <div>
-            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_160)] mb-2">5,000+</div>
-            <div className="text-sm text-[oklch(0.52_0.015_160)] font-inter">{t(language, 'home.happyClients')}</div>
+            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_155)] mb-2">5,000+</div>
+            <div className="text-sm text-[oklch(0.52_0.015_155)] font-inter">{t(language, 'home.happyClients')}</div>
           </div>
           <div>
-            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_160)] mb-2">100%</div>
-            <div className="text-sm text-[oklch(0.52_0.015_160)] font-inter">{t(language, 'home.independentAdvice')}</div>
+            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_155)] mb-2">100%</div>
+            <div className="text-sm text-[oklch(0.52_0.015_155)] font-inter">{t(language, 'home.independentAdvice')}</div>
           </div>
         </div>
       </section>
