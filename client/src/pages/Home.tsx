@@ -14,7 +14,7 @@ import { t } from "@/lib/i18n";
 
 const HERO_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/hero-banner-DQ43hiRTQkWyHmsrFp5TGz.webp";
 
-const getServices = (lang: 'en' | 'zh') => [
+const getServices = (lang: 'en' | 'zh' | 'pl') => [
   {
     icon: <Shield size={26} />,
     title: t(lang, 'services.protection'),
@@ -65,7 +65,7 @@ const getServices = (lang: 'en' | 'zh') => [
   },
 ];
 
-const getWhyPoints = (lang: 'en' | 'zh') => [
+const getWhyPoints = (lang: 'en' | 'zh' | 'pl') => [
   {
     icon: <CheckCircle2 size={22} />,
     title: t(lang, 'why.impartial'),
@@ -98,23 +98,23 @@ const getWhyPoints = (lang: 'en' | 'zh') => [
   },
 ];
 
-const getTestimonials = (lang: 'en' | 'zh') => [
+const getTestimonials = (lang: 'en' | 'zh' | 'pl') => [
   {
     text: t(lang, 'testimonials.sarah'),
     author: "Sarah M.",
-    location: lang === 'en' ? "Dublin" : "都柏林",
+    location: lang === 'en' ? "Dublin" : lang === 'zh' ? "都柏林" : "Dublin",
     rating: 5,
   },
   {
     text: t(lang, 'testimonials.james'),
     author: "James O'Brien",
-    location: lang === 'en' ? "Cork" : "科克",
+    location: lang === 'en' ? "Cork" : lang === 'zh' ? "科克" : "Cork",
     rating: 5,
   },
   {
     text: t(lang, 'testimonials.aoife'),
     author: "Aoife K.",
-    location: lang === 'en' ? "Galway" : "戈尔韦",
+    location: lang === 'en' ? "Galway" : lang === 'zh' ? "戈尔韦" : "Galway",
     rating: 5,
   },
 ];
@@ -215,7 +215,7 @@ export default function Home() {
                   {s.desc}
                 </p>
                 <div className="flex items-center gap-2 text-[oklch(0.40_0.11_195)] font-[Outfit] font-semibold text-sm group-hover:gap-3 transition-all">
-                  {language === 'en' ? 'Learn more' : '了解更多'} <ArrowRight size={14} />
+                  {t(language, 'home.learnMore')} <ArrowRight size={14} />
                 </div>
               </Link>
             ))}

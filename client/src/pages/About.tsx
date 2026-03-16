@@ -11,7 +11,7 @@ import { t } from "@/lib/i18n";
 
 const TEAM_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/about-team-Y4XQMAH63T64YtEXuxPddb.webp";
 
-const getValues = (lang: 'en' | 'zh') => [
+const getValues = (lang: 'en' | 'zh' | 'pl') => [
   {
     icon: <Shield size={22} />,
     title: t(lang, 'why.integrity'),

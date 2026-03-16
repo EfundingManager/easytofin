@@ -11,7 +11,7 @@ import { t } from "@/lib/i18n";
 
 const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/e3c1c2586bcbb90a41195e7460b08170_179c73fd.png";
 
-const getServices = (lang: 'en' | 'zh') => [
+const getServices = (lang: 'en' | 'zh' | 'pl') => [
   { label: t(lang, 'services.protection'), href: "/protection", desc: t(lang, 'serviceDesc.protection') },
   { label: t(lang, 'services.pensions'), href: "/pensions", desc: t(lang, 'serviceDesc.pensions') },
   { label: t(lang, 'services.healthInsurance'), href: "/health-insurance", desc: t(lang, 'serviceDesc.healthInsurance') },
@@ -129,10 +129,10 @@ export default function Navbar() {
             <button
               onClick={toggleLanguage}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-[Outfit] font-semibold text-[oklch(0.40_0.10_155)] hover:bg-[oklch(0.92_0.02_155)] transition-colors"
-              title={language === 'en' ? 'Switch to Chinese' : 'Switch to English'}
+              title={language === 'en' ? 'Switch to Chinese' : language === 'zh' ? 'Switch to Polish' : 'Switch to English'}
             >
               <Globe size={16} />
-              <span className="text-xs">{language === 'en' ? '中文' : 'EN'}</span>
+              <span className="text-xs">{language === 'en' ? '中文' : language === 'zh' ? 'PL' : 'EN'}</span>
             </button>
             <Link href="/contact" className="btn-gold text-sm px-5 py-2.5">
               {t(language, 'nav.getQuote')}
@@ -184,7 +184,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 px-3 py-2 text-sm font-[Outfit] font-semibold text-[oklch(0.40_0.10_155)] w-full rounded-lg hover:bg-[oklch(0.92_0.02_155)] transition-colors"
               >
                 <Globe size={16} />
-                {language === 'en' ? '中文' : 'EN'}
+                {language === 'en' ? '中文' : language === 'zh' ? 'PL' : 'EN'}
               </button>
               <a href="tel:+35312345678" className="flex items-center gap-2 px-3 py-2 text-sm text-[oklch(0.52_0.015_155)]">
                 <Phone size={14} /> +353 1 234 5678

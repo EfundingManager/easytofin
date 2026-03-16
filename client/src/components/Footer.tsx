@@ -7,7 +7,7 @@ import { Phone, Mail, MapPin, Facebook, Linkedin, Twitter } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
 
-const getServices = (lang: 'en' | 'zh') => [
+const getServices = (lang: 'en' | 'zh' | 'pl') => [
   { label: t(lang, 'services.protection'), href: "/protection" },
   { label: t(lang, 'services.pensions'), href: "/pensions" },
   { label: t(lang, 'services.healthInsurance'), href: "/health-insurance" },
@@ -16,7 +16,7 @@ const getServices = (lang: 'en' | 'zh') => [
   { label: t(lang, 'services.investments'), href: "/investments" },
 ];
 
-const getCompany = (lang: 'en' | 'zh') => [
+const getCompany = (lang: 'en' | 'zh' | 'pl') => [
   { label: t(lang, 'nav.aboutUs'), href: "/about" },
   { label: t(lang, 'common.contactUs'), href: "/contact" },
 ];

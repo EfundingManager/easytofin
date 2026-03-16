@@ -15,7 +15,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // Load language from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('language') as Language | null;
-    if (saved && (saved === 'en' || saved === 'zh')) {
+    if (saved && (saved === 'en' || saved === 'zh' || saved === 'pl')) {
       setLanguageState(saved);
     }
   }, []);
@@ -26,7 +26,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleLanguage = () => {
-    const newLang = language === 'en' ? 'zh' : 'en';
+    const langs: Language[] = ['en', 'zh', 'pl'];
+    const currentIndex = langs.indexOf(language);
+    const newLang = langs[(currentIndex + 1) % langs.length];
     setLanguage(newLang);
   };
 
