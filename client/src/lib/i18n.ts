@@ -13,6 +13,7 @@ export const translations = {
       aboutUs: 'About Us',
       contact: 'Contact',
       getQuote: 'Get a Quote',
+      language: 'Language',
     },
     // Services
     services: {
@@ -342,6 +343,7 @@ export const translations = {
       aboutUs: '关于我们',
       contact: '联系我们',
       getQuote: '获取报价',
+      language: '语言',
     },
     // Services
     services: {
@@ -671,6 +673,7 @@ export const translations = {
       aboutUs: 'O nas',
       contact: 'Kontakt',
       getQuote: 'Uzyskaj wycenę',
+      language: 'Język',
     },
     // Services
     services: {
