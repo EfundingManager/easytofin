@@ -9,7 +9,7 @@ import { Menu, X, ChevronDown, Phone, Mail, Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
 
-const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/e3c1c2586bcbb90a41195e7460b08170_179c73fd.png";
+const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/pasted_file_zMR7uG_c21572416a1a566c2aac129c5ff4edc3_6bbffacd.jpg";
 
 const getServices = (lang: 'en' | 'zh' | 'pl') => [
   { label: t(lang, 'services.protection'), href: "/protection", desc: t(lang, 'serviceDesc.protection') },
