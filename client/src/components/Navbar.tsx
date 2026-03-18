@@ -9,7 +9,7 @@ import { Menu, X, ChevronDown, Phone, Mail, Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
 
-const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/pasted_file_zMR7uG_c21572416a1a566c2aac129c5ff4edc3_6bbffacd.jpg";
+const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/pasted_file_vPhGVo_截屏2026-03-1810.38.12_5ed1a528.png";
 
 const LANGUAGE_OPTIONS = [
   { code: 'en' as const, label: 'English', nativeLabel: 'English' },
@@ -83,13 +83,13 @@ export default function Navbar() {
       <nav className={`sticky top-0 z-40 w-full transition-all duration-200 ${scrolled ? 'bg-white shadow-md' : 'bg-white'}`}>
         <div className="container flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
+          <Link href="/" className="flex items-center gap-3 group">
             <img 
               src={LOGO_URL} 
               alt="EasyToFin Logo" 
-              className="h-10 w-auto object-contain group-hover:opacity-80 transition-opacity"
+              className="h-14 w-auto object-contain group-hover:opacity-80 transition-opacity"
             />
-            <div></div>
+            <span className="hidden sm:inline text-[oklch(0.25_0.06_155)] font-[Outfit] font-bold text-lg tracking-wide">EasyToFin</span>
           </Link>
 
           {/* Desktop nav links */}
