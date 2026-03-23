@@ -150,7 +150,7 @@ export default function Home() {
                 <>您的财务<br /><span className="text-[oklch(0.82_0.17_70)]">未来，简单明了。</span></>
               )}
             </h1>
-            <p className="text-white/80 text-lg leading-relaxed mb-8 font-inter max-w-xl">
+            <p className="text-white/80 text-lg leading-relaxed mb-8 font-inter max-w-xl font-semibold">
               {t(language, 'home.description')}
             </p>
             <div className="flex flex-wrap gap-4">
