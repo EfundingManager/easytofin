@@ -89,12 +89,12 @@ export default function Navbar() {
               alt="EasyToFin Logo" 
               className="h-14 w-auto object-contain group-hover:opacity-80 transition-opacity"
             />
-            <span className="hidden sm:inline text-[oklch(0.25_0.06_155)] font-[Outfit] font-bold text-lg tracking-wide">EasyToFin</span>
+            <span className="hidden sm:inline text-[oklch(0.25_0.06_155)] font-[Outfit] font-bold text-2xl tracking-wide">EasyToFin</span>
           </Link>
 
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-1">
-            <Link href="/" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-base">
+            <Link href="/" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-xl">
               {t(language, 'nav.home')}
             </Link>
 
@@ -102,7 +102,7 @@ export default function Navbar() {
             <div className="relative group">
               <button
                 onClick={() => setServicesOpen(!servicesOpen)}
-                className="flex items-center gap-1 px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-base"
+                className="flex items-center gap-1 px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-xl"
               >
                 {t(language, 'nav.services')}
                 <ChevronDown size={14} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
@@ -125,10 +125,10 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link href="/about" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-base">
+            <Link href="/about" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-xl">
               {t(language, 'nav.aboutUs')}
             </Link>
-            <Link href="/contact" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-base">
+            <Link href="/contact" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-xl">
               {t(language, 'nav.contact')}
             </Link>
           </div>
@@ -142,7 +142,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-[Outfit] font-semibold text-[oklch(0.40_0.10_155)] hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-transparent hover:border-[oklch(0.92_0.02_155)]"
               >
                 <Globe size={16} />
-                <span>{currentLanguage?.nativeLabel}</span>
+                <span className="text-base">{currentLanguage?.nativeLabel}</span>
                 <ChevronDown size={14} className={`transition-transform ${languageDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
@@ -175,7 +175,7 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link href="/contact" className="btn-gold text-sm px-5 py-2.5">
+            <Link href="/contact" className="btn-gold text-base px-5 py-2.5">
               {t(language, 'nav.getQuote')}
             </Link>
           </div>
