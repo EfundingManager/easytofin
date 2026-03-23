@@ -94,7 +94,7 @@ export default function Navbar() {
 
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-1">
-            <Link href="/" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-sm">
+            <Link href="/" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-base">
               {t(language, 'nav.home')}
             </Link>
 
@@ -102,7 +102,7 @@ export default function Navbar() {
             <div className="relative group">
               <button
                 onClick={() => setServicesOpen(!servicesOpen)}
-                className="flex items-center gap-1 px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-sm"
+                className="flex items-center gap-1 px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-base"
               >
                 {t(language, 'nav.services')}
                 <ChevronDown size={14} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
@@ -125,10 +125,10 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link href="/about" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-sm">
+            <Link href="/about" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-base">
               {t(language, 'nav.aboutUs')}
             </Link>
-            <Link href="/contact" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-sm">
+            <Link href="/contact" className="nav-link px-3 py-2 rounded-md text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors text-base">
               {t(language, 'nav.contact')}
             </Link>
           </div>
