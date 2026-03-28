@@ -8,8 +8,12 @@ export default function Pensions() {
 
   const subServices = [
     {
-      title: t(language, 'pensions.personalPensions'),
-      description: t(language, 'pensions.personalPensionsDesc'),
+      title: t(language, 'pensions.prsa'),
+      description: t(language, 'pensions.prsaDesc'),
+    },
+    {
+      title: t(language, 'pensions.arf'),
+      description: t(language, 'pensions.arfDesc'),
     },
     {
       title: t(language, 'pensions.occupational'),
@@ -22,14 +26,6 @@ export default function Pensions() {
     {
       title: t(language, 'pensions.avc'),
       description: t(language, 'pensions.avcDesc'),
-    },
-    {
-      title: t(language, 'pensions.prsa'),
-      description: t(language, 'pensions.prsaDesc'),
-    },
-    {
-      title: t(language, 'pensions.arf'),
-      description: t(language, 'pensions.arfDesc'),
     },
   ];
 
