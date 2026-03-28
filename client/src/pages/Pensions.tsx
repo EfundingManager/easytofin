@@ -45,6 +45,7 @@ export default function Pensions() {
         points: Array.isArray(whyPoints) ? whyPoints : [],
       }}
       introductionSection={{
+        title: t(language, 'pensions.whyPensions'),
         subtitle: typeof introductionSubtitle === 'string' ? introductionSubtitle : '',
         paragraphs: Array.isArray(introductionParagraphs) ? introductionParagraphs : [],
       }}
