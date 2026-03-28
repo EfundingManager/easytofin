@@ -46,36 +46,6 @@ export default function ServicePage({
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      {/* Hero */}
-      <section className="teal-gradient text-white py-16 md:py-20">
-        <div className="container">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-white/60 text-sm mb-6 font-inter">
-            <Link href="/" className="hover:text-white transition-colors">{breadcrumbHome}</Link>
-            <ChevronRight size={14} />
-            <span className="text-white">{title}</span>
-          </div>
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-12 h-12 rounded-lg bg-white/15 flex items-center justify-center text-white">
-                {icon}
-              </div>
-              <span className="inline-block bg-white/15 text-white/90 text-xs font-[Outfit] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full">
-                {language === 'en' ? 'Service' : '服务'}
-              </span>
-            </div>
-            <h1 className="font-[Outfit] font-800 text-4xl md:text-5xl text-white mb-4 leading-tight">
-              {title}
-            </h1>
-            <p className="text-white/80 text-lg font-inter leading-relaxed mb-6">
-              {tagline}
-            </p>
-            <p className="text-white/70 text-base font-inter leading-relaxed max-w-2xl">
-              {heroDescription}
-            </p>
-          </div>
-        </div>
-      </section>
 
       {/* Sub Services */}
       <section className="py-20 bg-white">
