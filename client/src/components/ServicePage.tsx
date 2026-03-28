@@ -87,7 +87,7 @@ export default function ServicePage({
             <div className="space-y-4 max-w-3xl">
               {introductionSection.title && (
                 <h4 className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-lg font-semibold">
-                  {introductionSection.title}
+                  {introductionSection.title === 'Why Choose EasyToFin?' ? (language === 'zh' ? '为什么选择EasyToFin？' : language === 'pl' ? 'Dlaczego wybrać EasyToFin?' : 'Why Choose EasyToFin?') : introductionSection.title}
                 </h4>
               )}
               {introductionSection.subtitle && (
