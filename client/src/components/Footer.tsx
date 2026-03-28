@@ -33,9 +33,11 @@ export default function Footer() {
         {/* Brand */}
         <div className="lg:col-span-1">
           <Link href="/" className="flex items-center gap-2.5 mb-4">
-            <div className="w-9 h-9 rounded-lg bg-[oklch(0.76_0.19_75)] flex items-center justify-center text-[oklch(0.15_0.02_30)] font-bold text-lg font-[Outfit]">
-              E
-            </div>
+            <img 
+              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/pasted_file_vPhGVo_截屏2026-03-1810.38.12_5ed1a528.png" 
+              alt="EasyToFin Logo" 
+              className="h-10 w-auto object-contain"
+            />
             <div>
               <div className="font-[Outfit] font-bold text-white text-lg leading-tight">EasyToFin</div>
               <div className="text-[10px] text-white/60 leading-tight tracking-wide uppercase">Financial Services</div>
