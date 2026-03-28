@@ -34,6 +34,7 @@ export default function Investments() {
   ];
 
   const whyPoints = t(language, 'investments.whyInvestmentsPoints');
+  const introductionContent = t(language, 'investments.introductionContent');
 
   return (
     <ServicePage
@@ -42,6 +43,11 @@ export default function Investments() {
       heroDescription={t(language, 'investments.heroDesc')}
       icon={<BarChart3 size={28} />}
       subServices={subServices}
+      introductionSection={{
+        title: t(language, 'services.investments'),
+        subtitle: t(language, 'investments.introductionSubtitle'),
+        paragraphs: Array.isArray(introductionContent) ? introductionContent : [],
+      }}
       whySection={{
         title: t(language, 'investments.whyInvestments'),
         points: Array.isArray(whyPoints) ? whyPoints : [],

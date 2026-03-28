@@ -188,6 +188,12 @@ export const translations = {
       internationalDesc: 'For expats and those working abroad, providing global medical cover with access to private hospitals worldwide.',
       dental: 'Dental Insurance',
       dentalDesc: 'Standalone dental insurance covering routine care, treatments and emergency dental work. Helps manage dental costs effectively.',
+      introductionSubtitle: 'Private health insurance ensures you have access to quality healthcare when you need it, without the stress of NHS waiting lists. Our team helps you find the right plan for your needs and budget.',
+      introductionContent: [
+        'Good health is your most valuable asset. Private health insurance gives you choice, control and peace of mind.',
+        'Whether you need routine check-ups, specialist consultations or emergency treatment, private cover ensures you get the care you need, when you need it.',
+        'At EasyToFin, we compare plans from all major providers and help you understand exactly what\'s covered, ensuring you make an informed decision.',
+      ],
       whyHealth: 'Why Private Health Insurance Matters',
       whyHealthPoints: [
         'Faster access to diagnosis and treatment — no waiting lists for private consultations.',
@@ -215,6 +221,12 @@ export const translations = {
       travelDesc: 'Single trip and annual multi-trip travel insurance for individuals and families. Covers medical emergencies, cancellation, baggage and more — worldwide.',
       liability: 'Liability Insurance',
       liabilityDesc: 'Public liability, employers liability and professional indemnity insurance for businesses and sole traders. Protect yourself against third-party claims.',
+      introductionSubtitle: 'General insurance protects what matters most — your home, your car, your business and your peace of mind. We help you find comprehensive cover at competitive prices.',
+      introductionContent: [
+        'Life is unpredictable. Accidents, theft, damage and unexpected events can happen to anyone. General insurance ensures you\'re protected when they do.',
+        'With so many providers and policies available, finding the right cover at the right price can be overwhelming. That\'s where we come in.',
+        'At EasyToFin, we compare the market, understand your specific needs, and recommend policies that give you genuine value and comprehensive protection.',
+      ],
       whyBroker: 'Why Choose Us as Your Broker',
       whyBrokerPoints: [
         'We\'re not tied to any single insurance company — we work for you.',
@@ -270,6 +282,12 @@ export const translations = {
       structuredDesc: 'Structured investment products with capital protection or capital at risk, offering fixed returns linked to market performance. Suitable for investors seeking certainty.',
       education: 'Education Savings Plans',
       educationDesc: 'Start saving for your child\'s education now. Flexible regular savings plans ensure funds are available when third-level costs arise.',
+      introductionSubtitle: 'Investing is one of the most powerful ways to build long-term wealth. Whether you\'re saving for retirement, education or a major life goal, the right investment strategy can help you achieve it.',
+      introductionContent: [
+        'The power of compound returns means that even small regular investments can grow significantly over time. Starting early gives your money more time to work for you.',
+        'However, choosing the right investments requires careful consideration of your goals, risk tolerance and timeframe. There\'s no one-size-fits-all approach.',
+        'At EasyToFin, our investment advisors take time to understand your circumstances and recommend a tailored strategy designed to help you reach your financial goals with confidence.',
+      ],
       whyInvest: 'Investing with EasyToFin',
       whyInvestPoints: [
         'We carefully assess your risk profile before providing any investment advice.',

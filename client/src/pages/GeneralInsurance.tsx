@@ -34,6 +34,7 @@ export default function GeneralInsurance() {
   ];
 
   const whyPoints = t(language, 'general.whyGeneralPoints');
+  const introductionContent = t(language, 'general.introductionContent');
 
   return (
     <ServicePage
@@ -42,6 +43,11 @@ export default function GeneralInsurance() {
       heroDescription={t(language, 'general.heroDesc')}
       icon={<Building2 size={28} />}
       subServices={subServices}
+      introductionSection={{
+        title: t(language, 'services.generalInsurance'),
+        subtitle: t(language, 'general.introductionSubtitle'),
+        paragraphs: Array.isArray(introductionContent) ? introductionContent : [],
+      }}
       whySection={{
         title: t(language, 'general.whyGeneral'),
         points: Array.isArray(whyPoints) ? whyPoints : [],

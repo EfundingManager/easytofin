@@ -34,6 +34,7 @@ export default function HealthInsurance() {
   ];
 
   const whyPoints = t(language, 'health.whyHealthPoints');
+  const introductionContent = t(language, 'health.introductionContent');
 
   return (
     <ServicePage
@@ -42,6 +43,11 @@ export default function HealthInsurance() {
       heroDescription={t(language, 'health.heroDesc')}
       icon={<Heart size={28} />}
       subServices={subServices}
+      introductionSection={{
+        title: t(language, 'services.healthInsurance'),
+        subtitle: t(language, 'health.introductionSubtitle'),
+        paragraphs: Array.isArray(introductionContent) ? introductionContent : [],
+      }}
       whySection={{
         title: t(language, 'health.whyHealth'),
         points: Array.isArray(whyPoints) ? whyPoints : [],
