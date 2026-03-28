@@ -81,9 +81,9 @@ export default function ServicePage({
           <div className="container">
             <div className="space-y-4 max-w-3xl">
               {introductionSection.title && (
-                <p className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base font-semibold text-lg">
+                <h4 className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-lg font-semibold">
                   {introductionSection.title}
-                </p>
+                </h4>
               )}
               {introductionSection.paragraphs.map((paragraph, i) => (
                 <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base">
