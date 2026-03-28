@@ -73,21 +73,7 @@ export default function About() {
                 <p>{t(language, 'about.p2')}</p>
                 <p>{t(language, 'about.p3')}</p>
               </div>
-              <div className="mt-8 grid grid-cols-2 gap-4">
-                {[
-                  { value: "20+", label: t(language, 'about.yearsExp') },
-                  { value: "5,000+", label: t(language, 'about.clientsServed') },
-                ].map((stat, i) => (
-                  <div key={i} className="p-4 rounded-lg bg-[oklch(0.97_0.003_240)] border border-[oklch(0.88_0.008_240)]">
-                    <div className="font-[Outfit] font-800 text-2xl text-[oklch(0.40_0.11_195)]">
-                      {stat.value}
-                    </div>
-                    <div className="text-xs text-[oklch(0.52_0.015_240)] mt-1">
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
+
             </div>
             <div className="rounded-2xl overflow-hidden shadow-lg">
               <img src={TEAM_IMG} alt={language === 'en' ? "EasyToFin team" : "EasyToFin团队"} className="w-full h-full object-cover" />
