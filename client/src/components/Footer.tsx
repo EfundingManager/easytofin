@@ -104,7 +104,8 @@ export default function Footer() {
             <li className="flex items-start gap-2.5 text-white/70 text-sm">
               <MapPin size={15} className="mt-0.5 shrink-0 text-[oklch(0.76_0.19_75)]" />
               <a href="https://www.google.com/maps/search/18+Cook+Street,+Cork+City,+Ireland" target="_blank" rel="noopener noreferrer" className="hover:text-[oklch(0.76_0.19_75)] transition-colors">
-                EasyToFin Financial Services Limited<br />18 Cook Street, Cork City, Ireland
+                <div>{t(language, 'footer.addressLine1')}</div>
+                <div>{t(language, 'footer.addressLine2')}</div>
               </a>
             </li>
             <li>
