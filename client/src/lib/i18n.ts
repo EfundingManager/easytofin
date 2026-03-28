@@ -128,7 +128,7 @@ export const translations = {
         'If you were to pass away, how would your family cope with the loss of your income? Would they be able to maintain their current lifestyle and meet their ongoing financial commitments?',
         'For many of our clients, the key challenge is finding the right level of protection at a cost that represents real value. Our dedicated team at EasyToFin Financial Services Limited is here to help you identify and arrange the policies that best suit your personal circumstances and protection needs.',
       ],
-      introductionSubtitle: 'Protection is a key foundation of financial planning. It helps ensure that if the unexpected happens—such as illness, injury, or death—your family will still have the financial support needed to maintain their lifestyle and meet ongoing commitments.',
+      introductionSubtitle: 'Protection is a vital part of financial planning, helping ensure your family remains financially secure if the unexpected happens, such as illness, injury, or death. Your income supports your lifestyle, daily expenses, and future plans, so any disruption can have a significant impact. At EasyToFin, we take the time to understand your personal circumstances and recommend tailored protection solutions that provide the right level of cover, peace of mind, and long-term financial security at a competitive cost.',
       introductionContent: [
         'Your income provides stability, covers daily expenses, and supports your family\'s future. If that income stops, even temporarily, the impact can be significant.',
         'That is why having the right protection in place is so important.',
@@ -485,7 +485,7 @@ export const translations = {
         '如果您不幸退世，您的家人如何应对您收入的丧失？他们是否能不能维持目前的生活方式并应对他们正在进行的财务义务？',
         '对于我们的许多客户来说，主要挑战是以合理的价格找到合适的保障水平。EasyToFin金融服务有限公司的专业团队就在此为您服务，帮助您识别並安排最適合您个人情况和保障需求的保单。',
       ],
-      introductionSubtitle: '保险是财务规划的关键基础。它有助于确保如果发生意外——例如疾病、伤害或死亡——您的家人仍将获得所需的财务支持，以维持其生活方式并应对持续的财务承诺。',
+      introductionSubtitle: '保险是财务规划的重要组成部分，有助于确保如果发生意外事件（如疾病、伤害或死亡），您的家人仍然保持财务安全。您的收入支持您的生活方式、日常开支和未来计划，因此任何中断都会产生重大影响。在EasyToFin，我们花时间了解您的个人情况，并推荐量身定制的保护解决方案，提供适当的保障水平、安心和长期财务安全，价格具有竞争力。',
       introductionContent: [
         '您的收入提供稳定性、支付日常开支并支持您家人的未来。如果该收入停止，即使是暂时的，影响也可能很大。',
         '这就是为什么拥有适当的保障如此重要。',
@@ -843,7 +843,7 @@ export const translations = {
         'Jeśli byś zmarł, jak Twoja rodzina poradziłaby sobie ze stratą Twojego dochodu? Czy byliby w stanie utrzymać swój obecny styl życia i spełnić swoje bieżące zobowiązania finansowe?',
         'Dla wielu naszych klientów głównym wyzwaniem jest znalezienie odpowiedniego poziomu ochrony w cenie, która reprezentuje rzeczywistą wartość. Nasz dedykowany zespół w EasyToFin Financial Services Limited jest tutaj, aby pomóc Ci zidentyfikować i zaorganizować polisy, które najlepiej odpowiadają Twojej osobistej sytuacji i potrzebom ochrony.',
       ],
-      introductionSubtitle: 'Ochrona jest niezbędną częścią solidnego planowania finansowego. Zapewnia spokój ducha, gwarantując, że jeśli dojdzie do czegoś nieoczekiwanego — poprzez chorobę, uraz lub utratę życia — bezpieczeństwo finansowe i styl życia Twojej rodziny pozostaną chronione.',
+      introductionSubtitle: 'Ochrona jest istotną częścią planowania finansowego, pomagając zapewnić, że jeśli dojdzie do czegoś nieoczekiwanego, takiego jak choroba, uraz lub śmierć, Twoja rodzina pozostaje finansowo bezpieczna. Twój dochód wspiera Twój styl życia, codzienne wydatki i plany na przyszłość, więc każda przerwa może mieć znaczny wpływ. W EasyToFin poświęcamy czas na zrozumienie Twojej osobistej sytuacji i rekomendujemy dostosowane rozwiązania ochrony, które zapewniają odpowiedni poziom ochrony, spokój ducha i długoterminowe bezpieczeństwo finansowe w konkurencyjnej cenie.',
       introductionContent: [
         'Twój dochód zapewnia stabilność, pokrywa codzienne wydatki i wspiera przyszłość Twojej rodziny. Jeśli ten dochód się zatrzyma, nawet tymczasowo, wpływ może być znaczący.',
         'Dlatego właśnie posiadanie odpowiedniej ochrony jest tak ważne.',
