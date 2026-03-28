@@ -28,6 +28,7 @@ interface ServicePageProps {
     paragraphs: string[];
   };
   introductionSection?: {
+    title?: string;
     paragraphs: string[];
   };
 }
@@ -79,6 +80,11 @@ export default function ServicePage({
         <section className="py-16 bg-[oklch(0.97_0.003_240)]">
           <div className="container">
             <div className="space-y-4 max-w-3xl">
+              {introductionSection.title && (
+                <p className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base font-semibold text-lg">
+                  {introductionSection.title}
+                </p>
+              )}
               {introductionSection.paragraphs.map((paragraph, i) => (
                 <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base">
                   {paragraph}
