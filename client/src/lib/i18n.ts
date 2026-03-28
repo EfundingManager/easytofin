@@ -318,8 +318,7 @@ export const translations = {
       selectService: 'Select a service...',
       tellUs: 'Tell us about your situation and what you\'re looking for...',
       generalEnquiry: 'General Enquiry',
-      monFri: 'Monday to Friday: 9:00am - 5:30pm',
-      sat: 'Saturday: 10:00am - 1:00pm',
+      monFri: 'Monday to Friday: 9:00am - 5:00pm',
     },
     // Footer
     footer: {

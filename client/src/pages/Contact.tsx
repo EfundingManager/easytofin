@@ -2,10 +2,11 @@
  * EasyToFin Contact Page — "Warm Expertise" design with bilingual support
  * Contact form, office hours, phone/email
  */
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { MapView } from "@/components/Map";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
 
@@ -91,7 +92,7 @@ export default function Contact() {
                   <MapPin size={20} className="shrink-0 mt-0.5 text-[oklch(0.40_0.11_195)]" />
                   <span className="font-inter text-sm">
                     EasyToFin Financial Services Limited<br />
-                    Dublin, Ireland
+                    18 Cook Street, Cork City, Ireland
                   </span>
                 </div>
               </div>
@@ -105,10 +106,7 @@ export default function Contact() {
                     <Clock size={16} className="text-[oklch(0.40_0.11_195)]" />
                     <span>{t(language, 'contact.monFri')}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock size={16} className="text-[oklch(0.40_0.11_195)]" />
-                    <span>{t(language, 'contact.sat')}</span>
-                  </div>
+
                 </div>
               </div>
             </div>
@@ -223,6 +221,41 @@ export default function Contact() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Map Section */}
+      <section className="py-16 bg-white border-t border-[oklch(0.88_0.008_240)]">
+        <div className="container">
+          <div className="mb-8">
+            <h2 className="font-[Outfit] font-800 text-2xl text-[oklch(0.18_0.015_240)] mb-2">
+              {language === 'en' ? 'Visit Us' : '访问我们'}
+            </h2>
+            <p className="text-[oklch(0.30_0.015_240)] font-inter">
+              {language === 'en' ? 'Find us at our Cork office' : '在我们的Cork办公室找到我们'}
+            </p>
+          </div>
+          <MapView
+            initialCenter={{ lat: 51.8985, lng: -8.4756 }}
+            initialZoom={15}
+            className="rounded-xl overflow-hidden shadow-lg"
+            onMapReady={(map) => {
+              const geocoder = new window.google.maps.Geocoder();
+              geocoder.geocode(
+                { address: '18 Cook Street, Cork City, Ireland' },
+                (results, status) => {
+                  if (status === 'OK' && results && results[0]) {
+                    map.setCenter(results[0].geometry.location);
+                    new window.google.maps.marker.AdvancedMarkerElement({
+                      map,
+                      position: results[0].geometry.location,
+                      title: 'EasyToFin Financial Services',
+                    });
+                  }
+                }
+              );
+            }}
+          />
         </div>
       </section>
 
