@@ -104,10 +104,7 @@ export default function About() {
             </h2>
             <div className="space-y-4 mb-6">
               <p className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed">
-                Registered in Ireland, Registration Number 801689.
-              </p>
-              <p className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed">
-                Registered office: 18 Cook Street, Cork City
+                {t(language, 'about.regulatedDesc')}
               </p>
             </div>
             <div className="bg-[oklch(0.97_0.003_240)] rounded-lg p-6 border border-[oklch(0.88_0.008_240)]">
@@ -119,20 +116,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="teal-gradient py-14">
-        <div className="container text-center">
-          <h2 className="font-[Outfit] font-800 text-3xl text-white mb-4">
-            {t(language, 'common.readyGetStarted')}
-          </h2>
-          <p className="text-white/80 font-inter mb-7 max-w-md mx-auto">
-            {t(language, 'common.readyDesc')}
-          </p>
-          <Link href="/contact" className="btn-amber">
-            {t(language, 'nav.contact')} <ArrowRight size={16} />
-          </Link>
-        </div>
-      </section>
 
       <Footer />
     </div>
