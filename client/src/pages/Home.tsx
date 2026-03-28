@@ -107,7 +107,7 @@ const getTestimonials = (lang: 'en' | 'zh' | 'pl') => [
   },
   {
     text: t(lang, 'testimonials.james'),
-    author: "James O'Brien",
+    author: "James L.",
     location: lang === 'en' ? "Cork" : lang === 'zh' ? "科克" : "Cork",
     rating: 5,
   },
