@@ -42,10 +42,6 @@ export default function Protection() {
       whySection={{
         title: t(language, 'protection.whyProtection'),
         points: Array.isArray(whyPoints) ? whyPoints : [],
-        content: {
-          heading: t(language, 'protection.personalAllRoundProtectionHeading'),
-          paragraphs: (t(language, 'protection.personalAllRoundProtectionContent') as unknown as string[]) || [],
-        },
       }}
       relatedServices={[
         { label: t(language, 'services.pensions'), href: "/pensions" },

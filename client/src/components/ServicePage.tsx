@@ -23,14 +23,6 @@ interface ServicePageProps {
   whySection: {
     title: string;
     points: string[];
-    content?: {
-      heading: string;
-      paragraphs: string[];
-    };
-  };
-  resourcesSection?: {
-    title: string;
-    resources: { title: string; description: string; link?: string }[];
   };
   ctaText?: string;
   relatedServices?: { label: string; href: string }[];
@@ -43,7 +35,6 @@ export default function ServicePage({
   icon,
   subServices,
   whySection,
-  resourcesSection,
   ctaText = "Get a Free Quote",
   relatedServices = [],
 }: ServicePageProps) {
@@ -98,50 +89,8 @@ export default function ServicePage({
               </div>
             ))}
           </div>
-          {whySection.content && (
-            <div className="mt-12 max-w-3xl">
-              <h3 className="font-[Outfit] font-700 text-2xl text-[oklch(0.18_0.015_240)] mb-6">
-                {whySection.content.heading}
-              </h3>
-              <div className="space-y-4">
-                {whySection.content.paragraphs.map((paragraph, i) => (
-                  <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </section>
-
-      {/* Related Resources */}
-      {resourcesSection && resourcesSection.resources.length > 0 && (
-        <section className="py-20 bg-white">
-          <div className="container">
-            <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mb-12">
-              {resourcesSection.title}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {resourcesSection.resources.map((resource, i) => (
-                <div key={i} className="p-6 rounded-lg border border-[oklch(0.88_0.008_240)] hover:border-[oklch(0.40_0.11_195)] hover:shadow-md transition-all">
-                  <h3 className="font-[Outfit] font-700 text-lg text-[oklch(0.18_0.015_240)] mb-3">
-                    {resource.title}
-                  </h3>
-                  <p className="text-[oklch(0.30_0.015_240)] font-inter text-sm leading-relaxed mb-4">
-                    {resource.description}
-                  </p>
-                  {resource.link && (
-                    <a href={resource.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[oklch(0.40_0.11_195)] font-[Outfit] font-semibold hover:gap-3 transition-all">
-                      Learn More <ArrowRight size={16} />
-                    </a>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Related Services */}
       {relatedServices.length > 0 && (
