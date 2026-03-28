@@ -165,63 +165,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="bg-white py-12 border-b border-[oklch(0.92_0.02_155)]">
-        <div className="container grid grid-cols-3 gap-8 text-center">
-          <div>
-            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_155)] mb-2">20+</div>
-            <div className="text-sm text-[oklch(0.52_0.015_155)] font-inter">{t(language, 'home.yearsExp')}</div>
-          </div>
-          <div>
-            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_155)] mb-2">5,000+</div>
-            <div className="text-sm text-[oklch(0.52_0.015_155)] font-inter">{t(language, 'home.happyClients')}</div>
-          </div>
-          <div>
-            <div className="font-[Outfit] font-800 text-3xl md:text-4xl text-[oklch(0.40_0.10_155)] mb-2">100%</div>
-            <div className="text-sm text-[oklch(0.52_0.015_155)] font-inter">{t(language, 'home.independentAdvice')}</div>
-          </div>
-        </div>
-      </section>
 
-      {/* Services */}
-      <section className="py-20 bg-[oklch(0.97_0.003_240)]">
-        <div className="container">
-          <div className="text-center mb-14">
-            <span className="section-tag">{t(language, 'home.ourServices')}</span>
-            <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mt-3">
-              {t(language, 'home.everythingInOne')}
-            </h2>
-            <p className="text-[oklch(0.52_0.015_240)] font-inter mt-3 max-w-2xl mx-auto">
-              {t(language, 'home.everythingDesc')}
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((s) => (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="group p-6 rounded-2xl border border-[oklch(0.88_0.008_240)] bg-white hover:shadow-lg hover:border-[oklch(0.40_0.11_195)] transition-all duration-300"
-              >
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                  style={{ backgroundColor: s.color, color: s.iconColor }}
-                >
-                  {s.icon}
-                </div>
-                <h3 className="font-[Outfit] font-700 text-lg text-[oklch(0.18_0.015_240)] mb-2 group-hover:text-[oklch(0.40_0.11_195)] transition-colors">
-                  {s.title}
-                </h3>
-                <p className="text-sm text-[oklch(0.52_0.015_240)] font-inter leading-relaxed mb-4">
-                  {s.desc}
-                </p>
-                <div className="flex items-center gap-2 text-[oklch(0.40_0.11_195)] font-[Outfit] font-semibold text-sm group-hover:gap-3 transition-all">
-                  {t(language, 'home.learnMore')} <ArrowRight size={14} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+
+
 
       {/* Why Choose Us */}
       <section className="py-20 bg-white">
