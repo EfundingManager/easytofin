@@ -511,6 +511,11 @@ export const translations = {
         '我们为所有养老金建议提供清晰的书面适用性声明。',
         '定期养老金审查确保您的基金保持在轨道上以实现您的退休目标。',
       ],
+      introductionSubtitle: '我们的使命是为客户提供最佳的养老金解决方案，以实现安全的退休。我们的合格养老金专家团队指导您做出明智的决定，最大化您的养老金潜力。',
+      introductionContent: [
+        '养老金是为退休储蓄的最税收高效的方式。越早开始越好——但开始永远不会太晚。',
+        '我们的养老金专家将评估您的当前状况，清楚地解释您的选择，并帮助您建立一个为您提供财务独立的退休基金。',
+      ],
     },
     // Health Insurance page
     healthInsurance: {
@@ -833,12 +838,17 @@ export const translations = {
       annuitiesDesc: 'Zapewnia gwarantowany dochód na całe życie na emeryturze. Porównujemy stawki rent od wszystkich dostawców, aby upewnić się, że uzyskasz najlepszy możliwy dochód z funduszu emerytalnego.',
       whyRetirement: 'Zacznij planować emeryturę dzisiaj',
       whyRetirementPoints: [
-        'Wpłaty emerytalne przyciągają ulgę w podatku dochodowym według Twojej krańcowej stawki — 20% lub 40%.',
+        'Wpłaty emerytalne przyciągają ulgę w podatku dochodowym według Twojej krąńcowej stawki — 20% lub 40%.',
         'Im wcześniej zaczniesz, tym więcej czasu będzie miał Twój fundusz na wzrost dzięki zwrotom złożonym.',
         'Analizujemy Twoje istniejące ustalenia emerytalne i identyfikujemy wszelkie luki lub nieefektywności.',
         'Nasi doradcy są w pełni wykwalifikowani i na bieżąco z najnowszymi przepisami emerytalnymi.',
         'Zapewniamy jasne, pisemne Oświadczenie o Przydatności dla wszystkich rekomendacji emerytalnych.',
         'Regularne przeglądy emerytur zapewniają, że Twój fundusz pozostaje na ścieżce do osiągnięcia celów emerytalnych.',
+      ],
+      introductionSubtitle: 'Naszą misją jest dostarczanie klientom najlepszych rozwiązań emerytalnych dla bezpiecznej emerytury. Nasz zespół wykwalifikowanych specjalistów ds. emerytur prowadzi Cię do podejmowania świadomych decyzji, które maksymalizują potencjał Twojej emerytury.',
+      introductionContent: [
+        'Emerytura to najbardziej efektywna podatkowo metoda oszczędzania na emeryturę. Im wcześniej zaczniesz, tym lepiej — ale nigdy nie jest za późno.',
+        'Nasi specjaliści ds. emerytur ocenią Twoją obecną sytuację, jasno wyjaśniją Twoje opcje i pomogą Ci zbudować fundusz emerytalny, który zapewni Ci niezależność finansową.',
       ],
     },
     // Health Insurance page
