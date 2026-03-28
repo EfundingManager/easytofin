@@ -1,17 +1,11 @@
-/* 
- * EasyToFin ServicePage — shared layout for all service pages with bilingual support
- * "Warm Expertise" design: teal hero, clean content, amber CTAs
- */
+import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
-import { ArrowRight, CheckCircle2, ChevronRight } from "lucide-react";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
 
-interface SubService {
+interface WhySection {
   title: string;
-  description: string;
+  points: string[];
 }
 
 interface ServicePageProps {
@@ -19,13 +13,16 @@ interface ServicePageProps {
   tagline: string;
   heroDescription: string;
   icon: React.ReactNode;
-  subServices: SubService[];
-  whySection: {
+  subServices: Array<{
     title: string;
-    points: string[];
-  };
+    description: string;
+  }>;
+  whySection: WhySection;
   ctaText?: string;
-  relatedServices?: { label: string; href: string }[];
+  relatedServices?: Array<{
+    label: string;
+    href: string;
+  }>;
   contentSection?: {
     heading: string;
     paragraphs: string[];
@@ -48,26 +45,21 @@ export default function ServicePage({
   const getQuoteText = ctaText === "Get a Free Quote" ? t(language, 'home.learnMore') : t(language, 'nav.getQuote');
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-
-
+    <div className="min-h-screen bg-white">
       {/* Sub Services */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="container">
-          <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mb-12">
-            {language === 'en' ? 'What We Offer' : '我们提供的服务'}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <h3 className="font-[Outfit] font-700 text-xl text-[oklch(0.18_0.015_240)] mb-8">
+            {t(language, 'common.whatWeOffer')}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {subServices.map((service, i) => (
-              <div key={i} className="flex gap-4">
-                <div className="w-8 h-8 rounded-lg bg-[oklch(0.93_0.04_195)] flex items-center justify-center shrink-0 text-[oklch(0.40_0.11_195)] mt-0.5">
-                  <CheckCircle2 size={18} />
-                </div>
-                <div>
-                  <h3 className="font-[Outfit] font-700 text-[oklch(0.18_0.015_240)] text-lg mb-2">
-                    {service.title}
-                  </h3>
+              <div key={i} className="p-6 rounded-lg border border-[oklch(0.88_0.008_240)] hover:border-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.97_0.003_240)] transition-all">
+                <h4 className="font-[Outfit] font-semibold text-[oklch(0.18_0.015_240)] mb-3">
+                  {service.title}
+                </h4>
+                <div className="h-1 w-8 bg-[oklch(0.40_0.11_195)] rounded-full mb-4"></div>
+                <div className="space-y-2">
                   <p className="text-[oklch(0.52_0.015_240)] font-inter text-sm leading-relaxed">
                     {service.description}
                   </p>
@@ -78,13 +70,13 @@ export default function ServicePage({
         </div>
       </section>
 
-      {/* Why Section */}
+      {/* Why Section with Content */}
       <section className="py-20 bg-[oklch(0.97_0.003_240)]">
         <div className="container">
           <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mb-12">
             {whySection.title}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
             {whySection.points.map((point, i) => (
               <div key={i} className="flex items-start gap-3">
                 <CheckCircle2 size={20} className="text-[oklch(0.40_0.11_195)] mt-0.5 shrink-0" />
@@ -94,26 +86,24 @@ export default function ServicePage({
               </div>
             ))}
           </div>
+          
+          {/* Content directly in Why section */}
+          {contentSection && (
+            <div className="border-t border-[oklch(0.88_0.008_240)] pt-12">
+              <h3 className="font-[Outfit] font-800 text-2xl text-[oklch(0.18_0.015_240)] mb-6">
+                {contentSection.heading}
+              </h3>
+              <div className="space-y-4">
+                {contentSection.paragraphs.map((paragraph, i) => (
+                  <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
-
-      {/* Content Section */}
-      {contentSection && (
-        <section className="py-16 bg-white">
-          <div className="container">
-            <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mb-8">
-              {contentSection.heading}
-            </h2>
-            <div className="space-y-4">
-              {contentSection.paragraphs.map((paragraph, i) => (
-                <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Related Services */}
       {relatedServices.length > 0 && (
@@ -141,9 +131,6 @@ export default function ServicePage({
           </div>
         </section>
       )}
-
-
-      <Footer />
     </div>
   );
 }
