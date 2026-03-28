@@ -51,6 +51,7 @@ export default function Protection() {
         paragraphs: Array.isArray(contentParagraphs) ? contentParagraphs : [],
       }}
       introductionSection={{
+        title: t(language, 'protection.whyProtection'),
         paragraphs: Array.isArray(introductionParagraphs) ? introductionParagraphs : [],
       }}
       relatedServices={[
