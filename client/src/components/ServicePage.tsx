@@ -26,6 +26,10 @@ interface ServicePageProps {
   };
   ctaText?: string;
   relatedServices?: { label: string; href: string }[];
+  contentSection?: {
+    heading: string;
+    paragraphs: string[];
+  };
 }
 
 export default function ServicePage({
@@ -37,6 +41,7 @@ export default function ServicePage({
   whySection,
   ctaText = "Get a Free Quote",
   relatedServices = [],
+  contentSection,
 }: ServicePageProps) {
   const { language } = useLanguage();
   const breadcrumbHome = language === 'en' ? 'Home' : '首页';
@@ -91,6 +96,24 @@ export default function ServicePage({
           </div>
         </div>
       </section>
+
+      {/* Content Section */}
+      {contentSection && (
+        <section className="py-16 bg-white">
+          <div className="container">
+            <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mb-8">
+              {contentSection.heading}
+            </h2>
+            <div className="space-y-4">
+              {contentSection.paragraphs.map((paragraph, i) => (
+                <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Related Services */}
       {relatedServices.length > 0 && (
