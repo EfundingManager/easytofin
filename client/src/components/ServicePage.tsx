@@ -23,6 +23,10 @@ interface ServicePageProps {
   whySection: {
     title: string;
     points: string[];
+    content?: {
+      heading: string;
+      paragraphs: string[];
+    };
   };
   resourcesSection?: {
     title: string;
@@ -94,6 +98,20 @@ export default function ServicePage({
               </div>
             ))}
           </div>
+          {whySection.content && (
+            <div className="mt-12 max-w-3xl">
+              <h3 className="font-[Outfit] font-700 text-2xl text-[oklch(0.18_0.015_240)] mb-6">
+                {whySection.content.heading}
+              </h3>
+              <div className="space-y-4">
+                {whySection.content.paragraphs.map((paragraph, i) => (
+                  <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
