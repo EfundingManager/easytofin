@@ -49,7 +49,7 @@ export default function Investments() {
       relatedServices={[
         { label: t(language, 'services.pensions'), href: "/pensions" },
         { label: t(language, 'services.protection'), href: "/protection" },
-        { label: t(language, 'services.mortgages'), href: "/mortgages" },
+
       ]}
     />
   );

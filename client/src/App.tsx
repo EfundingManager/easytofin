@@ -10,7 +10,7 @@ import Protection from "./pages/Protection";
 import Pensions from "./pages/Pensions";
 import HealthInsurance from "./pages/HealthInsurance";
 import GeneralInsurance from "./pages/GeneralInsurance";
-import Mortgages from "./pages/Mortgages";
+
 import Investments from "./pages/Investments";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -23,7 +23,7 @@ function Router() {
       <Route path="/pensions" component={Pensions} />
       <Route path="/health-insurance" component={HealthInsurance} />
       <Route path="/general-insurance" component={GeneralInsurance} />
-      <Route path="/mortgages" component={Mortgages} />
+
       <Route path="/investments" component={Investments} />
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />

@@ -192,7 +192,7 @@ export default function Contact() {
                         <option value="pensions">{t(language, 'services.pensions')}</option>
                         <option value="health">{t(language, 'services.healthInsurance')}</option>
                         <option value="general">{t(language, 'services.generalInsurance')}</option>
-                        <option value="mortgages">{t(language, 'services.mortgages')}</option>
+
                         <option value="investments">{t(language, 'services.investments')}</option>
                       </select>
                     </div>

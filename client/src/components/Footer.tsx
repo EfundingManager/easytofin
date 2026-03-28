@@ -12,7 +12,7 @@ const getServices = (lang: 'en' | 'zh' | 'pl') => [
   { label: t(lang, 'services.pensions'), href: "/pensions" },
   { label: t(lang, 'services.healthInsurance'), href: "/health-insurance" },
   { label: t(lang, 'services.generalInsurance'), href: "/general-insurance" },
-  { label: t(lang, 'services.mortgages'), href: "/mortgages" },
+
   { label: t(lang, 'services.investments'), href: "/investments" },
 ];
 

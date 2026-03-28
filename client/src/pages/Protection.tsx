@@ -27,10 +27,7 @@ export default function Protection() {
       title: t(language, 'protection.personalAccident'),
       description: t(language, 'protection.personalAccidentDesc'),
     },
-    {
-      title: t(language, 'protection.mortgageProtection'),
-      description: t(language, 'protection.mortgageProtectionDesc'),
-    },
+
   ];
 
   const whyPoints = t(language, 'protection.whyProtectionPoints');
@@ -49,7 +46,7 @@ export default function Protection() {
       relatedServices={[
         { label: t(language, 'services.pensions'), href: "/pensions" },
         { label: t(language, 'services.healthInsurance'), href: "/health-insurance" },
-        { label: t(language, 'services.mortgages'), href: "/mortgages" },
+
       ]}
     />
   );

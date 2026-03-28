@@ -49,7 +49,7 @@ export default function Pensions() {
       relatedServices={[
         { label: t(language, 'services.protection'), href: "/protection" },
         { label: t(language, 'services.investments'), href: "/investments" },
-        { label: t(language, 'services.mortgages'), href: "/mortgages" },
+
       ]}
     />
   );

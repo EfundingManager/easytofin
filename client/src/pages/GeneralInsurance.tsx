@@ -48,7 +48,7 @@ export default function GeneralInsurance() {
       }}
       relatedServices={[
         { label: t(language, 'services.protection'), href: "/protection" },
-        { label: t(language, 'services.mortgages'), href: "/mortgages" },
+
         { label: t(language, 'services.healthInsurance'), href: "/health-insurance" },
       ]}
     />

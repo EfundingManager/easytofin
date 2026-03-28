@@ -47,14 +47,7 @@ const getServices = (lang: 'en' | 'zh' | 'pl') => [
     color: "oklch(0.92_0.02_155)",
     iconColor: "oklch(0.40_0.10_155)",
   },
-  {
-    icon: <HomeIcon size={26} />,
-    title: t(lang, 'services.mortgages'),
-    desc: t(lang, 'home.mortgages') || "First-time buyer, mover or remortgage — we guide you from application to drawdown.",
-    href: "/mortgages",
-    color: "oklch(0.92_0.02_155)",
-    iconColor: "oklch(0.40_0.10_155)",
-  },
+
   {
     icon: <BarChart3 size={26} />,
     title: t(lang, 'services.investments'),
