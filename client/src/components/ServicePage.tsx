@@ -27,6 +27,9 @@ interface ServicePageProps {
     heading: string;
     paragraphs: string[];
   };
+  introductionSection?: {
+    paragraphs: string[];
+  };
 }
 
 export default function ServicePage({
@@ -39,6 +42,7 @@ export default function ServicePage({
   ctaText = "Get a Free Quote",
   relatedServices = [],
   contentSection,
+  introductionSection,
 }: ServicePageProps) {
   const { language } = useLanguage();
   const breadcrumbHome = language === 'en' ? 'Home' : '首页';
@@ -70,6 +74,20 @@ export default function ServicePage({
         </div>
       </section>
 
+      {/* Introduction Section */}
+      {introductionSection && (
+        <section className="py-16 bg-[oklch(0.97_0.003_240)]">
+          <div className="container">
+            <div className="space-y-4 max-w-3xl">
+              {introductionSection.paragraphs.map((paragraph, i) => (
+                <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Related Services */}
       {relatedServices.length > 0 && (

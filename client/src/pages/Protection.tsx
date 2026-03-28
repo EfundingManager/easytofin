@@ -33,6 +33,7 @@ export default function Protection() {
   const whyPoints = t(language, 'protection.whyProtectionPoints');
   const contentHeading = t(language, 'protection.personalAllRoundProtectionHeading');
   const contentParagraphs = t(language, 'protection.personalAllRoundProtectionContent');
+  const introductionParagraphs = t(language, 'protection.introductionContent');
 
   return (
     <ServicePage
@@ -48,6 +49,9 @@ export default function Protection() {
       contentSection={{
         heading: typeof contentHeading === 'string' ? contentHeading : 'Personal All-Round Protection',
         paragraphs: Array.isArray(contentParagraphs) ? contentParagraphs : [],
+      }}
+      introductionSection={{
+        paragraphs: Array.isArray(introductionParagraphs) ? introductionParagraphs : [],
       }}
       relatedServices={[
         { label: t(language, 'services.pensions'), href: "/pensions" },
