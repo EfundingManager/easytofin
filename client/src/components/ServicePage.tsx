@@ -90,9 +90,6 @@ export default function ServicePage({
           {/* Content directly in Why section */}
           {contentSection && (
             <div className="border-t border-[oklch(0.88_0.008_240)] pt-12">
-              <h3 className="font-[Outfit] font-800 text-2xl text-[oklch(0.18_0.015_240)] mb-6">
-                {contentSection.heading}
-              </h3>
               <div className="space-y-4">
                 {contentSection.paragraphs.map((paragraph, i) => (
                   <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base">
