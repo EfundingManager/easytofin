@@ -762,7 +762,6 @@ export const translations = {
       pensions: 'Osobiste plany emerytalne, plany zawodowe, ARF, PRSA — zaplanuj emeryturę, którą zasługujesz.',
       healthInsurance: 'Prywatne plany ubezpieczenia zdrowotnego dla osób fizycznych, rodzin i firm na wszystkie budżety.',
       generalInsurance: 'Ubezpieczenie domu, samochodu, biznesu i odpowiedzialności — kompleksowa ochrona po konkurencyjnych cenach.',
-
       investments: 'Plany oszczędnościowe, obligacje inwestycyjne i zarządzanie portfelem — powiększaj swoje bogactwo w czasie.',
     },
     // Why points
