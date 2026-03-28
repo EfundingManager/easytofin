@@ -24,16 +24,18 @@ export default function Pensions() {
       description: t(language, 'pensions.avcDesc'),
     },
     {
-      title: t(language, 'pensions.prsas'),
-      description: t(language, 'pensions.prsasDesc'),
+      title: t(language, 'pensions.prsa'),
+      description: t(language, 'pensions.prsaDesc'),
     },
     {
-      title: t(language, 'pensions.arfs'),
-      description: t(language, 'pensions.arfsDesc'),
+      title: t(language, 'pensions.arf'),
+      description: t(language, 'pensions.arfDesc'),
     },
   ];
 
   const whyPoints = t(language, 'pensions.whyPensionsPoints');
+  const introductionSubtitle = t(language, 'pensions.introductionSubtitle');
+  const introductionParagraphs = t(language, 'pensions.introductionContent');
 
   return (
     <ServicePage
@@ -45,6 +47,10 @@ export default function Pensions() {
       whySection={{
         title: t(language, 'pensions.whyPensions'),
         points: Array.isArray(whyPoints) ? whyPoints : [],
+      }}
+      introductionSection={{
+        subtitle: typeof introductionSubtitle === 'string' ? introductionSubtitle : '',
+        paragraphs: Array.isArray(introductionParagraphs) ? introductionParagraphs : [],
       }}
       relatedServices={[
         { label: t(language, 'services.protection'), href: "/protection" },
