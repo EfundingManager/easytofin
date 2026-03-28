@@ -21,7 +21,6 @@ export const translations = {
       pensions: 'Pensions',
       healthInsurance: 'Health Insurance',
       generalInsurance: 'General Insurance',
-      mortgages: 'Mortgages',
       investments: 'Investments',
     },
     // Service descriptions
@@ -30,7 +29,6 @@ export const translations = {
       pensions: 'Plan your retirement',
       healthInsurance: 'Private medical cover',
       generalInsurance: 'Home, car & business',
-      mortgages: 'Buy your home',
       investments: 'Grow your wealth',
     },
     // Home page
@@ -59,8 +57,7 @@ export const translations = {
       pensions: 'Personal pensions, occupational schemes, ARFs, PRSAs — plan the retirement you deserve.',
       healthInsurance: 'Private medical insurance plans for individuals, families and businesses across all budgets.',
       generalInsurance: 'Home, motor, business and liability insurance — comprehensive cover at competitive rates.',
-      mortgages: 'First-time buyer, mover or remortgage — we guide you from application to drawdown.',
-      investments: 'Savings plans, investment bonds and portfolio management to grow your wealth over time.',
+      investments: 'Investment bonds and portfolio management to grow your wealth over time.',
     },
     // Why points
     why: {
@@ -97,7 +94,7 @@ export const translations = {
       tagline: 'Safeguard your family\'s financial future',
       heroDesc: 'Protection is the most important part of financial planning. It ensures that if the worst were to happen — through accident, serious illness or death — your family would have sufficient funds to maintain their lifestyle. Our expert advisors will help you find the right level of cover at the most competitive price.',
       lifeAssurance: 'Life Assurance',
-      lifeAssuranceDesc: 'A lump sum paid to your family in the event of your death, ensuring they can maintain their standard of living and meet financial obligations such as mortgages and bills.',
+      lifeAssuranceDesc: 'A lump sum paid to your family in the event of your death, ensuring they can maintain their standard of living and meet financial obligations such as bills and other commitments.',
       seriousIllness: 'Specified Serious Illness Cover',
       seriousIllnessDesc: 'A tax-free lump sum paid on diagnosis of a specified serious illness such as cancer, heart attack or stroke. Gives you financial breathing room to focus on recovery.',
       incomeProtection: 'Income Protection',
@@ -106,8 +103,7 @@ export const translations = {
       accidentSicknessDesc: 'Short-term income replacement cover that pays a weekly benefit if you are unable to work due to an accident or sickness. Ideal for self-employed individuals.',
       personalAccident: 'Personal Accident Plan',
       personalAccidentDesc: 'Provides cash benefits and lump sum payments in the event of accidental injury, fractures or hospitalisation. Complements your existing health insurance.',
-      mortgageProtection: 'Mortgage Protection',
-      mortgageProtectionDesc: 'Ensures your mortgage is paid off in the event of your death, protecting your family\'s home. A legal requirement for most mortgage holders in Ireland.',
+
       whyProtection: 'Why Protection Matters',
       whyProtectionPoints: [
         'Protection is the foundation of any solid financial plan — everything else builds on it.',
@@ -236,34 +232,6 @@ export const translations = {
         'Annual renewal reviews ensure you always get the best available deal.',
         'Specialist insurance for non-standard risks and unique situations.',
       ],
-    },
-    // Mortgages page
-    mortgages: {
-      title: 'Mortgages',
-      tagline: 'Your home, your way — we guide you every step',
-      heroDesc: 'Buying a home is one of the biggest financial decisions you\'ll make. Our mortgage advisors take the stress out of the process, guiding you from initial application through to drawdown. We have access to all major lenders and will find the mortgage that best suits your circumstances and financial goals.',
-      firstTime: 'First-Time Buyer Mortgages',
-      firstTimeDesc: 'Navigating your first mortgage can be confusing. We explain every step of the process, help you understand how much you can borrow, and find you the best available interest rates.',
-      mover: 'Mover Mortgages',
-      moverDesc: 'Moving home? We\'ll assess your current mortgage, explore portability options, and find you the best new deal — whether you\'re upgrading, downgrading or relocating.',
-      remortgage: 'Remortgaging',
-      remortgageDesc: 'If your fixed rate is coming to an end or you want to release equity, we\'ll compare the market and find you a better deal. Switching your mortgage could save you thousands.',
-      buyToLet: 'Buy-to-Let Mortgages',
-      buyToLetDesc: 'Investment property mortgages for landlords and property investors. We assess rental yields, loan-to-value ratios and find you the most competitive rates.',
-      mortgageProtection: 'Mortgage Protection Insurance',
-      mortgageProtectionDesc: 'A legal requirement for most mortgage holders in Ireland. We compare mortgage protection policies to ensure your home is protected at the best available price.',
-      equityRelease: 'Equity Release',
-      equityReleaseDesc: 'Access the equity in your home to fund home improvements, education or other major expenses. We explain all options and ensure you understand the implications.',
-      whyMortgage: 'Making Your Mortgage Journey Easier',
-      whyMortgagePoints: [
-        'We have access to all major Irish lenders including AIB, Bank of Ireland, Permanent TSB, Haven and more.',
-        'Our mortgage advisors are fully qualified and experienced in all types of mortgage applications.',
-        'We handle the paperwork and liaise with lenders on your behalf — saving you time and stress.',
-        'We help you understand eligibility for Help to Buy schemes and First Home schemes.',
-        'Honest advice — we recommend solutions that suit you, not the one that pays us most.',
-        'We\'re with you from application through to drawdown, keeping you informed at every stage.',
-      ],
-      getMortgageAdvice: 'Get Mortgage Advice',
     },
     // Investments page
     investments: {
@@ -439,7 +407,6 @@ export const translations = {
       pensions: '个人养老金、职业计划、ARF、PRSA——规划你应得的退休。',
       healthInsurance: '为个人、家庭和企业提供的私人医疗保险计划，适合所有预算。',
       generalInsurance: '家庭、汽车、业务和责任保险——全面的保险保障，优惠价格。',
-      mortgages: '首次购房、搬迁或重新抵押——我们指导你从申请到提取。',
       investments: '储蓄计划、投资债券和投资组合管理——随时间增加你的财富。',
     },
     // Why points
@@ -486,8 +453,7 @@ export const translations = {
       accidentSicknessDesc: '短期收入替代保险，如果您因事故或伤病无法工作，支付每周福利。对于自雇人士理想。',
       personalAccident: '个人意外保险',
       personalAccidentDesc: '在意外伤害、骨折或住院的情况下提供现金福利和一笔款项。补充您现有的健康保险。',
-      mortgageProtection: '抵押贷款保护',
-      mortgageProtectionDesc: '在您去世时确保您的抵押贷款被偿还，保护您家人的家。对爱尔兰大多数抵押贷款持有人来说是法律要求。',
+
       whyProtection: '为什么保险保护很重要',
       whyProtectionPoints: [
         '保险保护是任何坚实财务计划的基础——一切都建立在它之上。',
@@ -599,34 +565,6 @@ export const translations = {
         '年度续期审查确保您始终获得最佳可用交易。',
         '为非标准风险和独特情况提供专业保险。',
       ],
-    },
-    // Mortgages page
-    mortgages: {
-      title: '抵押贷款',
-      tagline: '您的家，您的方式——我们指导您每一步',
-      heroDesc: '购买房屋是您将做出的最大财务决定之一。我们的抵押贷款顾问消除了这个过程的压力，从初始申请指导您到提取。我们可以获得所有主要贷方，并将找到最适合您情况和财务目标的抵押贷款。',
-      firstTime: '首次购房者抵押贷款',
-      firstTimeDesc: '浏览您的第一笔抵押贷款可能令人困惑。我们解释过程的每一步，帮助您了解您能借多少，并为您找到最佳可用利率。',
-      mover: '搬家者抵押贷款',
-      moverDesc: '搬家？我们将评估您当前的抵押贷款，探索移植选项，并找到最佳新交易——无论您是升级、降级还是重新定位。',
-      remortgage: '重新抵押',
-      remortgageDesc: '如果您的固定利率即将结束或您想释放股权，我们将比较市场并找到更好的交易。切换您的抵押贷款可以为您节省数千美元。',
-      buyToLet: '出租房产抵押贷款',
-      buyToLetDesc: '为房东和房产投资者提供的投资房产抵押贷款。我们评估租金收益、贷款价值比并找到最具竞争力的利率。',
-      mortgageProtection: '抵押贷款保护保险',
-      mortgageProtectionDesc: '对爱尔兰大多数抵押贷款持有人来说是法律要求。我们比较抵押贷款保护保单，确保您的家以最佳可用价格得到保护。',
-      equityRelease: '股权释放',
-      equityReleaseDesc: '获取您家中的股权以资助家庭改善、教育或其他重大费用。我们解释所有选项并确保您了解含义。',
-      whyMortgage: '让您的抵押贷款之旅更轻松',
-      whyMortgagePoints: [
-        '我们可以获得所有主要爱尔兰贷方，包括AIB、Bank of Ireland、Permanent TSB、Haven等。',
-        '我们的抵押贷款顾问完全合格且在所有类型的抵押贷款申请方面经验丰富。',
-        '我们代表您处理文书工作并与贷方联系——为您节省时间和压力。',
-        '我们帮助您了解帮助购买计划和首次购房计划的资格。',
-        '诚实、公正的建议——我们推荐适合您的抵押贷款，而不是为我们支付最多的那个。',
-        '我们从申请到提取一直与您同在，在每个阶段保持您的信息。',
-      ],
-      getMortgageAdvice: '获取抵押贷款建议',
     },
     // Investments page
     investments: {
@@ -759,7 +697,7 @@ export const translations = {
       pensions: 'Emerytury',
       healthInsurance: 'Ubezpieczenie zdrowotne',
       generalInsurance: 'Ubezpieczenia ogólne',
-      mortgages: 'Hipoteki',
+
       investments: 'Inwestycje',
     },
     // Service descriptions
@@ -844,8 +782,7 @@ export const translations = {
       accidentSicknessDesc: 'Krótkoterminowa ochrona dochodów, która wypłaca tygodniowe świadczenie, jeśli nie możesz pracować z powodu wypadku lub choroby. Idealna dla osób samozatrudnionych.',
       personalAccident: 'Plan ochrony przed wypadkami osobistymi',
       personalAccidentDesc: 'Zapewnia świadczenia pieniężne i kwoty ryczałtowe w przypadku przypadkowego urazu, złamań lub hospitalizacji. Uzupełnia Twoje istniejące ubezpieczenie zdrowotne.',
-      mortgageProtection: 'Ochrona hipoteczna',
-      mortgageProtectionDesc: 'Zapewnia spłatę hipoteki w przypadku Twojej śmierci, chroniąc dom Twojej rodziny. Wymóg prawny dla większości posiadaczy hipotek w Irlandii.',
+
       whyProtection: 'Dlaczego ochrona jest ważna',
       whyProtectionPoints: [
         'Ochrona jest fundamentem każdego solidnego planu finansowego — wszystko inne na nim się opiera.',
@@ -957,34 +894,6 @@ export const translations = {
         'Roczne przeglądy odnowienia zapewniają, że zawsze uzyskujesz najlepszą dostępną ofertę.',
         'Specjalistyczne ubezpieczenie dla ryzyk niestandardowych i unikalnych sytuacji.',
       ],
-    },
-    // Mortgages page
-    mortgages: {
-      title: 'Hipoteki',
-      tagline: 'Twój dom, Twój sposób — prowadzimy Cię na każdym kroku',
-      heroDesc: 'Kupno domu to jedna z największych decyzji finansowych, które podejmiesz. Nasi doradcy hipoteczni usuwają stres z tego procesu, prowadząc Cię od wstępnego wniosku do wypłaty. Mamy dostęp do wszystkich głównych pożyczkodawców i znajdziemy hipotekę, która najlepiej pasuje do Twojej sytuacji i celów finansowych.',
-      firstTime: 'Hipoteki dla pierwszych nabywców',
-      firstTimeDesc: 'Poruszanie się po pierwszej hipotece może być mylące. Wyjaśniamy każdy krok procesu, pomagamy Ci zrozumieć, ile możesz pożyczyć, i znajdujemy Ci najlepsze dostępne stawki procentowe.',
-      mover: 'Hipoteki dla osób zmieniających miejsce zamieszkania',
-      moverDesc: 'Przeprowadzasz się? Ocenimy Twoją obecną hipotekę, zbadamy opcje przeniesienia i znajdziemy Ci najlepszą nową ofertę — niezależnie od tego, czy się podnoszysz, obniżasz czy przeprowadzasz.',
-      remortgage: 'Refinansowanie',
-      remortgageDesc: 'Jeśli Twoja stała stawka wkrótce się skończy lub chcesz uwolnić kapitał, porównamy rynek i znajdziemy Ci lepszą ofertę. Zmiana hipoteki może Ci zaoszczędzić tysiące.',
-      buyToLet: 'Hipoteki na nieruchomości inwestycyjne',
-      buyToLetDesc: 'Hipoteki na nieruchomości inwestycyjne dla właścicieli i inwestorów nieruchomościowych. Oceniamy rentowność czynszu, wskaźniki LTV i znajdujemy Ci najbardziej konkurencyjne stawki.',
-      mortgageProtection: 'Ubezpieczenie ochrony hipotecznej',
-      mortgageProtectionDesc: 'Wymóg prawny dla większości posiadaczy hipotek w Irlandii. Porównujemy polisy ochrony hipotecznej, aby upewnić się, że Twój dom jest chroniony w najlepszej dostępnej cenie.',
-      equityRelease: 'Uwolnienie kapitału',
-      equityReleaseDesc: 'Uzyskaj dostęp do kapitału w swoim domu, aby sfinansować remonty domu, edukację lub inne duże wydatki. Wyjaśniamy wszystkie opcje i zapewniamy, że rozumiesz implikacje.',
-      whyMortgage: 'Ułatwianie Twojej hipotecznej podróży',
-      whyMortgagePoints: [
-        'Mamy dostęp do wszystkich głównych irlandzkich pożyczkodawców, w tym AIB, Bank of Ireland, Permanent TSB, Haven i innych.',
-        'Nasi doradcy hipoteczni są w pełni wykwalifikowani i doświadczeni we wszystkich rodzajach wniosków hipotecznych.',
-        'Zajmujemy się dokumentacją i kontaktami z pożyczkodawcami w Twoim imieniu — oszczędzając Ci czasu i stresu.',
-        'Pomagamy Ci zrozumieć uprawnienia do schematów Help to Buy i First Home.',
-        'Uczciwe, bezstronne porady — rekomendujemy hipotekę, która do Ciebie pasuje, a nie tę, która nam płaci najlepiej.',
-        'Jesteśmy z Tobą od wniosku do wypłaty, informując Cię na każdym etapie.',
-      ],
-      getMortgageAdvice: 'Uzyskaj poradę hipoteczną',
     },
     // Investments page
     investments: {
