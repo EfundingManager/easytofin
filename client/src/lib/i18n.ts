@@ -359,7 +359,7 @@ export const translations = {
       pensions: '养老金',
       healthInsurance: '健康保险',
       generalInsurance: '综合保险',
-      mortgages: '抵押贷款',
+
       investments: '投资理财',
     },
     // Service descriptions
@@ -368,7 +368,7 @@ export const translations = {
       pensions: '规划您的退休',
       healthInsurance: '私人医疗保障',
       generalInsurance: '家庭、汽车和商业',
-      mortgages: '购买您的家',
+
       investments: '增长您的财富',
     },
     // Home page
@@ -601,17 +601,22 @@ export const translations = {
     about: {
       title: '关于我们',
       tagline: '您可信赖的财务合作伙伴',
-      aboutDesc: 'EasyToFin金融服务公司是一家由爱尔兰中央银行监管的独立财务服务公司。我们在保险保护、养老金、健康保险、综合保险、抵押贷款和投资理财方面提供专业、公正的建议。',
+      aboutDesc: 'EasyToFin金融服务公司是一家由爱尔兰中央银行监管的财务服务公司。我们在保险保护、养老金、健康保险和投资理财方面提供专业、公正的建议。',
       ourStory: '我们的故事',
       builtOnTrust: '建立在信任之上，由专业知识驱动',
       story1: 'EasyToFin金融服务公司的成立目标很简单：为每个爱尔兰家庭和企业提供可获得、易于理解且真正有用的财务规划。',
-      story2: '我们相信良好的财务建议不应该是仅供富人享受的奢侈品。无论您是寻求抵押贷款的首次购房者、寻求人寿保险的年轻家庭，还是规划退休的企业主，我们都在这里帮助。',
-      story3: '作为独立经纪人，我们不受任何单一产品提供商的束缚。这意味着我们的建议始终是公正的——完全专注于为您找到合适的解决方案。',
-      yearsOfExp: '年经验',
+      story2: '我们相信良好的财务建议不应该是仅供富人享受的奢侈品。无论您是首次购房者、寻求人寿保险的年轻家庭，还是规划退休的企业主，我们都在这里帮助。',
+      story3: '我们不受任何单一产品提供商的束缚。这意味着我们的建议始终是公正的——完全专注于为您找到合适的解决方案。',
+      yearsExp: '年经验',
       clientsServed: '客户服务',
+      independent: '',
+      services: '',
       serviceAreas: '服务领域',
+      p1: '保险应该提供真正的保护和心安。虽然某些形式的保险是必需的，但如果不符合您的实际需求，其他可能提供的价值有限。这就是为什么全面、仔细的逐案评估如此重要。我们分析您的个人和商业保险需求，并提供量身定制的、有效的解决方案，以提供适当的保护水平，让您可以放心前进，知道意外损失不会成为财务负担。',
+      p2: '我们相信良好的财务建议不应该是仅供富人享受的奢侈品。无论您是首次购房者、寻求人寿保险的年轻家庭，还是规划退休的企业主，我们都在这里帮助。',
+      p3: '我们不受任何单一产品提供商的束缚。这意味着我们的建议始终是公正的——完全专注于为您找到合适的解决方案。',
       ourValues: '我们的价值观',
-      whatWeStand: '我们的立场',
+      whatWeStand: '',
       regulatory: '监管信息',
       regulatedCompliant: '受监管且合规',
       regulatoryPoints: [
@@ -623,6 +628,8 @@ export const translations = {
       ],
       letsConversation: '让我们开始对话',
       touchDesc: '立即与我们的团队联系，获得免费的无义务咨询。',
+      visitUs: '访问我们',
+      findUs: '在我们的科克办公室找到我们',
     },
     // Contact page
     contact: {
@@ -647,8 +654,7 @@ export const translations = {
       selectService: '选择服务...',
       tellUs: '告诉我们您的情况和您在寻找什么...',
       generalEnquiry: '一般咨询',
-      monFri: '周一至周五：上午9:00-下午5:30',
-      sat: '周六：上午10:00-下午1:00',
+      monFri: '周一至周五：上午9:00 - 下午5:00',
     },
     // Footer
     footer: {
@@ -698,7 +704,7 @@ export const translations = {
       pensions: 'Zaplanuj swoją emeryturę',
       healthInsurance: 'Prywatna ochrona medyczna',
       generalInsurance: 'Dom, samochód i biznes',
-      mortgages: 'Kup swój dom',
+
       investments: 'Zwiększ swoje bogactwo',
     },
     // Home page
@@ -716,7 +722,7 @@ export const translations = {
       everythingDesc: 'Od ochrony swojej rodziny dzisiaj do planowania emerytury jutro — obejmujemy każdy etap Twojego życia finansowego.',
       whyChooseUs: 'Dlaczego nas wybrać',
       financialAdvice: 'Porady finansowe, którym możesz zaufać',
-      trustDesc: 'W EasyToFin wierzymy, że każdy zasługuje na jasne, uczciwe porady finansowe. Nasi niezależni doradcy poświęcają czas, aby zrozumieć Twoją sytuację i znaleźć rozwiązania, które naprawdę do Ciebie pasują.',
+      trustDesc: 'W EasyToFin wierzymy, że każdy zasługuje na jasne, uczciwe porady finansowe. Nasi profesjonalni doradcy poświęcają czas, aby zrozumieć Twoją sytuację i znaleźć rozwiązania, które naprawdę do Ciebie pasują.',
       clientStories: 'Historie klientów',
       whatOurClients: 'Co mówią nasi klienci',
       readySecure: 'Gotów zabezpieczyć swoją przyszłość finansową?',
@@ -727,7 +733,7 @@ export const translations = {
       pensions: 'Osobiste plany emerytalne, plany zawodowe, ARF, PRSA — zaplanuj emeryturę, którą zasługujesz.',
       healthInsurance: 'Prywatne plany ubezpieczenia zdrowotnego dla osób fizycznych, rodzin i firm na wszystkie budżety.',
       generalInsurance: 'Ubezpieczenie domu, samochodu, biznesu i odpowiedzialności — kompleksowa ochrona po konkurencyjnych cenach.',
-      mortgages: 'Pierwszy nabywca, przeprowadzka lub refinansowanie — prowadzimy Cię od podania do wypłaty.',
+
       investments: 'Plany oszczędnościowe, obligacje inwestycyjne i zarządzanie portfelem — powiększaj swoje bogactwo w czasie.',
     },
     // Why points
@@ -740,8 +746,8 @@ export const translations = {
       expertiseDesc: 'Nasz zespół posiada najwyższe kwalifikacje zawodowe i jest na bieżąco z najnowszymi przepisami finansowymi i produktami.',
       partnership: 'Długoterminowe partnerstwo',
       partnershipDesc: 'Budujemy trwałe relacje, przeglądając Twój plan finansowy w miarę zmian Twojego życia, aby zawsze służył Twoim celom.',
-      impartial: 'Niezależne i bezstronne',
-      impartialDesc: 'Pracujemy dla Ciebie, a nie dla towarzystw ubezpieczeniowych. Nasze porady zawsze są w Twoim najlepszym interesie.',
+      clientCentric: 'Skupienie na kliencie',
+      clientCentricDesc: 'Pracujemy dla Ciebie, a nie dla towałystw ubezpieczeniowych. Nasze porady zawsze są w Twoim najlepszym interesie.',
       trustedReg: 'Regulowane i zaufane',
       trustedRegDesc: 'EasyToFin Financial Services Limited jest w pełni regulowane przez Centralny Bank Irlandii.',
       expertAdvisors: 'Ekspertni doradcy',
@@ -931,17 +937,24 @@ export const translations = {
     about: {
       title: 'O nas',
       tagline: 'Twój zaufany partner finansowy',
-      aboutDesc: 'EasyToFin Financial Services to niezależna firma świadcząca usługi finansowe regulowana przez Centralny Bank Irlandii. Zapewniamy fachowe, bezstronne porady dotyczące ochrony, emerytur, ubezpieczenia zdrowotnego, ubezpieczeń ogólnych, hipotek i inwestycji.',
+      aboutDesc: 'EasyToFin Financial Services to firma świadcząca usługi finansowe regulowana przez Centralny Bank Irlandii. Zapewniamy fachowe, bezstronne porady dotyczące ochrony, emerytur, ubezpieczenia zdrowotnego i inwestycji.',
       ourStory: 'Nasza historia',
       builtOnTrust: 'Zbudowane na zaufaniu, napędzane fachowością',
       story1: 'EasyToFin Financial Services została założona z prostym celem: uczynić planowanie finansowe dostępnym, łatwym do zrozumienia i naprawdę użytecznym dla każdej irlandzkiej rodziny i biznesu.',
-      story2: 'Wierzymy, że dobre porady finansowe nie powinny być luksusem zarezerwowanym dla bogatych. Niezależnie od tego, czy jesteś pierwszym nabywcą szukającym hipoteki, młodą rodziną szukającą ubezpieczenia na życie, czy właścicielem biznesu planującym emeryturę, jesteśmy tutaj, aby Ci pomóc.',
-      story3: 'Jako niezależny broker nie jesteśmy związani żadnym pojedynczym dostawcą produktów. Oznacza to, że nasze porady są zawsze bezstronne — całkowicie skupione na znalezieniu dla Ciebie odpowiedniego rozwiązania.',
-      yearsOfExp: 'Lat doświadczenia',
+      story2: 'Wierzymy, że dobre porady finansowe nie powinny być luksusem zarezerwowanym dla bogatych. Niezależnie od tego, czy jesteś pierwszym nabywcą, młodą rodziną szukającą ubezpieczenia na życie, czy właścicielem biznesu planującym emeryturę, jesteśmy tutaj, aby Ci pomóc.',
+      story3: 'Nie jesteśmy związani żadnym pojedynczym dostawcą produktów. Oznacza to, że nasze porady są zawsze bezstronne — całkowicie skupione na znalezieniu dla Ciebie odpowiedniego rozwiązania.',
+      yearsExp: 'Lat doświadczenia',
       clientsServed: 'Obsłużeni klienci',
+      independent: '',
+      services: '',
+      p1: 'Ubezpieczenie powinno zapewniać rzeczywistą ochronę i spokój ducha. Choć niektóre formy ubezpieczenia są niezbędne, inne mogą oferować ograniczoną wartość, jeśli nie są dostosowane do Twoich rzeczywistych potrzeb. Dlatego właściwa, szczegółowa ocena poszczególnych przypadków jest tak ważna. Analizujemy Twoje osobiste i biznesowe potrzeby ubezpieczeniowe i zapewniamy dostosowane, skuteczne rozwiązania, które zapewniają odpowiedni poziom ochrony — abyś mógł spokojnie ruszać naprzód, wiedząc, że nieoczekiwana strata nie stanie się obciążeniem finansowym.',
+      p2: 'Wierzymy, że dobre porady finansowe nie powinny być luksusem zarezerwowanym dla bogatych. Niezależnie od tego, czy jesteś pierwszym nabywcą, młodą rodziną szukającą ubezpieczenia na życie, czy właścicielem biznesu planującym emeryturę, jesteśmy tutaj, aby Ci pomóc.',
+      p3: 'Nie jesteśmy związani żadnym pojedynczym dostawcą produktów. Oznacza to, że nasze porady są zawsze bezstronne — całkowicie skupione na znalezieniu dla Ciebie odpowiedniego rozwiązania.',
+      visitUs: 'Odwiedź nas',
+      findUs: 'Znajdź nas w naszym biurze w Cork',
       serviceAreas: 'Obszary usług',
       ourValues: 'Nasze wartości',
-      whatWeStand: 'Na czym nam zależy',
+      whatWeStand: '',
       regulatory: 'Informacje regulacyjne',
       regulatedCompliant: 'Regulowane i zgodne',
       regulatoryPoints: [
@@ -977,8 +990,7 @@ export const translations = {
       selectService: 'Wybierz usługę...',
       tellUs: 'Powiedz nam o swojej sytuacji i czego szukasz...',
       generalEnquiry: 'Ogólne zapytanie',
-      monFri: 'Poniedziałek do piątku: 9:00-17:30',
-      sat: 'Sobota: 10:00-13:00',
+      monFri: 'Poniedziałek do piątku: 9:00-17:00',
     },
     // Footer
     footer: {
