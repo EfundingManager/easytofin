@@ -128,6 +128,7 @@ export const translations = {
         'If you were to pass away, how would your family cope with the loss of your income? Would they be able to maintain their current lifestyle and meet their ongoing financial commitments?',
         'For many of our clients, the key challenge is finding the right level of protection at a cost that represents real value. Our dedicated team at EasyToFin Financial Services Limited is here to help you identify and arrange the policies that best suit your personal circumstances and protection needs.',
       ],
+      introductionSubtitle: 'Protection is an essential part of sound financial planning. It provides peace of mind by ensuring that, if the unexpected happens—through illness, injury, or loss of life—your family\'s financial security and lifestyle remain protected.',
       introductionContent: [
         'Protection is a key foundation of financial planning. It helps ensure that if the unexpected happens, such as illness, injury, or death. Your family will still have the financial support needed to maintain their lifestyle and meet ongoing commitments.',
         'Your income provides stability, covers daily expenses, and supports your family\'s future. If that income stops, even temporarily, the impact can be significant.',
@@ -485,6 +486,7 @@ export const translations = {
         '如果您不幸退世，您的家人如何应对您收入的丧失？他们是否能不能维持目前的生活方式并应对他们正在进行的财务义务？',
         '对于我们的许多客户来说，主要挑战是以合理的价格找到合适的保障水平。EasyToFin金融服务有限公司的专业团队就在此为您服务，帮助您识别並安排最適合您个人情况和保障需求的保单。',
       ],
+      introductionSubtitle: '保险保护是健全财务规划的重要组成部分。它通过确保在发生意外事件（如疾病、伤害或死亡）时，您家人的财务安全和生活方式得到保护，从而提供安心。',
       introductionContent: [
         '保险保护是财务规划的关键基础。它有助于确保如果发生意外——例如疾病、伤害或死亡——您的家人仍将获得所需的财务支持，以维持其生活方式并应对持续的财务承诺。',
         '您的收入提供稳定性、支付日常开支并支持您家人的未来。如果该收入停止，即使是暂时的，影响也可能很大。',
@@ -843,6 +845,7 @@ export const translations = {
         'Jeśli byś zmarł, jak Twoja rodzina poradziłaby sobie ze stratą Twojego dochodu? Czy byliby w stanie utrzymać swój obecny styl życia i spełnić swoje bieżące zobowiązania finansowe?',
         'Dla wielu naszych klientów głównym wyzwaniem jest znalezienie odpowiedniego poziomu ochrony w cenie, która reprezentuje rzeczywistą wartość. Nasz dedykowany zespół w EasyToFin Financial Services Limited jest tutaj, aby pomóc Ci zidentyfikować i zaorganizować polisy, które najlepiej odpowiadają Twojej osobistej sytuacji i potrzebom ochrony.',
       ],
+      introductionSubtitle: 'Ochrona jest niezbędną częścią solidnego planowania finansowego. Zapewnia spokój ducha, gwarantując, że jeśli dojdzie do czegoś nieoczekiwanego — poprzez chorobę, uraz lub utratę życia — bezpieczeństwo finansowe i styl życia Twojej rodziny pozostaną chronione.',
       introductionContent: [
         'Ochrona jest kluczową podstawą planowania finansowego. Pomaga zapewnić, że jeśli dojdzie do czegoś nieoczekiwanego, takiego jak choroba, uraz lub śmierć, Twoja rodzina będzie miała wsparcie finansowe potrzebne do utrzymania swojego stylu życia i spełnienia bieżących zobowiązań.',
         'Twój dochód zapewnia stabilność, pokrywa codzienne wydatki i wspiera przyszłość Twojej rodziny. Jeśli ten dochód się zatrzyma, nawet tymczasowo, wpływ może być znaczący.',

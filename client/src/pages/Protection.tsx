@@ -33,6 +33,7 @@ export default function Protection() {
   const whyPoints = t(language, 'protection.whyProtectionPoints');
   const contentHeading = t(language, 'protection.personalAllRoundProtectionHeading');
   const contentParagraphs = t(language, 'protection.personalAllRoundProtectionContent');
+  const introductionSubtitle = t(language, 'protection.introductionSubtitle');
   const introductionParagraphs = t(language, 'protection.introductionContent');
 
   return (
@@ -52,6 +53,7 @@ export default function Protection() {
       }}
       introductionSection={{
         title: t(language, 'protection.whyProtection'),
+        subtitle: typeof introductionSubtitle === 'string' ? introductionSubtitle : '',
         paragraphs: Array.isArray(introductionParagraphs) ? introductionParagraphs : [],
       }}
       relatedServices={[

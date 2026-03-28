@@ -29,6 +29,7 @@ interface ServicePageProps {
   };
   introductionSection?: {
     title?: string;
+    subtitle?: string;
     paragraphs: string[];
   };
 }
@@ -84,6 +85,11 @@ export default function ServicePage({
                 <h4 className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-lg font-semibold">
                   {introductionSection.title}
                 </h4>
+              )}
+              {introductionSection.subtitle && (
+                <p className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base">
+                  {introductionSection.subtitle}
+                </p>
               )}
               {introductionSection.paragraphs.map((paragraph, i) => (
                 <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base">
