@@ -77,8 +77,6 @@ export default function About() {
                 {[
                   { value: "20+", label: t(language, 'about.yearsExp') },
                   { value: "5,000+", label: t(language, 'about.clientsServed') },
-                  { value: "100%", label: t(language, 'about.independent') },
-                  { value: "6", label: t(language, 'about.services') },
                 ].map((stat, i) => (
                   <div key={i} className="p-4 rounded-lg bg-[oklch(0.97_0.003_240)] border border-[oklch(0.88_0.008_240)]">
                     <div className="font-[Outfit] font-800 text-2xl text-[oklch(0.40_0.11_195)]">
@@ -103,9 +101,11 @@ export default function About() {
         <div className="container">
           <div className="text-center mb-14">
             <span className="section-tag">{t(language, 'about.ourValues')}</span>
-            <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mt-3">
-              {t(language, 'about.whatWeStand')}
-            </h2>
+            {t(language, 'about.whatWeStand') && (
+              <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mt-3">
+                {t(language, 'about.whatWeStand')}
+              </h2>
+            )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value, i) => (
@@ -132,9 +132,14 @@ export default function About() {
             <h2 className="font-[Outfit] font-800 text-2xl text-[oklch(0.18_0.015_240)] mb-4">
               {t(language, 'about.regulated')}
             </h2>
-            <p className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed mb-4">
-              {t(language, 'about.regulatedDesc')}
-            </p>
+            <div className="space-y-4 mb-6">
+              <p className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed">
+                Registered in Ireland, Registration Number 801689.
+              </p>
+              <p className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed">
+                Registered office: 18 Cook Street, Cork City
+              </p>
+            </div>
             <div className="bg-[oklch(0.97_0.003_240)] rounded-lg p-6 border border-[oklch(0.88_0.008_240)]">
               <p className="text-sm text-[oklch(0.52_0.015_240)] font-inter">
                 {t(language, 'about.regulationInfo')}

@@ -279,10 +279,10 @@ export const translations = {
       p3: 'We\'re not tied to any single product provider. This means our advice is always impartial — entirely focused on finding the right solution for you.',
       ourValues: 'Our Values',
       whatWeBelieve: 'What We Believe In',
-      whatWeStand: 'What We Stand For',
+      whatWeStand: '',
       regulatory: 'Regulatory Information',
       regulated: 'EasyToFin Financial Services Limited',
-      regulatedDesc: 'Registered in Ireland, Registration Number 801689\n\n18 Cook Street, Cork City',
+      regulatedDesc: 'Registered in Ireland, Registration Number 801689.\n\nRegistered office: 18 Cook Street, Cork City',
       regulationInfo: 'Easytofin Financial Services Limited is regulated by the Central Bank of Ireland',
       regulatedCompliant: 'Regulated & Compliant',
       regulatoryPoints: [
