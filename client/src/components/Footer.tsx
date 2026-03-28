@@ -103,7 +103,9 @@ export default function Footer() {
           <ul className="space-y-3">
             <li className="flex items-start gap-2.5 text-white/70 text-sm">
               <MapPin size={15} className="mt-0.5 shrink-0 text-[oklch(0.76_0.19_75)]" />
-              <span>EasyToFin Financial Services Limited<br />Ireland</span>
+              <a href="https://www.google.com/maps/search/18+Cook+Street,+Cork+City,+Ireland" target="_blank" rel="noopener noreferrer" className="hover:text-[oklch(0.76_0.19_75)] transition-colors">
+                EasyToFin Financial Services Limited<br />18 Cook Street, Cork City, Ireland
+              </a>
             </li>
             <li>
               <a href="tel:+35312345678" className="flex items-center gap-2.5 text-white/70 text-sm hover:text-[oklch(0.76_0.19_75)] transition-colors">
