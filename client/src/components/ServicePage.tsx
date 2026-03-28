@@ -2,6 +2,8 @@ import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 interface WhySection {
   title: string;
@@ -51,7 +53,9 @@ export default function ServicePage({
   const getQuoteText = ctaText === "Get a Free Quote" ? t(language, 'home.learnMore') : t(language, 'nav.getQuote');
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+    <Navbar />
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Sub Services */}
       <section className="py-16 bg-white">
         <div className="container">
@@ -127,6 +131,8 @@ export default function ServicePage({
           </div>
         </section>
       )}
+      <Footer />
     </div>
+    </>
   );
 }
