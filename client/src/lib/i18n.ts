@@ -618,8 +618,8 @@ export const translations = {
       ourValues: '我们的价值观',
       whatWeStand: '',
       regulated: 'EasyToFin金融服务有限公司',
-      regulatedDesc: '注册于爱尔兰，注册司801689。\n\n注册地址：爱尔兰科克市库克街18号',
-      regulationInfo: 'EasyToFin金融服务有限公司由爱尔兰中央银行监管',
+      regulatedDesc: '注册于爱尔兰，公司注册司801689。\n\n注册地址：18 Cook Street, Cork City',
+      regulationInfo: 'EasyToFin Financial Services Limited由爱尔兰中央银行监管',
       regulatory: '监管信息',
       regulatedCompliant: '受监管且合规',
       regulatoryPoints: [
