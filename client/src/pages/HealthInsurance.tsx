@@ -20,16 +20,16 @@ export default function HealthInsurance() {
       description: t(language, 'health.corporateDesc'),
     },
     {
+      title: t(language, 'health.senior'),
+      description: t(language, 'health.seniorDesc'),
+    },
+    {
+      title: t(language, 'health.international'),
+      description: t(language, 'health.internationalDesc'),
+    },
+    {
       title: t(language, 'health.dental'),
       description: t(language, 'health.dentalDesc'),
-    },
-    {
-      title: t(language, 'health.vision'),
-      description: t(language, 'health.visionDesc'),
-    },
-    {
-      title: t(language, 'health.mental'),
-      description: t(language, 'health.mentalDesc'),
     },
   ];
 
