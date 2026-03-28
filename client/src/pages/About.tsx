@@ -104,7 +104,7 @@ export default function About() {
           <div className="text-center mb-14">
             <span className="section-tag">{t(language, 'about.ourValues')}</span>
             <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mt-3">
-              {t(language, 'about.whatWeBelieve')}
+              {t(language, 'about.whatWeStand')}
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
