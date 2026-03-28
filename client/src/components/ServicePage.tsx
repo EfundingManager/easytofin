@@ -119,20 +119,6 @@ export default function ServicePage({
         </section>
       )}
 
-      {/* CTA */}
-      <section className="teal-gradient py-14">
-        <div className="container text-center">
-          <h2 className="font-[Outfit] font-800 text-3xl text-white mb-4">
-            {t(language, 'common.readyGetStarted')}
-          </h2>
-          <p className="text-white/80 font-inter mb-7 max-w-md mx-auto">
-            {t(language, 'common.readyDesc')}
-          </p>
-          <Link href="/contact" className="btn-amber">
-            {getQuoteText} <ArrowRight size={16} />
-          </Link>
-        </div>
-      </section>
 
       <Footer />
     </div>
