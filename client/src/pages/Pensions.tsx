@@ -12,8 +12,8 @@ export default function Pensions() {
       description: t(language, 'pensions.prsaDesc'),
     },
     {
-      title: t(language, 'pensions.arf'),
-      description: t(language, 'pensions.arfDesc'),
+      title: t(language, 'pensions.avc'),
+      description: t(language, 'pensions.avcDesc'),
     },
     {
       title: t(language, 'pensions.occupational'),
@@ -24,8 +24,8 @@ export default function Pensions() {
       description: t(language, 'pensions.executiveDesc'),
     },
     {
-      title: t(language, 'pensions.avc'),
-      description: t(language, 'pensions.avcDesc'),
+      title: t(language, 'pensions.arf'),
+      description: t(language, 'pensions.arfDesc'),
     },
   ];
 
