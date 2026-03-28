@@ -70,37 +70,6 @@ export default function ServicePage({
         </div>
       </section>
 
-      {/* Why Section with Content */}
-      <section className="py-20 bg-[oklch(0.97_0.003_240)]">
-        <div className="container">
-          <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mb-12">
-            {whySection.title}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            {whySection.points.map((point, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <CheckCircle2 size={20} className="text-[oklch(0.40_0.11_195)] mt-0.5 shrink-0" />
-                <p className="text-[oklch(0.30_0.015_240)] font-inter text-sm leading-relaxed">
-                  {point}
-                </p>
-              </div>
-            ))}
-          </div>
-          
-          {/* Content directly in Why section */}
-          {contentSection && (
-            <div className="border-t border-[oklch(0.88_0.008_240)] pt-12">
-              <div className="space-y-4">
-                {contentSection.paragraphs.map((paragraph, i) => (
-                  <p key={i} className="text-[oklch(0.30_0.015_240)] font-inter leading-relaxed text-base">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* Related Services */}
       {relatedServices.length > 0 && (
