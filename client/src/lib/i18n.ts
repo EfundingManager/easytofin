@@ -165,6 +165,11 @@ export const translations = {
         'We provide a clear, written Statement of Suitability for all pension recommendations.',
         'Regular pension reviews ensure your fund stays on track to meet your retirement goals.',
       ],
+      introductionSubtitle: 'Our mission is to provide clients with the best pension solutions for a secure retirement. Our team of qualified pension specialists guides you to make informed decisions that maximise your pension\'s potential.',
+      introductionContent: [
+        'A pension is the most tax-efficient way to save for your retirement. The earlier you start, the better — but it\'s never too late to begin.',
+        'Our pension specialists will assess your current position, explain your options clearly, and help you build a retirement fund that gives you financial independence.',
+      ],
     },
     // Health Insurance page
     healthInsurance: {
