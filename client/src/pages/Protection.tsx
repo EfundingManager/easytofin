@@ -52,7 +52,7 @@ export default function Protection() {
         paragraphs: Array.isArray(contentParagraphs) ? contentParagraphs : [],
       }}
       introductionSection={{
-        title: t(language, 'protection.whyProtection'),
+        title: 'Why Choose EasyToFin?',
         subtitle: typeof introductionSubtitle === 'string' ? introductionSubtitle : '',
         paragraphs: Array.isArray(introductionParagraphs) ? introductionParagraphs : [],
       }}

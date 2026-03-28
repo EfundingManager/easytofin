@@ -44,7 +44,7 @@ export default function GeneralInsurance() {
       icon={<Building2 size={28} />}
       subServices={subServices}
       introductionSection={{
-        title: t(language, 'services.generalInsurance'),
+        title: 'Why Choose EasyToFin?',
         subtitle: t(language, 'general.introductionSubtitle'),
         paragraphs: Array.isArray(introductionContent) ? introductionContent : [],
       }}

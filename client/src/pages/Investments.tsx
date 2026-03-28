@@ -44,7 +44,7 @@ export default function Investments() {
       icon={<BarChart3 size={28} />}
       subServices={subServices}
       introductionSection={{
-        title: t(language, 'services.investments'),
+        title: 'Why Choose EasyToFin?',
         subtitle: t(language, 'investments.introductionSubtitle'),
         paragraphs: Array.isArray(introductionContent) ? introductionContent : [],
       }}

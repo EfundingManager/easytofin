@@ -44,7 +44,7 @@ export default function HealthInsurance() {
       icon={<Heart size={28} />}
       subServices={subServices}
       introductionSection={{
-        title: t(language, 'services.healthInsurance'),
+        title: 'Why Choose EasyToFin?',
         subtitle: t(language, 'health.introductionSubtitle'),
         paragraphs: Array.isArray(introductionContent) ? introductionContent : [],
       }}
