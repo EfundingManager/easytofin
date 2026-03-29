@@ -90,7 +90,7 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-white/65 text-sm hover:text-[oklch(0.76_0.19_75)] transition-colors">
+              <a href="/terms-of-business" target="_blank" rel="noopener noreferrer" className="text-white/65 text-sm hover:text-[oklch(0.76_0.19_75)] transition-colors">
                 {t(language, 'footer.termsOfBusiness')}
               </a>
             </li>
