@@ -211,7 +211,7 @@ export const translations = {
 
       liability: 'Liability Insurance',
       liabilityDesc: 'Public liability, employers liability and professional indemnity insurance for businesses and sole traders. Protect yourself against third-party claims.',
-      introductionSubtitle: 'General insurance protects what matters most — your home, your car, your business and your peace of mind. We help you find comprehensive cover at competitive prices.',
+      introductionSubtitle: 'General insurance protects what matters most - your home, your car, your business and your peace of mind. We help you find comprehensive cover at competitive prices.',
       introductionContent: [
         'Life is unpredictable. Accidents, theft, damage and unexpected events can happen to anyone. General insurance ensures you\'re protected when they do.',
         'With so many providers and policies available, finding the right cover at the right price can be overwhelming. That\'s where we come in.',
@@ -555,7 +555,7 @@ export const translations = {
 
       liability: '责任保险',
       liabilityDesc: '为企业和个体经营者提供的公众责任、雇主责任和专业赔偿保险。保护您免受第三方索赔。',
-      introductionSubtitle: '综合保险保护了最重要的事情——你的家、你的汽车、你的业务和你的安心。我们帮助您以具有竞争力的价格找到全面的保险。',
+      introductionSubtitle: '综合保险保护了最重要的事情 - 你的家、你的汿车、你的业务和你的安心。我们帮助您以具有竞争力的价格找到全面的保险。',
       introductionContent: [
         '综合保险是保护你的资产和生活方式的重要方式。不管您是住宅所有者、汽车主人还是业主，我们都能为您提供提供合适的保险。',
         '我们的专家团队不受任何单一保险公司的限制——我们为您工作。我们比较来自爱尔兰领先综合保险公司的广泛报价。',
@@ -901,7 +901,7 @@ export const translations = {
 
       liability: 'Ubezpieczenie odpowiedzialności cywilnej',
       liabilityDesc: 'Ubezpieczenie odpowiedzialności cywilnej, odpowiedzialności pracodawcy i ubezpieczenia zawodowego dla biznesów i osób samozatrudnionych. Chroń się przed roszczeniami osób trzecich.',
-      introductionSubtitle: 'Ubezpieczenia ogólne chronią to, co najważniejsze — Twój dom, Twój samochód, Twój biznes i Twój spokój ducha. Pomagamy Ci znaleźć kompleksową ochronę w konkurencyjnych cenach.',
+      introductionSubtitle: 'Ubezpieczenia ogólne chronią to, co najważniejsze - Twój dom, Twój samochód, Twój biznes i Twój spokój ducha. Pomagamy Ci znaleźć kompleksową ochronę w konkurencyjnych cenach.',
       introductionContent: [
         'Ubezpieczenia ogólne to ważny sposób ochrony Twoich aktywów i stylu życia. Niezależnie od tego, czy jesteś właścicielem domu, właścicielem samochodu czy przedsiębiorcaą, możemy zapewnić Ci odpowiednią ochronę.',
         'Nasz zespoł ekspertów nie jest związany żadnym pojedynczym towarzystwem ubezpieczeniowym — pracujemy dla Ciebie. Porównujemy szeroki zakres ofert od wiodących irlandzkich ubezpieczycieli ogólnych.',
