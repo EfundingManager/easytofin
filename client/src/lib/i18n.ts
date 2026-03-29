@@ -534,6 +534,12 @@ export const translations = {
       internationalDesc: '为侨民和在国外工作的人士提供全球医疗保障，可以获得全球私人医院。',
       dental: '牙科',
       dentalDesc: '独立牙科保险，涵盖常规护理、治疗和紧急牙科工作。有效管理牙科成本。',
+      introductionSubtitle: '私人健康保险确保您在需要时能够获得优质医疗保健，无需承受NHS等待名单的压力。我们的团队帮助您找到适合您需求和预算的合适计划。',
+      introductionContent: [
+        '良好的健康是您最宝贵的资产。私人健康保险为您提供选择、控制和安心。',
+        '无论您需要定期检查、专家咨询还是紧急治疗，私人保障都能确保您在需要时获得所需的护理。',
+        '在EasyToFin，我们比较所有主要提供商的计划，帮助您准确了解保障范围，确保您做出明智的决定。',
+      ],
       whyHealth: '为什么私人健康保险很重要',
       whyHealthPoints: [
         '更快的诊断和治疗获取——没有私人咨询的等待列表。',
@@ -561,6 +567,12 @@ export const translations = {
       travelDesc: '为个人和家庭提供的单次旅行和年度多次旅行保险。涵盖医疗紧急情况、取消、行李等——全球范围。',
       liability: '责任保险',
       liabilityDesc: '为企业和个体经营者提供的公众责任、雇主责任和专业赔偿保险。保护您免受第三方索赔。',
+      introductionSubtitle: '综合保险保护了最重要的事情——你的家、你的汽车、你的业务和你的安心。我们帮助您以具有竞争力的价格找到全面的保险。',
+      introductionContent: [
+        '综合保险是保护你的资产和生活方式的重要方式。不管您是住宅所有者、汽车主人还是业主，我们都能为您提供提供合适的保险。',
+        '我们的专家团队不受任何单一保险公司的限制——我们为您工作。我们比较来自爱尔兰领先综合保险公司的广泛报价。',
+        '我们确保您获得需要的保险级别——而不仅仅是最便宜的选择。如果您需要提出索赔，我们会提供索赔支持。',
+      ],
       whyBroker: '独立经纪人为您工作',
       whyBrokerPoints: [
         '作为独立经纪人，我们不受任何单一保险公司的束缚——我们为您工作。',
@@ -588,6 +600,12 @@ export const translations = {
       structuredDesc: '本金保护或本金风险的结构化投资产品，提供与市场表现相关的固定回报。适合寻求确定性的投资者。',
       education: '教育储蓄计划',
       educationDesc: '立即开始为您孩子的教育储蓄。灵活的定期储蓄计划确保资金在第三级成本产生时可用。',
+      introductionSubtitle: '无论您是想投资一笔款项、定期储蓄还是分散现有投资组合，我们的投资顾问都能帮助您。我们花时间了解您的财务目标、风险承受能力和时间框架。',
+      introductionContent: [
+        '投资是为您的未来帮助您的一种方式。无论您是初次投资者还是经验丰富的投资者，我们都能为您提供专业的建议。',
+        '我们不受任何单一产品提供商的限制。这意味着我们的建议始终是公正的——完全专注于为您找到合适的解决方案。',
+        '我们清楚地解释投资风险——没有行业术语，没有惊営。我们的投资组合定期审查确保您的投资不失控。',
+      ],
       whyInvest: '与EasyToFin投资',
       whyInvestPoints: [
         '我们在进行任何投资建议之前仔细评估您的风险状况。',
@@ -868,6 +886,12 @@ export const translations = {
       internationalDesc: 'Dla emigrantów i osób pracujących za granicą, zapewniająca globalną ochronę medyczną z dostępem do prywatnych szpitali na całym świecie.',
       dental: 'Dentystyczne',
       dentalDesc: 'Samodzielne ubezpieczenie dentystyczne obejmujące rutynową opiekę, leczenie i nagłe zabiegi dentystyczne. Pomaga efektywnie zarządzać kosztami dentystycznymi.',
+      introductionSubtitle: 'Prywatne ubezpieczenie zdrowotne zapewnia Ci dostęp do wysokiej jakości opieki zdrowotnej, gdy jej potrzebujesz, bez stresu związanego z listami oczekiwania NHS. Nasz zespół pomaga Ci znaleźć odpowiedni plan na Twoje potrzeby i budżet.',
+      introductionContent: [
+        'Dobre zdrowie to Twój najcenniejszy zasób. Prywatne ubezpieczenie zdrowotne daje Ci wybór, kontrolę i spokój ducha.',
+        'Niezależnie od tego, czy potrzebujesz regularnych badań, konsultacji specjalistów czy leczenia nagłego, prywatna ochrona zapewnia Ci opiekę, której potrzebujesz, kiedy jej potrzebujesz.',
+        'W EasyToFin porównujemy plany wszystkich głównych dostawców i pomagamy Ci dokładnie zrozumieć, co jest objęte, zapewniając, że podejmiesz świadomą decyzję.',
+      ],
       whyHealth: 'Dlaczego prywatne ubezpieczenie zdrowotne jest ważne',
       whyHealthPoints: [
         'Szybszy dostęp do diagnozy i leczenia — bez list oczekiwania na prywatne konsultacje.',
@@ -895,6 +919,12 @@ export const translations = {
       travelDesc: 'Ubezpieczenie podróży w jedną stronę i wielokrotne podróże rocznie dla osób i rodzin. Obejmuje nagłe wypadki medyczne, anulowanie, bagaż i wiele więcej — na całym świecie.',
       liability: 'Ubezpieczenie odpowiedzialności cywilnej',
       liabilityDesc: 'Ubezpieczenie odpowiedzialności cywilnej, odpowiedzialności pracodawcy i ubezpieczenia zawodowego dla biznesów i osób samozatrudnionych. Chroń się przed roszczeniami osób trzecich.',
+      introductionSubtitle: 'Ubezpieczenia ogólne chronią to, co najważniejsze — Twój dom, Twój samochód, Twój biznes i Twój spokój ducha. Pomagamy Ci znaleźć kompleksową ochronę w konkurencyjnych cenach.',
+      introductionContent: [
+        'Ubezpieczenia ogólne to ważny sposób ochrony Twoich aktywów i stylu życia. Niezależnie od tego, czy jesteś właścicielem domu, właścicielem samochodu czy przedsiębiorcaą, możemy zapewnić Ci odpowiednią ochronę.',
+        'Nasz zespoł ekspertów nie jest związany żadnym pojedynczym towarzystwem ubezpieczeniowym — pracujemy dla Ciebie. Porównujemy szeroki zakres ofert od wiodących irlandzkich ubezpieczycieli ogólnych.',
+        'Zapewniamy, że masz odpowiedni poziom ochrony — nie tylko najtańszą opcję. Jeśli musisz złożyć roszczenie, zapewniamy wsparcie w roszczeniach.',
+      ],
       whyBroker: 'Dlaczego warto korzystać z niezależnego brokera',
       whyBrokerPoints: [
         'Jako niezależny broker nie jesteśmy związani żadnym pojedynczym towarzystwem ubezpieczeniowym — pracujemy dla Ciebie.',
@@ -920,8 +950,14 @@ export const translations = {
       portfolioDesc: 'Dla większych portfeli oferujemy ciągłe usługi zarządzania i przeglądu, zapewniając, że Twoje inwestycje pozostają zgodne z Twoimi celami i warunkami rynkowymi.',
       structured: 'Produkty strukturyzowane',
       structuredDesc: 'Strukturyzowane produkty inwestycyjne z ochroną kapitału lub ryzykiem kapitału, oferujące stałe zwroty powiązane z wynikami rynkowymi. Odpowiednie dla inwestorów szukających pewności.',
-      education: 'Plany oszczędnościowe na edukację',
-      educationDesc: 'Zacznij oszczędzać na edukację swojego dziecka już teraz. Elastyczne regularne plany oszczędnościowe zapewniają dostępność środków, gdy pojawiają się koszty trzeciego poziomu.',
+        education: 'Plany oszędznościowe na edukację',
+      educationDesc: 'Zacznij oszędzać na edukację swojego dziecka już teraz. Elastyczne regularne plany oszędznościowe zapewniają dostępność środków, gdy pojawiają się koszty trzeciego poziomu.',
+      introductionSubtitle: 'Niezależnie od tego, czy masz kwotę ryczatłową do zainwestowania, chcesz oszczędzać regularnie, czy chcesz zdywersyfikować swój istniejący portfel, nasi doradcy inwestycyjni mogą Ci pomóc. Poświęcamy czas, aby zrozumieć Twoje cele finansowe.',
+      introductionContent: [
+        'Inwestowanie to sposób na pomoc w Twojej przyszłości. Niezależnie od tego, czy jesteś inwestorem pierwszego razu czy doświadczonym inwestorem, możemy Ci zapewnić profesjonalne porady.',
+        'Nie jesteśmy związani żadnym pojedynczym dostawcą produktów. Oznacza to, że nasze porady są zawsze bezstronne — całkowicie skupione na znalezieniu dla Ciebie odpowiedniego rozwiązania.',
+        'Jasno wyjaśniamy ryzyka inwestycyjne — bez Żargonu, bez niespodzianek. Regularne przeglądy portfela utrzymują Twoje inwestycje na ścieżce do osiągnięcia celów.',
+      ],
       whyInvest: 'Inwestowanie z EasyToFin',
       whyInvestPoints: [
         'Ostrożnie oceniamy Twój profil ryzyka przed udzieleniem jakichkolwiek porad inwestycyjnych.',
@@ -1039,4 +1075,19 @@ export function getTranslation(lang: Language, key: string, defaultValue: string
 
 export function t(lang: Language, key: string): string {
   return getTranslation(lang, key, key);
+}
+
+export function getArrayTranslation(lang: Language, key: string): string[] {
+  const keys = key.split('.');
+  let value: any = translations[lang];
+  
+  for (const k of keys) {
+    if (value && typeof value === 'object' && k in value) {
+      value = value[k];
+    } else {
+      return [];
+    }
+  }
+  
+  return Array.isArray(value) ? value : [];
 }

@@ -8,48 +8,49 @@ export default function GeneralInsurance() {
 
   const subServices = [
     {
-      title: t(language, 'general.homeowners'),
-      description: t(language, 'general.homeownersDesc'),
+      title: t(language, 'generalInsurance.home'),
+      description: t(language, 'generalInsurance.homeDesc'),
     },
     {
-      title: t(language, 'general.renters'),
-      description: t(language, 'general.rentersDesc'),
+      title: t(language, 'generalInsurance.motor'),
+      description: t(language, 'generalInsurance.motorDesc'),
     },
     {
-      title: t(language, 'general.motor'),
-      description: t(language, 'general.motorDesc'),
+      title: t(language, 'generalInsurance.business'),
+      description: t(language, 'generalInsurance.businessDesc'),
     },
     {
-      title: t(language, 'general.travel'),
-      description: t(language, 'general.travelDesc'),
+      title: t(language, 'generalInsurance.landlord'),
+      description: t(language, 'generalInsurance.landlordDesc'),
     },
     {
-      title: t(language, 'general.pet'),
-      description: t(language, 'general.petDesc'),
+      title: t(language, 'generalInsurance.travel'),
+      description: t(language, 'generalInsurance.travelDesc'),
     },
     {
-      title: t(language, 'general.business'),
-      description: t(language, 'general.businessDesc'),
+      title: t(language, 'generalInsurance.liability'),
+      description: t(language, 'generalInsurance.liabilityDesc'),
     },
   ];
 
-  const whyPoints = t(language, 'general.whyGeneralPoints');
-  const introductionContent = t(language, 'general.introductionContent');
+  const whyPoints = t(language, 'generalInsurance.whyBrokerPoints');
+  const introductionContent = t(language, 'generalInsurance.introductionContent');
+  const introductionSubtitle = t(language, 'generalInsurance.introductionSubtitle');
 
   return (
     <ServicePage
       title={t(language, 'services.generalInsurance')}
-      tagline={t(language, 'general.tagline')}
-      heroDescription={t(language, 'general.heroDesc')}
+      tagline={t(language, 'generalInsurance.tagline')}
+      heroDescription={t(language, 'generalInsurance.heroDesc')}
       icon={<Building2 size={28} />}
       subServices={subServices}
       introductionSection={{
         title: 'Why Choose EasyToFin?',
-        subtitle: t(language, 'general.introductionSubtitle'),
+        subtitle: typeof introductionSubtitle === 'string' ? introductionSubtitle : '',
         paragraphs: Array.isArray(introductionContent) ? introductionContent : [],
       }}
       whySection={{
-        title: t(language, 'general.whyGeneral'),
+        title: t(language, 'generalInsurance.whyBroker'),
         points: Array.isArray(whyPoints) ? whyPoints : [],
       }}
       relatedServices={[

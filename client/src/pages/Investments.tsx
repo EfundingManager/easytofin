@@ -8,16 +8,16 @@ export default function Investments() {
 
   const subServices = [
     {
-      title: t(language, 'investments.savings'),
-      description: t(language, 'investments.savingsDesc'),
+      title: t(language, 'investments.investmentBonds'),
+      description: t(language, 'investments.investmentBondsDesc'),
     },
     {
-      title: t(language, 'investments.bonds'),
-      description: t(language, 'investments.bondsDesc'),
+      title: t(language, 'investments.regularSavings'),
+      description: t(language, 'investments.regularSavingsDesc'),
     },
     {
-      title: t(language, 'investments.funds'),
-      description: t(language, 'investments.fundsDesc'),
+      title: t(language, 'investments.lumpSum'),
+      description: t(language, 'investments.lumpSumDesc'),
     },
     {
       title: t(language, 'investments.portfolio'),
@@ -28,13 +28,14 @@ export default function Investments() {
       description: t(language, 'investments.educationDesc'),
     },
     {
-      title: t(language, 'investments.review'),
-      description: t(language, 'investments.reviewDesc'),
+      title: t(language, 'investments.structured'),
+      description: t(language, 'investments.structuredDesc'),
     },
   ];
 
   const whyPoints = t(language, 'investments.whyInvestmentsPoints');
   const introductionContent = t(language, 'investments.introductionContent');
+  const introductionSubtitle = t(language, 'investments.introductionSubtitle');
 
   return (
     <ServicePage
@@ -45,7 +46,7 @@ export default function Investments() {
       subServices={subServices}
       introductionSection={{
         title: 'Why Choose EasyToFin?',
-        subtitle: t(language, 'investments.introductionSubtitle'),
+        subtitle: typeof introductionSubtitle === 'string' ? introductionSubtitle : '',
         paragraphs: Array.isArray(introductionContent) ? introductionContent : [],
       }}
       whySection={{

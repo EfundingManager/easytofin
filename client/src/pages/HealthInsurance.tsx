@@ -1,40 +1,42 @@
 import { Heart } from "lucide-react";
 import ServicePage from "@/components/ServicePage";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { t } from "@/lib/i18n";
+import { t, translations } from "@/lib/i18n";
 
 export default function HealthInsurance() {
   const { language } = useLanguage();
+  const health = translations[language]?.healthInsurance || translations['en'].healthInsurance;
 
   const subServices = [
     {
-      title: t(language, 'health.individual'),
-      description: t(language, 'health.individualDesc'),
+      title: health.individual,
+      description: health.individualDesc,
     },
     {
-      title: t(language, 'health.family'),
-      description: t(language, 'health.familyDesc'),
+      title: health.family,
+      description: health.familyDesc,
     },
     {
-      title: t(language, 'health.corporate'),
-      description: t(language, 'health.corporateDesc'),
+      title: health.corporate,
+      description: health.corporateDesc,
     },
     {
-      title: t(language, 'health.senior'),
-      description: t(language, 'health.seniorDesc'),
+      title: health.senior,
+      description: health.seniorDesc,
     },
     {
-      title: t(language, 'health.international'),
-      description: t(language, 'health.internationalDesc'),
+      title: health.international,
+      description: health.internationalDesc,
     },
     {
-      title: t(language, 'health.dental'),
-      description: t(language, 'health.dentalDesc'),
+      title: health.dental,
+      description: health.dentalDesc,
     },
   ];
 
-  const whyPoints = t(language, 'health.whyHealthPoints');
-  const introductionContent = t(language, 'health.introductionContent');
+  const whyPoints = t(language, 'healthInsurance.whyHealthPoints');
+  const introductionContent = t(language, 'healthInsurance.introductionContent');
+  const introductionSubtitle = t(language, 'healthInsurance.introductionSubtitle');
 
   return (
     <ServicePage
@@ -45,11 +47,11 @@ export default function HealthInsurance() {
       subServices={subServices}
       introductionSection={{
         title: 'Why Choose EasyToFin?',
-        subtitle: t(language, 'health.introductionSubtitle'),
+        subtitle: typeof introductionSubtitle === 'string' ? introductionSubtitle : '',
         paragraphs: Array.isArray(introductionContent) ? introductionContent : [],
       }}
       whySection={{
-        title: t(language, 'health.whyHealth'),
+        title: t(language, 'healthInsurance.whyHealth'),
         points: Array.isArray(whyPoints) ? whyPoints : [],
       }}
       relatedServices={[
