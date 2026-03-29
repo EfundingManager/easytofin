@@ -174,33 +174,16 @@ export default function PrivacyPolicy() {
             <p className="text-base leading-relaxed">{pp.section9Content}</p>
           </section>
 
-          {/* Section 10: Children's Privacy */}
+          {/* Section 10: Contact Information */}
           <section className="mb-8">
             <h2 className="text-2xl font-bold mb-4">{pp.section10Title}</h2>
             <p className="text-base leading-relaxed">{pp.section10Content}</p>
           </section>
 
-          {/* Section 11: Data Protection Officer */}
+          {/* Section 11: Regulatory Information */}
           <section className="mb-8">
             <h2 className="text-2xl font-bold mb-4">{pp.section11Title}</h2>
             <p className="text-base leading-relaxed mb-4">{pp.section11Content}</p>
-            <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
-              <p className="text-base"><strong>Email:</strong> {pp.dpoEmail}</p>
-              <p className="text-base"><strong>Address:</strong> {pp.dpoAddress}</p>
-              <p className="text-base"><strong>Phone:</strong> {pp.dpoPhone}</p>
-            </div>
-          </section>
-
-          {/* Section 12: Contact Information */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">{pp.section12Title}</h2>
-            <p className="text-base leading-relaxed">{pp.section12Content}</p>
-          </section>
-
-          {/* Section 13: Regulatory Information */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">{pp.section13Title}</h2>
-            <p className="text-base leading-relaxed mb-4">{pp.section13Content}</p>
             <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
               <p className="text-base"><strong>Address:</strong> {pp.cbAddress}</p>
               <p className="text-base"><strong>Phone:</strong> {pp.cbPhone}</p>
@@ -208,10 +191,10 @@ export default function PrivacyPolicy() {
             </div>
           </section>
 
-          {/* Section 14: Changes */}
+          {/* Section 12: Changes */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">{pp.section14Title}</h2>
-            <p className="text-base leading-relaxed">{pp.section14Content}</p>
+            <h2 className="text-2xl font-bold mb-4">{pp.section12Title}</h2>
+            <p className="text-base leading-relaxed">{pp.section12Content}</p>
           </section>
 
           {/* Footer */}
