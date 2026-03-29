@@ -133,14 +133,14 @@ export default function Home() {
         <div className="relative container py-20">
           <div className="max-w-2xl">
 
-            <h1 className="font-[Outfit] font-800 text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-5">
+            <h1 className="font-[Outfit] font-800 text-5xl md:text-6xl lg:text-7xl text-white leading-tight mb-5">
               {language === 'en' ? (
                 <>Own Your Future<br /><span className="text-[oklch(0.82_0.17_70)]">Made Easy.</span></>
               ) : (
                 <>控制你的未来<br /><span className="text-[oklch(0.82_0.17_70)]">轻松搞定。</span></>
               )}
             </h1>
-            <p className="text-white/80 text-lg leading-relaxed mb-8 font-inter max-w-xl font-semibold">
+            <p className="text-white/80 text-xl md:text-2xl leading-relaxed mb-8 font-inter max-w-2xl font-semibold">
               {t(language, 'home.description')}
             </p>
             <div className="flex flex-wrap gap-4">
