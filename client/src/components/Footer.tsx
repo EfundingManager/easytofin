@@ -85,9 +85,9 @@ export default function Footer() {
               </li>
             ))}
             <li>
-              <a href="#" className="text-white/65 text-sm hover:text-[oklch(0.76_0.19_75)] transition-colors">
+              <Link href="/privacy-policy" className="text-white/65 text-sm hover:text-[oklch(0.76_0.19_75)] transition-colors">
                 {t(language, 'footer.privacyPolicy')}
-              </a>
+              </Link>
             </li>
             <li>
               <a href="#" className="text-white/65 text-sm hover:text-[oklch(0.76_0.19_75)] transition-colors">
