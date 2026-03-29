@@ -208,8 +208,7 @@ export const translations = {
       businessDesc: 'Tailored insurance solutions for businesses of all sizes, including public liability, employers liability, professional indemnity, commercial property and business interruption insurance.',
       landlord: 'Landlord Insurance',
       landlordDesc: 'Specialist insurance for property investors and landlords, including buildings cover, rent loss, public liability and legal fees. Protect your investment and income.',
-      travel: 'Travel Insurance',
-      travelDesc: 'Single trip and annual multi-trip travel insurance for individuals and families. Covers medical emergencies, cancellation, baggage and more — worldwide.',
+
       liability: 'Liability Insurance',
       liabilityDesc: 'Public liability, employers liability and professional indemnity insurance for businesses and sole traders. Protect yourself against third-party claims.',
       introductionSubtitle: 'General insurance protects what matters most — your home, your car, your business and your peace of mind. We help you find comprehensive cover at competitive prices.',
@@ -553,8 +552,7 @@ export const translations = {
       businessDesc: '为各种规模的企业量身定制的保险解决方案，包括公众责任、雇主责任、专业赔偿、商业财产和业务中断保险。',
       landlord: '房东保险',
       landlordDesc: '为房产投资者和房东提供的专业保险，包括建筑保险、租金损失、公众责任和法律费用。保护您的投资和收入。',
-      travel: '旅行保险',
-      travelDesc: '为个人和家庭提供的单次旅行和年度多次旅行保险。涵盖医疗紧急情况、取消、行李等——全球范围。',
+
       liability: '责任保险',
       liabilityDesc: '为企业和个体经营者提供的公众责任、雇主责任和专业赔偿保险。保护您免受第三方索赔。',
       introductionSubtitle: '综合保险保护了最重要的事情——你的家、你的汽车、你的业务和你的安心。我们帮助您以具有竞争力的价格找到全面的保险。',
@@ -900,8 +898,7 @@ export const translations = {
       businessDesc: 'Dostosowane rozwiązania ubezpieczeniowe dla biznesów wszystkich rozmiarów, w tym odpowiedzialność cywilna, odpowiedzialność pracodawcy, ubezpieczenie zawodowe, majątek komercyjny i ubezpieczenie przerwania działalności.',
       landlord: 'Ubezpieczenie właściciela nieruchomości',
       landlordDesc: 'Specjalistyczne ubezpieczenie dla inwestorów nieruchomościowych i właścicieli, obejmujące ubezpieczenie budynku, utratę czynszu, odpowiedzialność cywilną i opłaty prawne. Chroń swoją inwestycję i dochód.',
-      travel: 'Ubezpieczenie podróży',
-      travelDesc: 'Ubezpieczenie podróży w jedną stronę i wielokrotne podróże rocznie dla osób i rodzin. Obejmuje nagłe wypadki medyczne, anulowanie, bagaż i wiele więcej — na całym świecie.',
+
       liability: 'Ubezpieczenie odpowiedzialności cywilnej',
       liabilityDesc: 'Ubezpieczenie odpowiedzialności cywilnej, odpowiedzialności pracodawcy i ubezpieczenia zawodowego dla biznesów i osób samozatrudnionych. Chroń się przed roszczeniami osób trzecich.',
       introductionSubtitle: 'Ubezpieczenia ogólne chronią to, co najważniejsze — Twój dom, Twój samochód, Twój biznes i Twój spokój ducha. Pomagamy Ci znaleźć kompleksową ochronę w konkurencyjnych cenach.',

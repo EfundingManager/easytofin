@@ -23,10 +23,7 @@ export default function GeneralInsurance() {
       title: t(language, 'generalInsurance.landlord'),
       description: t(language, 'generalInsurance.landlordDesc'),
     },
-    {
-      title: t(language, 'generalInsurance.travel'),
-      description: t(language, 'generalInsurance.travelDesc'),
-    },
+
     {
       title: t(language, 'generalInsurance.liability'),
       description: t(language, 'generalInsurance.liabilityDesc'),
