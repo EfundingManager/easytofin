@@ -115,9 +115,9 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="mailto:info@easytofin.ie" className="flex items-center gap-2.5 text-white/70 text-sm hover:text-[oklch(0.76_0.19_75)] transition-colors">
+              <a href="mailto:info@easytofin.com" className="flex items-center gap-2.5 text-white/70 text-sm hover:text-[oklch(0.76_0.19_75)] transition-colors">
                 <Mail size={15} className="shrink-0 text-[oklch(0.76_0.19_75)]" />
-                info@easytofin.ie
+                info@easytofin.com
               </a>
             </li>
           </ul>

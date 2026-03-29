@@ -71,9 +71,9 @@ export default function Navbar() {
               <Phone size={13} />
               <span className="text-xs">+353 1 234 5678</span>
             </a>
-            <a href="mailto:info@easytofin.ie" className="flex items-center gap-1.5 text-white/90 hover:text-white transition-colors">
+            <a href="mailto:info@easytofin.com" className="flex items-center gap-1.5 text-white/90 hover:text-white transition-colors">
               <Mail size={13} />
-              <span className="text-xs">info@easytofin.ie</span>
+              <span className="text-xs">info@easytofin.com</span>
             </a>
           </div>
         </div>
@@ -244,8 +244,8 @@ export default function Navbar() {
               <a href="tel:+35312345678" className="flex items-center gap-2 px-3 py-2 text-sm text-[oklch(0.52_0.015_155)]">
                 <Phone size={14} /> +353 1 234 5678
               </a>
-              <a href="mailto:info@easytofin.ie" className="flex items-center gap-2 px-3 py-2 text-sm text-[oklch(0.52_0.015_155)]">
-                <Mail size={14} /> info@easytofin.ie
+              <a href="mailto:info@easytofin.com" className="flex items-center gap-2 px-3 py-2 text-sm text-[oklch(0.52_0.015_155)]">
+                <Mail size={14} /> info@easytofin.com
               </a>
             </div>
           </div>

@@ -62,9 +62,9 @@ export default function Contact() {
                 <h3 className="font-[Outfit] font-700 text-lg text-[oklch(0.18_0.015_240)] mb-4">
                   {t(language, 'contact.email')}
                 </h3>
-                <a href="mailto:info@easytofin.ie" className="flex items-center gap-3 text-[oklch(0.40_0.11_195)] hover:text-[oklch(0.32_0.09_195)] transition-colors">
+                <a href="mailto:info@easytofin.com" className="flex items-center gap-3 text-[oklch(0.40_0.11_195)] hover:text-[oklch(0.32_0.09_195)] transition-colors">
                   <Mail size={20} className="shrink-0" />
-                  <span className="font-inter">info@easytofin.ie</span>
+                  <span className="font-inter">info@easytofin.com</span>
                 </a>
               </div>
 
