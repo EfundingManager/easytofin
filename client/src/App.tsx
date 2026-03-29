@@ -14,6 +14,7 @@ import GeneralInsurance from "./pages/GeneralInsurance";
 import Investments from "./pages/Investments";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 function Router() {
   return (
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/investments" component={Investments} />
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
