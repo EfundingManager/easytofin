@@ -138,9 +138,9 @@ export default function Home() {
             </div>
             <h1 className="font-[Outfit] font-800 text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-5">
               {language === 'en' ? (
-                <>Your Financial<br /><span className="text-[oklch(0.82_0.17_70)]">Future, Simplified.</span></>
+                <>Your Financial<br /><span className="text-[oklch(0.82_0.17_70)]">Made Easy.</span></>
               ) : (
-                <>您的财务<br /><span className="text-[oklch(0.82_0.17_70)]">未来，简单明了。</span></>
+                <>您的财务<br /><span className="text-[oklch(0.82_0.17_70)]">轻松搞定。</span></>
               )}
             </h1>
             <p className="text-white/80 text-lg leading-relaxed mb-8 font-inter max-w-xl font-semibold">
