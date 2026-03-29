@@ -1301,3 +1301,18 @@ export function getArrayTranslation(lang: Language, key: string): string[] {
   
   return Array.isArray(value) ? value : [];
 }
+
+export function getObjectTranslation(lang: Language, key: string): Record<string, any> {
+  const keys = key.split('.');
+  let value: any = translations[lang];
+  
+  for (const k of keys) {
+    if (value && typeof value === 'object' && k in value) {
+      value = value[k];
+    } else {
+      return {};
+    }
+  }
+  
+  return typeof value === 'object' ? value : {};
+}

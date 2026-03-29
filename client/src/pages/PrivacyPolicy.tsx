@@ -1,10 +1,10 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import { t } from '@/lib/i18n';
+import { getObjectTranslation } from '@/lib/i18n';
 
 export default function PrivacyPolicy() {
   const { language } = useLanguage();
 
-  const pp = t(language, 'privacyPolicy') as unknown as Record<string, string>;
+  const pp = getObjectTranslation(language, 'privacyPolicy');
 
   return (
     <div className="min-h-screen bg-background text-foreground">
