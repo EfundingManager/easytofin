@@ -184,7 +184,7 @@ export const translations = {
       internationalDesc: 'For expats and those working abroad, providing global medical cover with access to private hospitals worldwide.',
       dental: 'Dental',
       dentalDesc: 'Standalone dental insurance covering routine care, treatments and emergency dental work. Helps manage dental costs effectively.',
-      introductionSubtitle: 'Private health insurance ensures you have access to quality healthcare when you need it, without the stress of NHS waiting lists. Our team helps you find the right plan for your needs and budget.',
+      introductionSubtitle: 'Private health insurance ensures you have access to quality healthcare when you need it, without the stress of HSE waiting lists. Our team helps you find the right plan for your needs and budget.',
       introductionContent: [
         'Good health is your most valuable asset. Private health insurance gives you choice, control and peace of mind.',
         'Whether you need routine check-ups, specialist consultations or emergency treatment, private cover ensures you get the care you need, when you need it.',
@@ -534,7 +534,7 @@ export const translations = {
       internationalDesc: '为侨民和在国外工作的人士提供全球医疗保障，可以获得全球私人医院。',
       dental: '牙科',
       dentalDesc: '独立牙科保险，涵盖常规护理、治疗和紧急牙科工作。有效管理牙科成本。',
-      introductionSubtitle: '私人健康保险确保您在需要时能够获得优质医疗保健，无需承受NHS等待名单的压力。我们的团队帮助您找到适合您需求和预算的合适计划。',
+      introductionSubtitle: '私人健康保险确保您在需要时能够获得优质医疗保健，无需承受HSE等待名单的压力。我们的团队帮助您找到适合您需求和预算的合适计划。',
       introductionContent: [
         '良好的健康是您最宝贵的资产。私人健康保险为您提供选择、控制和安心。',
         '无论您需要定期检查、专家咨询还是紧急治疗，私人保障都能确保您在需要时获得所需的护理。',
@@ -886,7 +886,7 @@ export const translations = {
       internationalDesc: 'Dla emigrantów i osób pracujących za granicą, zapewniająca globalną ochronę medyczną z dostępem do prywatnych szpitali na całym świecie.',
       dental: 'Dentystyczne',
       dentalDesc: 'Samodzielne ubezpieczenie dentystyczne obejmujące rutynową opiekę, leczenie i nagłe zabiegi dentystyczne. Pomaga efektywnie zarządzać kosztami dentystycznymi.',
-      introductionSubtitle: 'Prywatne ubezpieczenie zdrowotne zapewnia Ci dostęp do wysokiej jakości opieki zdrowotnej, gdy jej potrzebujesz, bez stresu związanego z listami oczekiwania NHS. Nasz zespół pomaga Ci znaleźć odpowiedni plan na Twoje potrzeby i budżet.',
+      introductionSubtitle: 'Prywatne ubezpieczenie zdrowotne zapewnia Ci dostęp do wysokiej jakości opieki zdrowotnej, gdy jej potrzebujesz, bez stresu związanego z listami oczekiwania HSE. Nasz zespół pomaga Ci znaleźć odpowiedni plan na Twoje potrzeby i budżet.',
       introductionContent: [
         'Dobre zdrowie to Twój najcenniejszy zasób. Prywatne ubezpieczenie zdrowotne daje Ci wybór, kontrolę i spokój ducha.',
         'Niezależnie od tego, czy potrzebujesz regularnych badań, konsultacji specjalistów czy leczenia nagłego, prywatna ochrona zapewnia Ci opiekę, której potrzebujesz, kiedy jej potrzebujesz.',
