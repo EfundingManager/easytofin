@@ -20,18 +20,7 @@ export default function HealthInsurance() {
       title: health.corporate,
       description: health.corporateDesc,
     },
-    {
-      title: health.senior,
-      description: health.seniorDesc,
-    },
-    {
-      title: health.international,
-      description: health.internationalDesc,
-    },
-    {
-      title: health.dental,
-      description: health.dentalDesc,
-    },
+
   ];
 
   const whyPoints = t(language, 'healthInsurance.whyHealthPoints');

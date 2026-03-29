@@ -178,12 +178,7 @@ export const translations = {
       familyDesc: 'Family-focused benefits include dedicated plans and comprehensive coverage for children, maternity, and everyday health needs.',
       corporate: 'Corporate',
       corporateDesc: 'With personalised packages covering fertility, sport, mind, and travel, every employee can choose the cover that suits their needs.',
-      senior: 'Senior',
-      seniorDesc: 'Specialised health insurance for those aged 65+. Covers age-related health needs with no upper age limits and guaranteed renewability.',
-      international: 'International',
-      internationalDesc: 'For expats and those working abroad, providing global medical cover with access to private hospitals worldwide.',
-      dental: 'Dental',
-      dentalDesc: 'Standalone dental insurance covering routine care, treatments and emergency dental work. Helps manage dental costs effectively.',
+
       introductionSubtitle: 'Private health insurance ensures you have access to quality healthcare when you need it, without the stress of HSE waiting lists. Our team helps you find the right plan for your needs and budget.',
       introductionContent: [
         'Good health is your most valuable asset. Private health insurance gives you choice, control and peace of mind.',
@@ -528,12 +523,7 @@ export const translations = {
       familyDesc: '以家庭为中心的福利包括专门计划和儿童、产妇和日常健康需求的全面保障。',
       corporate: '企业',
       corporateDesc: '通过个性化套餐涵盖生育、运动、心理健康和旅行，每位员工都可以选择适合其需求的保障。',
-      senior: '老年人',
-      seniorDesc: '为65岁及以上人士提供的专业健康保险。涵盖与年龄相关的健康需求，没有上限年龄，并保证可续期。',
-      international: '国际',
-      internationalDesc: '为侨民和在国外工作的人士提供全球医疗保障，可以获得全球私人医院。',
-      dental: '牙科',
-      dentalDesc: '独立牙科保险，涵盖常规护理、治疗和紧急牙科工作。有效管理牙科成本。',
+
       introductionSubtitle: '私人健康保险确保您在需要时能够获得优质医疗保健，无需承受HSE等待名单的压力。我们的团队帮助您找到适合您需求和预算的合适计划。',
       introductionContent: [
         '良好的健康是您最宝贵的资产。私人健康保险为您提供选择、控制和安心。',
@@ -880,12 +870,7 @@ export const translations = {
       familyDesc: 'Korzyści skoncentrowane na rodzinie obejmują dedykowane plany i kompleksową ochronę dla dzieci, macierzyństwa i codziennych potrzeb zdrowotnych.',
       corporate: 'Korporacyjne',
       corporateDesc: 'Z spersonalizowanymi pakietami obejmującymi płodność, sport, zdrowie psychiczne i podróże, każdy pracownik może wybrać ochronę, która odpowiada jego potrzebom.',
-      senior: 'Seniorzy',
-      seniorDesc: 'Specjalistyczne ubezpieczenie zdrowotne dla osób w wieku 65+. Obejmuje potrzeby zdrowotne związane z wiekiem bez górnych limitów wieku i gwarantowaną odnawialność.',
-      international: 'Międzynarodowe',
-      internationalDesc: 'Dla emigrantów i osób pracujących za granicą, zapewniająca globalną ochronę medyczną z dostępem do prywatnych szpitali na całym świecie.',
-      dental: 'Dentystyczne',
-      dentalDesc: 'Samodzielne ubezpieczenie dentystyczne obejmujące rutynową opiekę, leczenie i nagłe zabiegi dentystyczne. Pomaga efektywnie zarządzać kosztami dentystycznymi.',
+
       introductionSubtitle: 'Prywatne ubezpieczenie zdrowotne zapewnia Ci dostęp do wysokiej jakości opieki zdrowotnej, gdy jej potrzebujesz, bez stresu związanego z listami oczekiwania HSE. Nasz zespół pomaga Ci znaleźć odpowiedni plan na Twoje potrzeby i budżet.',
       introductionContent: [
         'Dobre zdrowie to Twój najcenniejszy zasób. Prywatne ubezpieczenie zdrowotne daje Ci wybór, kontrolę i spokój ducha.',
