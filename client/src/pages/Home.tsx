@@ -132,10 +132,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.22_0.07_195)/0.92] via-[oklch(0.22_0.07_195)/0.75] to-[oklch(0.22_0.07_195)/0.20]" />
         <div className="relative container py-20">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
-              <span className="w-2 h-2 rounded-full bg-[oklch(0.82_0.17_70)]"></span>
-              <span className="text-white/90 text-sm font-inter">{t(language, 'home.regulated')}</span>
-            </div>
+
             <h1 className="font-[Outfit] font-800 text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-5">
               {language === 'en' ? (
                 <>Your Financial<br /><span className="text-[oklch(0.82_0.17_70)]">Made Easy.</span></>
