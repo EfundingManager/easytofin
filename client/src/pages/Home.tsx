@@ -11,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 const HERO_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/hero-banner-DQ43hiRTQkWyHmsrFp5TGz.webp";
 
@@ -113,6 +114,7 @@ const getTestimonials = (lang: 'en' | 'zh' | 'pl') => [
 ];
 
 export default function Home() {
+  const { user, loading, error, isAuthenticated, logout } = useAuth();
   const { language } = useLanguage();
   const services = getServices(language);
   const whyPoints = getWhyPoints(language);
