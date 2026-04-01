@@ -9,7 +9,7 @@ import { Menu, X, ChevronDown, Phone, Mail, Globe, LogIn } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
 
-const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/pasted_file_vPhGVo_截屏2026-03-1810.38.12_5ed1a528.png";
+const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/pasted_file_AerKiv_image_27b62de2.png";
 
 const LANGUAGE_OPTIONS = [
   { code: 'en' as const, label: 'English', nativeLabel: 'English' },
