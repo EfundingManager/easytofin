@@ -5,8 +5,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export default function TermsOfBusiness() {
-  const { language } = useLanguage();
-  const tob = getObjectTranslation(language, 'termsOfBusiness') as Record<string, string>;
+  // Always use English for Terms of Business - no translation required
+  const tob = getObjectTranslation('en', 'termsOfBusiness') as Record<string, string>;
 
   return (
     <div className="min-h-screen flex flex-col">
