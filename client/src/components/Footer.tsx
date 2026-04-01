@@ -34,7 +34,7 @@ export default function Footer() {
         <div className="lg:col-span-1">
           <Link href="/" className="flex items-center gap-2.5 mb-4">
             <img 
-              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/pasted_file_AerKiv_image_27b62de2.png" 
+              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/pasted_file_OvDeTG_QQ_1775074728487_0c61a8f9.png" 
               alt="EasyToFin Logo" 
               className="h-10 w-auto object-contain"
             />
