@@ -180,7 +180,12 @@ export default function PrivacyPolicy() {
           {/* Section 10: Contact Information */}
           <section className="mb-8">
             <h2 className="text-2xl font-bold mb-4">{pp.section10Title}</h2>
-            <p className="text-base leading-relaxed">{pp.section10Content}</p>
+            <p className="text-base leading-relaxed mb-6">{pp.section10Content}</p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-base mb-2"><strong>{pp.section10AddressLabel}</strong> {pp.section10Address}</p>
+              <p className="text-base mb-2"><strong>{pp.section10PhoneLabel}</strong> {pp.section10Phone}</p>
+              <p className="text-base"><strong>{pp.section10EmailLabel}:</strong> {pp.section10Email}</p>
+            </div>
           </section>
 
           {/* Section 11: Regulatory Information */}
