@@ -5,7 +5,7 @@
  */
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown, Phone, Mail, Globe, LogIn } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, Mail, Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
 
@@ -175,10 +175,6 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link href="/phone-auth" className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-base">
-              <LogIn size={18} />
-              Client Login
-            </Link>
             <Link href="/contact" className="btn-gold text-base px-5 py-2.5">
               {t(language, 'nav.getQuote')}
             </Link>
@@ -218,11 +214,7 @@ export default function Navbar() {
             <Link href="/contact" className="block px-3 py-2.5 rounded-lg text-[oklch(0.25_0.06_155)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors">
               {t(language, 'nav.contact')}
             </Link>
-            <div className="pt-2 space-y-2">
-              <Link href="/phone-auth" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-sm">
-                <LogIn size={16} />
-                Client Login
-              </Link>
+            <div className="pt-2">
               <Link href="/contact" className="btn-gold w-full justify-center text-sm">
                 {t(language, 'nav.getQuote')}
               </Link>
