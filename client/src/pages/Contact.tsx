@@ -52,9 +52,9 @@ export default function Contact() {
                 <h3 className="font-[Outfit] font-700 text-lg text-[oklch(0.18_0.015_240)] mb-4">
                   {t(language, 'contact.phone')}
                 </h3>
-                <a href="tel:+35312345678" className="flex items-center gap-3 text-[oklch(0.40_0.11_195)] hover:text-[oklch(0.32_0.09_195)] transition-colors">
+                <a href="tel:1800008888" className="flex items-center gap-3 text-[oklch(0.40_0.11_195)] hover:text-[oklch(0.32_0.09_195)] transition-colors">
                   <Phone size={20} className="shrink-0" />
-                  <span className="font-inter">+353 1 234 5678</span>
+                  <span className="font-inter">1800 008888</span>
                 </a>
               </div>
 
