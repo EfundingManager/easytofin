@@ -16,11 +16,13 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfBusiness from "./pages/TermsOfBusiness";
-
+import PhoneAuth from "./pages/PhoneAuth";
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/phone-auth" component={PhoneAuth} />
       <Route path="/protection" component={Protection} />
       <Route path="/pensions" component={Pensions} />
       <Route path="/health-insurance" component={HealthInsurance} />
