@@ -1,12 +1,11 @@
-import { useLanguage } from '@/contexts/LanguageContext';
+
 import { getObjectTranslation } from '@/lib/i18n';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export default function PrivacyPolicy() {
-  const { language } = useLanguage();
-
-  const pp = getObjectTranslation(language, 'privacyPolicy');
+  // Always use English for Privacy Policy regardless of language selection
+  const pp = getObjectTranslation('en', 'privacyPolicy');
 
   return (
     <div className="min-h-screen flex flex-col">
