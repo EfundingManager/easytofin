@@ -1,5 +1,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getObjectTranslation } from '@/lib/i18n';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 export default function PrivacyPolicy() {
   const { language } = useLanguage();
@@ -7,7 +9,9 @@ export default function PrivacyPolicy() {
   const pp = getObjectTranslation(language, 'privacyPolicy');
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <div className="flex-grow bg-background text-foreground">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-primary/80 py-12">
         <div className="container mx-auto px-4">
@@ -203,6 +207,8 @@ export default function PrivacyPolicy() {
           </div>
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }

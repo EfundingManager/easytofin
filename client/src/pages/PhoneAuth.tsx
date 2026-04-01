@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Loader2, ArrowLeft } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 type AuthStep = "phone" | "otp" | "register";
 
@@ -171,7 +173,9 @@ export default function PhoneAuth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[oklch(0.97_0.003_240)] to-[oklch(0.92_0.02_155)] flex items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <div className="flex-grow bg-gradient-to-br from-[oklch(0.97_0.003_240)] to-[oklch(0.92_0.02_155)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Link href="/" className="inline-flex items-center text-[oklch(0.40_0.11_195)] hover:text-[oklch(0.35_0.10_195)] mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -344,6 +348,8 @@ export default function PhoneAuth() {
           </a>
         </p>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }
