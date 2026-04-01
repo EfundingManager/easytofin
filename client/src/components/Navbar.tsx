@@ -67,9 +67,9 @@ export default function Navbar() {
         <div className="container flex justify-between items-center">
           <span className="text-white/80 font-inter text-xs">{t(language, 'footer.regulatedCB')}</span>
           <div className="flex items-center gap-6">
-            <a href="tel:+35312345678" className="flex items-center gap-1.5 text-white/90 hover:text-white transition-colors">
+            <a href="tel:1800008888" className="flex items-center gap-1.5 text-white/90 hover:text-white transition-colors">
               <Phone size={13} />
-              <span className="text-xs">+353 1 234 5678</span>
+              <span className="text-xs">1800 008888</span>
             </a>
             <a href="mailto:info@easytofin.com" className="flex items-center gap-1.5 text-white/90 hover:text-white transition-colors">
               <Mail size={13} />

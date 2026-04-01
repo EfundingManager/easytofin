@@ -136,7 +136,7 @@ export default function Home() {
           <div className="max-w-2xl">
 
             <h1 className="font-[Outfit] font-800 text-5xl md:text-6xl lg:text-7xl text-white leading-tight mb-5">
-              Own Your Future<br /><span className="text-[oklch(0.82_0.17_70)]">Made Easy.</span>
+              Your Financial Future,<br /><span className="text-[oklch(0.82_0.17_70)]">Made Easy</span>
             </h1>
             <p className="text-white/80 text-xl md:text-2xl leading-relaxed mb-8 font-inter max-w-2xl font-semibold">
               {t(language, 'home.description')}
@@ -145,7 +145,7 @@ export default function Home() {
               <Link href="/contact" className="btn-gold text-sm px-6 py-3.5 flex items-center gap-2">
                 {t(language, 'home.learnMore')} <ArrowRight size={16} />
               </Link>
-              <a href="tel:+35312345678" className="btn-white text-sm px-6 py-3.5 flex items-center gap-2">
+              <a href="tel:1800008888" className="btn-white text-sm px-6 py-3.5 flex items-center gap-2">
                 <Phone size={16} /> {t(language, 'home.callNow')}
               </a>
             </div>
