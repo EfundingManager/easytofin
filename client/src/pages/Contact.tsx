@@ -227,7 +227,7 @@ export default function Contact() {
               const geocoder = new window.google.maps.Geocoder();
               geocoder.geocode(
                 { address: '18 Cook Street, Cork City, Ireland' },
-                (results, status) => {
+                (results: any, status: any) => {
                   if (status === 'OK' && results && results[0]) {
                     map.setCenter(results[0].geometry.location);
                     new window.google.maps.marker.AdvancedMarkerElement({

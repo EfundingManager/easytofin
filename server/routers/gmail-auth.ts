@@ -40,7 +40,7 @@ export const gmailAuthRouter = router({
 
         // Create new user from Google profile
         const newUser = await createPhoneUser({
-          phone: null, // Phone not required for Google OAuth
+          phone: "", // Phone not required for Google OAuth
           email: input.email,
           name: input.name,
           googleId: input.googleId,

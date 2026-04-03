@@ -30,7 +30,7 @@ export type InsertUser = typeof users.$inferInsert;
  */
 export const phoneUsers = mysqlTable("phoneUsers", {
   id: int("id").autoincrement().primaryKey(),
-  phone: varchar("phone", { length: 20 }).notNull().unique(),
+  phone: varchar("phone", { length: 20 }).unique(),
   email: varchar("email", { length: 320 }),
   name: text("name"),
   passwordHash: text("passwordHash"),
@@ -38,6 +38,9 @@ export const phoneUsers = mysqlTable("phoneUsers", {
   twoFactorSecret: text("twoFactorSecret"),
   verified: mysqlEnum("verified", ["true", "false"]).default("false").notNull(),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  googleId: varchar("googleId", { length: 255 }),
+  picture: text("picture"),
+  loginMethod: varchar("loginMethod", { length: 64 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn"),

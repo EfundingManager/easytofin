@@ -15,6 +15,20 @@
       "when": 1774850666013,
       "tag": "0001_strange_corsair",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1775217575704,
+      "tag": "0002_handy_felicia_hardy",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1775217619022,
+      "tag": "0003_common_meteorite",
+      "breakpoints": true
     }
   ]
 }

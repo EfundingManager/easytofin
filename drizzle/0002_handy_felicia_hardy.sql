@@ -1,0 +1,1 @@
+ALTER TABLE `phoneUsers` MODIFY COLUMN `phone` varchar(20);

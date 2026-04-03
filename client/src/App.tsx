@@ -17,6 +17,8 @@ import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfBusiness from "./pages/TermsOfBusiness";
 import PhoneAuth from "./pages/PhoneAuth";
+import AdminDashboard from "./pages/AdminDashboard";
+
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -35,6 +37,7 @@ function Router() {
       <Route path="/privacy" component={PrivacyPolicy} />
       <Route path="/terms-of-business" component={TermsOfBusiness} />
       <Route path="/terms" component={TermsOfBusiness} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

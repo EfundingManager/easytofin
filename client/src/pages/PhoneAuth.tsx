@@ -11,12 +11,6 @@ import Footer from "@/components/Footer";
 
 type AuthStep = "phone" | "otp" | "register";
 
-declare global {
-  interface Window {
-    google?: any;
-  }
-}
-
 export default function PhoneAuth() {
   const [step, setStep] = useState<AuthStep>("phone");
   const [phone, setPhone] = useState("");
@@ -78,14 +72,15 @@ export default function PhoneAuth() {
 
   // Initialize Google Sign-In button
   const initializeGoogleSignIn = () => {
-    if (window.google && window.google.accounts) {
-      window.google.accounts.id.initialize({
+    const googleWindow = window as any;
+    if (googleWindow.google && googleWindow.google.accounts) {
+      googleWindow.google.accounts.id.initialize({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
         callback: handleGoogleSignIn,
       });
       const buttonElement = document.getElementById("google-signin-button");
       if (buttonElement) {
-        window.google.accounts.id.renderButton(buttonElement, {
+        googleWindow.google.accounts.id.renderButton(buttonElement, {
           theme: "outline",
           size: "large",
           width: "100%",

@@ -82,7 +82,7 @@ import { cn } from "@/lib/utils";
 
 declare global {
   interface Window {
-    google?: typeof google;
+    google?: any;
   }
 }
 
@@ -155,7 +155,7 @@ export function MapView({
       streetViewControl: true,
       mapId: "DEMO_MAP_ID",
     });
-    if (onMapReady) {
+    if (onMapReady && map.current) {
       onMapReady(map.current);
     }
   });
