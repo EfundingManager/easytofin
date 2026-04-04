@@ -89,3 +89,9 @@
 - [x] Update profile submission to send verification email (UserProfile.tsx updated)
 - [x] Create email verification page with token validation (VerifyEmail.tsx)
 - [ ] Test complete email verification flow
+
+## Phase 9: Admin Email Notifications
+- [x] Create admin notification email service (adminNotification.ts with 3 functions)
+- [x] Update profile submission to trigger admin notifications (profile router updated)
+- [x] Update policy assignment to trigger admin notifications (workflow router updated)
+- [ ] Test email notification workflow

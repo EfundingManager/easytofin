@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getDb } from '../db';
 import { phoneUsers, userProducts } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
+import { notifyAdminNewProfile } from '../_core/adminNotification';
 
 export const profileRouter = router({
   /**
@@ -141,6 +142,20 @@ export const profileRouter = router({
             product: service as any,
             status: 'selected',
           });
+        }
+
+        // Send admin notification
+        try {
+          await notifyAdminNewProfile({
+            clientName: input.name,
+            clientEmail: input.email,
+            clientPhone: input.phone,
+            selectedServices: input.services,
+            submittedAt: new Date(),
+          });
+        } catch (error) {
+          console.error('[Profile] Failed to send admin notification:', error);
+          // Don't fail the submission if notification fails
         }
 
         return {

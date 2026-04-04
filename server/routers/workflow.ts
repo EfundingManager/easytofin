@@ -3,6 +3,7 @@ import { getDb } from "../db";
 import { phoneUsers, policyAssignments, factFindingForms } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { notifyAdminPolicyAssigned } from "../_core/adminNotification";
 
 export const workflowRouter = router({
   getClientsQueue: adminProcedure
@@ -105,6 +106,23 @@ export const workflowRouter = router({
         });
         await db.update(phoneUsers).set({ clientStatus: "customer", updatedAt: new Date() }).where(eq(phoneUsers.id, input.clientId));
         await db.update(factFindingForms).set({ policyNumber: input.policyNumber, policyAssignedAt: new Date(), updatedAt: new Date() }).where(eq(factFindingForms.phoneUserId, input.clientId));
+        
+        // Get client info for notification
+        const clientResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.clientId));
+        if (clientResult && clientResult.length > 0) {
+          const client = clientResult[0];
+          try {
+            await notifyAdminPolicyAssigned(
+              client.name || 'Client',
+              input.policyNumber,
+              input.product,
+              input.insurerName || 'N/A'
+            );
+          } catch (error) {
+            console.error('[Workflow] Failed to send policy assignment notification:', error);
+          }
+        }
+        
         return { success: true, policyNumber: input.policyNumber };
       } catch (error) {
         console.error("[Workflow] Failed to assign policy:", error);
