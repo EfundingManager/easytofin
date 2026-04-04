@@ -95,3 +95,14 @@
 - [x] Update profile submission to trigger admin notifications (profile router updated)
 - [x] Update policy assignment to trigger admin notifications (workflow router updated)
 - [ ] Test email notification workflow
+
+## Phase 10: Fact-Finding Forms for Each Service
+- [x] Database schema already has factFindingForms table
+- [x] Create Protection (Life Insurance) fact-finding form component
+- [x] Create Pensions fact-finding form component
+- [x] Create Health Insurance fact-finding form component
+- [x] Create General Insurance fact-finding form component
+- [x] Create Investments fact-finding form component
+- [x] Create API procedures to save form responses (submitFactFindingForm mutation)
+- [x] Create fact-finding form page with service routing (FactFindingForm.tsx)
+- [ ] Test complete fact-finding workflow

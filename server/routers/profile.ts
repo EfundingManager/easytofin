@@ -105,6 +105,43 @@ export const profileRouter = router({
     }),
 
   /**
+   * Submit fact-finding form for a specific product
+   */
+  submitFactFindingForm: protectedProcedure
+    .input(
+      z.object({
+        product: z.enum(['protection', 'pensions', 'healthInsurance', 'generalInsurance', 'investments']),
+        formData: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const db = await getDb();
+        if (!db) {
+          return { success: false, error: 'Database not available' };
+        }
+
+        const { factFindingForms } = await import('../../drizzle/schema');
+
+        await db.insert(factFindingForms).values({
+          phoneUserId: ctx.user.id,
+          product: input.product as any,
+          formData: input.formData,
+          status: 'submitted',
+          submittedAt: new Date(),
+        });
+
+        return {
+          success: true,
+          message: `${input.product} fact-finding form submitted successfully`,
+        };
+      } catch (error) {
+        console.log('[Profile] Failed to submit fact-finding form:', error);
+        return { success: false, error: 'Failed to submit fact-finding form' };
+      }
+    }),
+
+  /**
    * Submit profile and services (complete registration)
    */
   submitProfile: protectedProcedure
