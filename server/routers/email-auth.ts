@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../_core/trpc";
+import { sendOtpEmail, sendAccountConfirmationEmail, sendWelcomeEmail } from "../_core/emailService";
 import {
   createPhoneUser,
   getPhoneUserByEmail,
@@ -57,6 +58,9 @@ export const emailAuthRouter = router({
 
           console.log(`[OTP] Login OTP for ${input.email}: ${code}`);
 
+          // Send OTP email for login
+          await sendOtpEmail(input.email, existingUser.name || "User", code, false);
+
           return {
             success: true,
             message: "OTP sent to your email",
@@ -67,6 +71,9 @@ export const emailAuthRouter = router({
         } else {
           // New user - we'll create the account after OTP verification
           console.log(`[OTP] Registration OTP for ${input.email}: ${code}`);
+
+          // Send OTP email
+          await sendOtpEmail(input.email, "New User", code, true);
 
           return {
             success: true,
@@ -164,6 +171,15 @@ export const emailAuthRouter = router({
             code: "INTERNAL_SERVER_ERROR",
             message: "User not found after verification",
           });
+        }
+
+        // Send confirmation email
+        const dashboardUrl = `${process.env.VITE_FRONTEND_URL || "https://easytofin.com"}/dashboard`;
+        await sendAccountConfirmationEmail(user.email || input.email, user.name || "User", dashboardUrl);
+
+        // Send welcome email if new user
+        if (input.isNewUser) {
+          await sendWelcomeEmail(user.email || input.email, user.name || "User", dashboardUrl);
         }
 
         return {

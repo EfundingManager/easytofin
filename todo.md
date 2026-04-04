@@ -142,3 +142,11 @@
 - [x] Update phone registration flow with OTP verification (already implemented)
 - [x] Add email/phone toggle on registration page (AuthSelection page with both options)
 - [ ] Test complete registration with both methods
+
+## Phase 16: Branded Email Templates
+- [x] Create OTP email template with brand colors and logo (emailTemplates.ts)
+- [x] Create account confirmation email template (emailTemplates.ts)
+- [x] Create policy assignment email template (emailTemplates.ts)
+- [x] Create email template service for rendering templates (emailService.ts with 5 functions)
+- [x] Integrate email sending with branded templates (email-auth router updated)
+- [ ] Test email delivery and rendering
