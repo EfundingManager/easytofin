@@ -122,3 +122,8 @@
 - [x] Add quick action buttons (Edit Profile, Continue Forms, View Policies)
 - [x] Add routing to /dashboard for authenticated users
 - [ ] Test complete dashboard workflow
+
+## Phase 13: Profile Submission Redirect
+- [x] Update UserProfile to redirect to dashboard after submission
+- [x] Update success message to indicate redirect ("Redirecting to your dashboard...")
+- [ ] Test complete profile submission and redirect flow

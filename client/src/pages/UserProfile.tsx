@@ -68,10 +68,10 @@ export default function UserProfile() {
         
         setSubmitted(true);
         setError(null);
-        // Reset form after 5 seconds
+        // Redirect to dashboard after 3 seconds
         setTimeout(() => {
-          setLocation('/');
-        }, 5000);
+          setLocation('/dashboard');
+        }, 3000);
       } else {
         setError(data.error || 'Failed to submit profile');
       }
@@ -197,7 +197,7 @@ export default function UserProfile() {
                 Our team will reach out to you at {formData.phone} or {formData.email} within 24 hours.
               </p>
             </div>
-            <p className="text-xs text-gray-500 pt-2">Redirecting to home page...</p>
+            <p className="text-xs text-gray-500 pt-2">Redirecting to your dashboard...</p>
           </CardContent>
         </Card>
       </div>
