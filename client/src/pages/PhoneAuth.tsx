@@ -58,9 +58,11 @@ export default function PhoneAuth() {
         localStorage.setItem("phoneUserData", JSON.stringify(result.user));
 
         if (result.isNewRegistration) {
-          window.location.href = "/product-selection";
+          // New user - redirect to profile page to complete information and select services
+          window.location.href = "/profile";
         } else {
-          window.location.href = "/dashboard";
+          // Existing user - redirect to home
+          window.location.href = "/";
         }
       }
     } catch (error: any) {
@@ -153,11 +155,11 @@ export default function PhoneAuth() {
         localStorage.setItem("phoneUserData", JSON.stringify(result.user));
 
         if (result.isNewRegistration) {
-          // New user - redirect to product selection
-          window.location.href = "/product-selection";
+          // New user - redirect to profile page to complete information and select services
+          window.location.href = "/profile";
         } else {
-          // Existing user - redirect to dashboard or home
-          window.location.href = "/dashboard";
+          // Existing user - redirect to home
+          window.location.href = "/";
         }
       }
     } catch (error: any) {

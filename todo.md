@@ -76,3 +76,9 @@
 - [x] Create success confirmation modal with contact info
 - [x] Update routing to add /profile route
 - [ ] Test complete registration and profile flow
+
+## Phase 7: Phone Auth Integration with Profile Redirect
+- [x] Review phone authentication flow
+- [x] Update phone auth backend to set redirect URL (already configured)
+- [x] Update phone auth frontend to redirect to profile after login (PhoneAuth.tsx updated)
+- [ ] Test complete registration and profile flow
