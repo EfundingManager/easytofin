@@ -7,6 +7,7 @@ import FormProgress from '@/components/FormProgress';
 import { useLocation } from 'wouter';
 import { Mail, Phone, User, FileText, Award, LogOut, Edit2 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
+import DocumentUpload from '@/components/DocumentUpload';
 
 export default function UserDashboard() {
   const { user, loading, logout } = useAuth();
@@ -220,6 +221,11 @@ export default function UserDashboard() {
             </Card>
           </div>
         </div>
+      </div>
+
+      {/* Document Upload Section */}
+      <div className="max-w-6xl mx-auto">
+        <DocumentUpload />
       </div>
     </div>
   );

@@ -50,6 +50,13 @@
       "when": 1775344207033,
       "tag": "0006_lowly_lyja",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1775345286438,
+      "tag": "0007_spooky_gargoyle",
+      "breakpoints": true
     }
   ]
 }

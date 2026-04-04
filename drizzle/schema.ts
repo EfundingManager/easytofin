@@ -137,3 +137,26 @@ export const emailVerificationTokens = mysqlTable("emailVerificationTokens", {
 
 export type EmailVerificationToken = typeof emailVerificationTokens.$inferSelect;
 export type InsertEmailVerificationToken = typeof emailVerificationTokens.$inferInsert;
+
+/**
+ * Client documents for KYC and supporting documentation
+ */
+export const clientDocuments = mysqlTable("clientDocuments", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull().references(() => phoneUsers.id, { onDelete: "cascade" }),
+  documentType: varchar("documentType", { length: 100 }).notNull(), // e.g., "ID", "ProofOfIncome", "BankStatement"
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileUrl: text("fileUrl").notNull(),
+  fileKey: varchar("fileKey", { length: 500 }).notNull(), // S3 key for reference
+  mimeType: varchar("mimeType", { length: 100 }),
+  fileSize: int("fileSize"), // in bytes
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt"), // optional expiration for temporary documents
+  status: mysqlEnum("status", ["pending", "verified", "rejected"]).default("pending").notNull(),
+  notes: text("notes"), // admin notes about the document
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ClientDocument = typeof clientDocuments.$inferSelect;
+export type InsertClientDocument = typeof clientDocuments.$inferInsert;

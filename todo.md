@@ -127,3 +127,11 @@
 - [x] Update UserProfile to redirect to dashboard after submission
 - [x] Update success message to indicate redirect ("Redirecting to your dashboard...")
 - [ ] Test complete profile submission and redirect flow
+
+## Phase 14: Document Upload Feature
+- [x] Update database schema to store document uploads (clientDocuments table)
+- [x] Create document upload API procedures (upload, list, delete, getDownloadUrl in documents router)
+- [x] Create DocumentUpload component with drag-and-drop
+- [x] Integrate document upload into user dashboard
+- [x] Add document management section showing uploaded files
+- [ ] Test complete document upload workflow
