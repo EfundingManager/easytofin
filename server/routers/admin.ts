@@ -394,4 +394,69 @@ export const adminRouter = router({
         return [];
       }
     }),
+
+  /**
+   * Global search by policy number or client name
+   */
+  globalSearch: adminProcedure
+    .input(
+      z.object({
+        query: z.string().min(1).max(100),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        return {
+          forms: [],
+          clients: [],
+          total: 0,
+        };
+      }
+
+      try {
+        // Search forms by policy number
+        const formsResult: any = await db.select().from(factFindingForms);
+        const matchedForms = formsResult
+          .filter((form: any) => form.policyNumber && form.policyNumber.includes(input.query))
+          .map((form: any) => ({
+            id: form.id,
+            type: "form",
+            policyNumber: form.policyNumber,
+            product: form.product,
+            status: form.status,
+            submittedAt: form.submittedAt,
+          }));
+
+        // Search clients by name
+        const clientsResult: any = await db.select().from(phoneUsers);
+        const matchedClients = clientsResult
+          .filter(
+            (client: any) =>
+              client.name?.toLowerCase().includes(input.query.toLowerCase()) ||
+              client.email?.toLowerCase().includes(input.query.toLowerCase())
+          )
+          .map((client: any) => ({
+            id: client.id,
+            type: "client",
+            name: client.name,
+            email: client.email,
+            phone: client.phone,
+            verified: client.verified === "true",
+          }));
+
+        return {
+          forms: matchedForms,
+          clients: matchedClients,
+          total: matchedForms.length + matchedClients.length,
+        };
+      } catch (error) {
+        console.error("[Admin] Failed to perform global search:", error);
+        return {
+          forms: [],
+          clients: [],
+          total: 0,
+        };
+      }
+    }),
 });

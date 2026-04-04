@@ -51,3 +51,12 @@
 - [ ] Test admin configuration features
 - [ ] Create checkpoint
 - [ ] Deploy to production
+
+## Phase 4.5: Admin Dashboard Enhancements
+- [x] Add global search function at top of admin dashboard (search by policy number or name)
+- [x] Implement client workflow management (queue → customers)
+- [x] Add client status tracking (new → in_progress → assigned_policy → customer)
+- [x] Create clients queue view (unassigned clients)
+- [x] Create customers section (clients with policy numbers)
+- [x] Add policy number assignment interface (assignPolicy procedure)
+- [x] Move clients from queue to customers when policy assigned

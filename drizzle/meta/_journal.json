@@ -29,6 +29,20 @@
       "when": 1775217619022,
       "tag": "0003_common_meteorite",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1775341089456,
+      "tag": "0004_flashy_moira_mactaggert",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1775341769453,
+      "tag": "0005_absent_gabe_jones",
+      "breakpoints": true
     }
   ]
 }

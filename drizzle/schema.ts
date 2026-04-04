@@ -41,6 +41,7 @@ export const phoneUsers = mysqlTable("phoneUsers", {
   googleId: varchar("googleId", { length: 255 }),
   picture: text("picture"),
   loginMethod: varchar("loginMethod", { length: 64 }),
+  clientStatus: mysqlEnum("clientStatus", ["queue", "in_progress", "assigned", "customer"]).default("queue").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn"),
@@ -86,13 +87,36 @@ export const factFindingForms = mysqlTable("factFindingForms", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId"),
   phoneUserId: int("phoneUserId"),
+  policyNumber: varchar("policyNumber", { length: 100 }).unique(),
   product: mysqlEnum("product", ["protection", "pensions", "healthInsurance", "generalInsurance", "investments"]).notNull(),
   formData: text("formData"),
   status: mysqlEnum("status", ["draft", "submitted", "reviewed", "archived"]).default("draft").notNull(),
   submittedAt: timestamp("submittedAt"),
+  policyAssignedAt: timestamp("policyAssignedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
 export type FactFindingForm = typeof factFindingForms.$inferSelect;
 export type InsertFactFindingForm = typeof factFindingForms.$inferInsert;
+
+/**
+ * Policy assignments linking clients to their policies
+ */
+export const policyAssignments = mysqlTable("policyAssignments", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull(),
+  policyNumber: varchar("policyNumber", { length: 100 }).notNull().unique(),
+  product: mysqlEnum("product", ["protection", "pensions", "healthInsurance", "generalInsurance", "investments"]).notNull(),
+  insurerName: varchar("insurerName", { length: 255 }),
+  premiumAmount: varchar("premiumAmount", { length: 50 }),
+  startDate: timestamp("startDate"),
+  endDate: timestamp("endDate"),
+  notes: text("notes"),
+  assignedAt: timestamp("assignedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PolicyAssignment = typeof policyAssignments.$inferSelect;
+export type InsertPolicyAssignment = typeof policyAssignments.$inferInsert;

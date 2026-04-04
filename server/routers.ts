@@ -5,6 +5,7 @@ import { publicProcedure, router } from "./_core/trpc";
 import { phoneAuthRouter } from "./routers/phone-auth";
 import { gmailAuthRouter } from "./routers/gmail-auth";
 import { adminRouter } from "./routers/admin";
+import { workflowRouter } from "./routers/workflow";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -22,6 +23,7 @@ export const appRouter = router({
   phoneAuth: phoneAuthRouter,
   gmailAuth: gmailAuthRouter,
   admin: adminRouter,
+  workflow: workflowRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({

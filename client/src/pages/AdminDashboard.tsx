@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -6,13 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock } from "lucide-react";
+import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");
+  const [globalSearchQuery, setGlobalSearchQuery] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   // Fetch admin data
   const statsQuery = trpc.admin.getStats.useQuery();
@@ -23,6 +25,18 @@ export default function AdminDashboard() {
     limit: 10,
     search: searchQuery || undefined,
   });
+
+  // Global search
+  const globalSearchQuery_trimmed = globalSearchQuery.trim();
+  const globalSearchResults = trpc.admin.globalSearch.useQuery(
+    { query: globalSearchQuery_trimmed },
+    { enabled: globalSearchQuery_trimmed.length > 0 }
+  );
+
+  // Workflow data
+  const workflowStatsQuery = trpc.workflow.getWorkflowStats.useQuery();
+  const clientsQueueQuery = trpc.workflow.getClientsQueue.useQuery({ page: 1, limit: 10 });
+  const customersQuery = trpc.workflow.getCustomers.useQuery({ page: 1, limit: 10 });
 
   // Redirect if not admin
   if (!loading && (!user || user.role !== "admin")) {
@@ -64,6 +78,111 @@ export default function AdminDashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
+        {/* Global Search Bar */}
+        <div className="relative">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by policy number or client name..."
+                value={globalSearchQuery}
+                onChange={(e) => {
+                  setGlobalSearchQuery(e.target.value);
+                  setShowSearchResults(e.target.value.length > 0);
+                }}
+                className="pl-10"
+              />
+              {globalSearchQuery && (
+                <button
+                  onClick={() => {
+                    setGlobalSearchQuery("");
+                    setShowSearchResults(false);
+                  }}
+                  className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Search Results Dropdown */}
+          {showSearchResults && globalSearchQuery_trimmed.length > 0 && (
+            <Card className="absolute top-full left-0 right-0 mt-2 z-50 max-h-96 overflow-y-auto">
+              <CardContent className="pt-4">
+                {globalSearchResults.isLoading ? (
+                  <div className="text-center py-4 text-muted-foreground">
+                    <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                    <p className="mt-2">Searching...</p>
+                  </div>
+                ) : globalSearchResults.data && globalSearchResults.data.total > 0 ? (
+                  <div className="space-y-4">
+                    {/* Forms Results */}
+                    {globalSearchResults.data.forms.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Policies ({globalSearchResults.data.forms.length})
+                        </h3>
+                        <div className="space-y-2">
+                          {globalSearchResults.data.forms.map((form: any) => (
+                            <div
+                              key={form.id}
+                              className="p-2 border rounded hover:bg-accent cursor-pointer transition"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="font-medium text-sm">{form.policyNumber}</p>
+                                  <p className="text-xs text-muted-foreground capitalize">{form.product}</p>
+                                </div>
+                                <Badge variant="outline" className="text-xs">
+                                  {form.status}
+                                </Badge>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Clients Results */}
+                    {globalSearchResults.data.clients.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          Clients ({globalSearchResults.data.clients.length})
+                        </h3>
+                        <div className="space-y-2">
+                          {globalSearchResults.data.clients.map((client: any) => (
+                            <div
+                              key={client.id}
+                              className="p-2 border rounded hover:bg-accent cursor-pointer transition"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="font-medium text-sm">{client.name}</p>
+                                  <p className="text-xs text-muted-foreground">{client.email}</p>
+                                </div>
+                                <Badge variant={client.verified ? "default" : "secondary"} className="text-xs">
+                                  {client.verified ? "Verified" : "Unverified"}
+                                </Badge>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-muted-foreground">
+                    <p>No results found</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
@@ -123,6 +242,8 @@ export default function AdminDashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="queue">Clients Queue</TabsTrigger>
+            <TabsTrigger value="customers">Customers</TabsTrigger>
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
             <TabsTrigger value="forms">Forms</TabsTrigger>
             <TabsTrigger value="configuration">Configuration</TabsTrigger>
@@ -175,6 +296,90 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Clients Queue Tab */}
+          <TabsContent value="queue" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Clients Queue</CardTitle>
+                <CardDescription>New registrations awaiting processing</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {clientsQueueQuery.data && clientsQueueQuery.data.clients.length > 0 ? (
+                  <div className="space-y-4">
+                    <div className="text-sm text-muted-foreground mb-4">
+                      Total in queue: {clientsQueueQuery.data.total}
+                    </div>
+                    <div className="space-y-2">
+                      {clientsQueueQuery.data.clients.map((client: any) => (
+                        <div key={client.id} className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium">{client.name}</p>
+                              <p className="text-sm text-muted-foreground">{client.email}</p>
+                              <p className="text-xs text-muted-foreground">{client.phone}</p>
+                            </div>
+                            <Badge variant="outline">Queue</Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No clients in queue</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Customers Tab */}
+          <TabsContent value="customers" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Customers</CardTitle>
+                <CardDescription>Clients with assigned policies</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {customersQuery.data && customersQuery.data.customers.length > 0 ? (
+                  <div className="space-y-4">
+                    <div className="text-sm text-muted-foreground mb-4">
+                      Total customers: {customersQuery.data.total}
+                    </div>
+                    <div className="space-y-3">
+                      {customersQuery.data.customers.map((customer: any) => (
+                        <div key={customer.id} className="p-3 border rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <p className="font-medium">{customer.name}</p>
+                              <p className="text-sm text-muted-foreground">{customer.email}</p>
+                            </div>
+                            <Badge>Customer</Badge>
+                          </div>
+                          {customer.policies.length > 0 && (
+                            <div className="mt-2 pt-2 border-t space-y-1">
+                              {customer.policies.map((policy: any, idx: number) => (
+                                <div key={idx} className="text-xs text-muted-foreground">
+                                  <span className="font-medium">{policy.policyNumber}</span> - {policy.product}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No customers yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Submissions Tab */}
