@@ -60,3 +60,10 @@
 - [x] Create customers section (clients with policy numbers)
 - [x] Add policy number assignment interface (assignPolicy procedure)
 - [x] Move clients from queue to customers when policy assigned
+
+## Phase 5: Policy Assignment Modal
+- [x] Create PolicyAssignmentModal component with form fields
+- [x] Add form validation for policy number and required fields
+- [x] Integrate modal with Clients Queue tab
+- [x] Add mutation handler for assigning policies
+- [ ] Test policy assignment workflow

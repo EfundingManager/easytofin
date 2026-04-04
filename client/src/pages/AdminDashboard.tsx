@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X } from "lucide-react";
+import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { PolicyAssignmentModal } from "@/components/PolicyAssignmentModal";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -15,6 +16,7 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [globalSearchQuery, setGlobalSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [selectedClientForPolicy, setSelectedClientForPolicy] = useState<{ id: number; name: string } | null>(null);
 
   // Fetch admin data
   const statsQuery = trpc.admin.getStats.useQuery();
@@ -313,14 +315,24 @@ export default function AdminDashboard() {
                     </div>
                     <div className="space-y-2">
                       {clientsQueueQuery.data.clients.map((client: any) => (
-                        <div key={client.id} className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition">
+                        <div key={client.id} className="p-3 border rounded-lg hover:bg-muted/50 transition">
                           <div className="flex items-center justify-between">
-                            <div>
+                            <div className="flex-1">
                               <p className="font-medium">{client.name}</p>
                               <p className="text-sm text-muted-foreground">{client.email}</p>
                               <p className="text-xs text-muted-foreground">{client.phone}</p>
                             </div>
-                            <Badge variant="outline">Queue</Badge>
+                            <div className="flex items-center gap-2 ml-4">
+                              <Badge variant="outline">Queue</Badge>
+                              <Button
+                                size="sm"
+                                onClick={() => setSelectedClientForPolicy({ id: client.id, name: client.name })}
+                                className="gap-1"
+                              >
+                                <Plus className="h-3 w-3" />
+                                Assign
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -530,6 +542,20 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Policy Assignment Modal */}
+        {selectedClientForPolicy && (
+          <PolicyAssignmentModal
+            isOpen={!!selectedClientForPolicy}
+            onClose={() => setSelectedClientForPolicy(null)}
+            clientId={selectedClientForPolicy.id}
+            clientName={selectedClientForPolicy.name}
+            onSuccess={() => {
+              clientsQueueQuery.refetch();
+              customersQuery.refetch();
+            }}
+          />
+        )}
       </div>
     </DashboardLayout>
   );
