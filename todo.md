@@ -67,3 +67,12 @@
 - [x] Integrate modal with Clients Queue tab
 - [x] Add mutation handler for assigning policies
 - [ ] Test policy assignment workflow
+
+## Phase 6: User Profile & Service Selection
+- [x] Update database schema to track selected services (userProducts table exists)
+- [x] Create API procedures for profile update and service selection (profile router)
+- [x] Create UserProfile page component with form
+- [x] Add service selection multi-select with checkboxes
+- [x] Create success confirmation modal with contact info
+- [x] Update routing to add /profile route
+- [ ] Test complete registration and profile flow

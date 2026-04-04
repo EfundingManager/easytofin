@@ -18,6 +18,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfBusiness from "./pages/TermsOfBusiness";
 import PhoneAuth from "./pages/PhoneAuth";
 import AdminDashboard from "./pages/AdminDashboard";
+import UserProfile from "./pages/UserProfile";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -25,6 +26,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/phone-auth" component={PhoneAuth} />
+      <Route path="/profile" component={UserProfile} />
       <Route path="/protection" component={Protection} />
       <Route path="/pensions" component={Pensions} />
       <Route path="/health-insurance" component={HealthInsurance} />
