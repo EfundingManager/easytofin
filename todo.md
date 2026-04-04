@@ -135,3 +135,10 @@
 - [x] Integrate document upload into user dashboard
 - [x] Add document management section showing uploaded files
 - [ ] Test complete document upload workflow
+
+## Phase 15: Phone & Email Registration Options
+- [x] Update authentication UI to show phone and email registration options (AuthSelection page)
+- [x] Create email registration flow with OTP verification (EmailAuth page + emailAuthRouter)
+- [x] Update phone registration flow with OTP verification (already implemented)
+- [x] Add email/phone toggle on registration page (AuthSelection page with both options)
+- [ ] Test complete registration with both methods

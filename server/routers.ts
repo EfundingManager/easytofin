@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { phoneAuthRouter } from "./routers/phone-auth";
 import { gmailAuthRouter } from "./routers/gmail-auth";
+import { emailAuthRouter } from "./routers/email-auth";
 import { adminRouter } from "./routers/admin";
 import { workflowRouter } from "./routers/workflow";
 import { profileRouter } from "./routers/profile";
@@ -26,6 +27,7 @@ export const appRouter = router({
   }),
   phoneAuth: phoneAuthRouter,
   gmailAuth: gmailAuthRouter,
+  emailAuth: emailAuthRouter,
   admin: adminRouter,
   workflow: workflowRouter,
   profile: profileRouter,

@@ -17,6 +17,8 @@ import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfBusiness from "./pages/TermsOfBusiness";
 import PhoneAuth from "./pages/PhoneAuth";
+import AuthSelection from "./pages/AuthSelection";
+import EmailAuth from "./pages/EmailAuth";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserProfile from "./pages/UserProfile";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -28,7 +30,9 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/auth-selection" component={AuthSelection} />
       <Route path="/phone-auth" component={PhoneAuth} />
+      <Route path="/email-auth" component={EmailAuth} />
       <Route path="/profile" component={UserProfile} />
       <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/fact-finding" component={FactFindingForm} />
