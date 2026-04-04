@@ -37,6 +37,7 @@ export const phoneUsers = mysqlTable("phoneUsers", {
   twoFactorEnabled: mysqlEnum("twoFactorEnabled", ["true", "false"]).default("false").notNull(),
   twoFactorSecret: text("twoFactorSecret"),
   verified: mysqlEnum("verified", ["true", "false"]).default("false").notNull(),
+  emailVerified: mysqlEnum("emailVerified", ["true", "false"]).default("false").notNull(),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   googleId: varchar("googleId", { length: 255 }),
   picture: text("picture"),
@@ -120,3 +121,19 @@ export const policyAssignments = mysqlTable("policyAssignments", {
 
 export type PolicyAssignment = typeof policyAssignments.$inferSelect;
 export type InsertPolicyAssignment = typeof policyAssignments.$inferInsert;
+
+/**
+ * Email verification tokens for profile confirmation
+ */
+export const emailVerificationTokens = mysqlTable("emailVerificationTokens", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  verifiedAt: timestamp("verifiedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type EmailVerificationToken = typeof emailVerificationTokens.$inferSelect;
+export type InsertEmailVerificationToken = typeof emailVerificationTokens.$inferInsert;

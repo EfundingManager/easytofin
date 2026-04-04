@@ -31,6 +31,10 @@ export default function UserProfile() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
+
+  // Send verification email mutation
+  const sendVerificationEmailMutation = trpc.emailVerification.sendVerificationEmail.useMutation();
 
   // Fetch current profile
   const profileQuery = trpc.profile.getProfile.useQuery(undefined, {
@@ -52,14 +56,22 @@ export default function UserProfile() {
 
   // Submit profile mutation
   const submitMutation = trpc.profile.submitProfile.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.success) {
+        // Send verification email
+        try {
+          await sendVerificationEmailMutation.mutateAsync({ email: formData.email });
+          setVerificationEmail(formData.email);
+        } catch (error) {
+          console.error('Failed to send verification email:', error);
+        }
+        
         setSubmitted(true);
         setError(null);
-        // Reset form after 3 seconds
+        // Reset form after 5 seconds
         setTimeout(() => {
           setLocation('/');
-        }, 3000);
+        }, 5000);
       } else {
         setError(data.error || 'Failed to submit profile');
       }
@@ -167,6 +179,14 @@ export default function UserProfile() {
               <p className="text-sm font-medium text-gray-900">Selected Services: {selectedServices.length}</p>
               <p className="text-xs text-gray-600 mt-1">
                 {selectedServices.map(s => SERVICES.find(srv => srv.id === s)?.label).join(', ')}
+              </p>
+            </div>
+            <div className="bg-amber-50 p-3 rounded-lg border border-amber-200">
+              <p className="text-sm text-amber-900">
+                <strong>Verification Email Sent!</strong>
+              </p>
+              <p className="text-xs text-amber-800 mt-1">
+                A verification link has been sent to <strong>{verificationEmail}</strong>. Please check your inbox and click the link to confirm your email address.
               </p>
             </div>
             <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">

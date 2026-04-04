@@ -82,3 +82,10 @@
 - [x] Update phone auth backend to set redirect URL (already configured)
 - [x] Update phone auth frontend to redirect to profile after login (PhoneAuth.tsx updated)
 - [ ] Test complete registration and profile flow
+
+## Phase 8: Email Verification
+- [x] Update database schema to track email verification tokens and status (emailVerificationTokens table)
+- [x] Create email verification API procedures (email-verification router with 4 procedures)
+- [x] Update profile submission to send verification email (UserProfile.tsx updated)
+- [x] Create email verification page with token validation (VerifyEmail.tsx)
+- [ ] Test complete email verification flow
