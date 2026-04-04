@@ -106,3 +106,11 @@
 - [x] Create API procedures to save form responses (submitFactFindingForm mutation)
 - [x] Create fact-finding form page with service routing (FactFindingForm.tsx)
 - [ ] Test complete fact-finding workflow
+
+## Phase 11: Form Progress Tracking
+- [x] Create progress tracking API procedures (getFormProgress, updateFormProgress in profile-progress router)
+- [x] Create FormProgress component with visual progress bar and completion status
+- [x] Integrate progress tracker into FactFindingForm page (both selection and form pages)
+- [x] Add progress persistence to database (via factFindingForms table)
+- [x] Add resume functionality for incomplete forms (status tracking)
+- [ ] Test progress tracking workflow

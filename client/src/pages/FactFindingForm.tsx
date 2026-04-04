@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
+import FormProgress from '@/components/FormProgress';
 import ProtectionForm, { ProtectionFormData } from '@/components/FactFindingForms/ProtectionForm';
 import PensionsForm, { PensionsFormData } from '@/components/FactFindingForms/PensionsForm';
 import HealthInsuranceForm, { HealthInsuranceFormData } from '@/components/FactFindingForms/HealthInsuranceForm';
@@ -51,11 +52,20 @@ export default function FactFindingForm() {
   const productInfo = PRODUCT_INFO[product];
 
   const saveFormMutation = trpc.profile.submitFactFindingForm.useMutation();
+  const progressQuery = trpc.profileProgress.getFormProgress.useQuery();
 
   if (!match || !productInfo) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4">
-        <div className="max-w-2xl mx-auto space-y-8">
+        <div className="max-w-4xl mx-auto space-y-8">
+          {progressQuery.data?.success && progressQuery.data?.data && (
+            <FormProgress
+              progress={progressQuery.data.data.progress}
+              completedCount={progressQuery.data.data.completedCount}
+              totalCount={progressQuery.data.data.totalCount}
+              completionPercentage={progressQuery.data.data.completionPercentage}
+            />
+          )}
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-bold">Fact-Finding Forms</h1>
             <p className="text-lg text-muted-foreground">
@@ -135,6 +145,16 @@ export default function FactFindingForm() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* Progress Tracker */}
+        {progressQuery.data?.success && progressQuery.data?.data && (
+          <FormProgress
+            progress={progressQuery.data.data.progress}
+            completedCount={progressQuery.data.data.completedCount}
+            totalCount={progressQuery.data.data.totalCount}
+            completionPercentage={progressQuery.data.data.completionPercentage}
+          />
+        )}
+
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button
