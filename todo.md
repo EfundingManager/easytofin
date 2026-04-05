@@ -230,3 +230,8 @@
 - [x] Create KYC status component for admin customer detail page (KYCStatusDisplay.tsx)
 - [x] Integrate KYC status component into admin customer detail page
 - [x] Test KYC status update functionality - component renders and allows status changes
+
+## Phase 30: KYC Verification Requirement for Policy Assignment
+- [x] Add KYC verification check to policy assignment procedure (workflow router)
+- [x] Create UI validation to prevent policy assignment when KYC is not verified (PolicyAssignmentModal)
+- [x] Test policy assignment with KYC verification requirement - warning displays and button disabled

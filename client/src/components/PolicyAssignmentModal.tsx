@@ -13,6 +13,7 @@ interface PolicyAssignmentModalProps {
   onClose: () => void;
   clientId: number;
   clientName: string;
+  kycStatus?: "pending" | "verified" | "rejected";
   onSuccess?: () => void;
 }
 
@@ -21,6 +22,7 @@ export function PolicyAssignmentModal({
   onClose,
   clientId,
   clientName,
+  kycStatus = "pending",
   onSuccess,
 }: PolicyAssignmentModalProps) {
   const [policyNumber, setPolicyNumber] = useState("");
@@ -116,6 +118,16 @@ export function PolicyAssignmentModal({
             Assign a policy to {clientName}
           </DialogDescription>
         </DialogHeader>
+
+        {kycStatus !== "verified" && (
+          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-yellow-700">
+              <p className="font-medium">KYC Verification Required</p>
+              <p className="text-xs mt-1">This customer's KYC status is "{kycStatus}". KYC must be verified before assigning policies.</p>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Policy Number */}
@@ -257,10 +269,12 @@ export function PolicyAssignmentModal({
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || kycStatus !== "verified"}
               className="gap-2"
             >
-              {isSubmitting ? (
+              {kycStatus !== "verified" ? (
+                "KYC Verification Required"
+              ) : isSubmitting ? (
                 <>
                   <div className="inline-block animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
                   Assigning...

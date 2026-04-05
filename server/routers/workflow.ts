@@ -94,6 +94,17 @@ export const workflowRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       try {
+        // Check if customer has verified KYC status
+        const clientResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.clientId));
+        if (!clientResult || clientResult.length === 0) {
+          throw new Error("Customer not found");
+        }
+        
+        const client = clientResult[0];
+        if (client.kycStatus !== "verified") {
+          throw new Error(`KYC verification required. Current status: ${client.kycStatus}`);
+        }
+        
         await db.insert(policyAssignments).values({
           phoneUserId: input.clientId,
           policyNumber: input.policyNumber,
@@ -108,12 +119,12 @@ export const workflowRouter = router({
         await db.update(factFindingForms).set({ policyNumber: input.policyNumber, policyAssignedAt: new Date(), updatedAt: new Date() }).where(eq(factFindingForms.phoneUserId, input.clientId));
         
         // Get client info for notification
-        const clientResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.clientId));
-        if (clientResult && clientResult.length > 0) {
-          const client = clientResult[0];
+        const clientForNotification: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.clientId));
+        if (clientForNotification && clientForNotification.length > 0) {
+          const clientNotif = clientForNotification[0];
           try {
             await notifyAdminPolicyAssigned(
-              client.name || 'Client',
+              clientNotif.name || 'Client',
               input.policyNumber,
               input.product,
               input.insurerName || 'N/A'
