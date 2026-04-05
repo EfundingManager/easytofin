@@ -202,3 +202,8 @@
 - [x] Implement search functionality to filter documents by name and type
 - [x] Implement filter controls for document type, status, and date range (7/30/90 days)
 - [x] Test search and filter functionality - all controls render correctly
+
+## Phase 25: Document Preview Modal for PDF Viewing
+- [x] Create document preview modal component with PDF viewer (DocumentPreviewModal.tsx)
+- [x] Integrate preview modal into DocumentList component - preview button opens modal
+- [x] Test PDF preview functionality - modal renders correctly with all features

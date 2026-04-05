@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText, Download, Eye, Trash2, Calendar, Search, X } from "lucide-react";
 import { useState, useMemo } from "react";
+import { DocumentPreviewModal } from "./DocumentPreviewModal";
 
 interface Document {
   id: number;
@@ -60,6 +61,8 @@ export function DocumentList({ documents, onDelete, onPreview }: DocumentListPro
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterDateRange, setFilterDateRange] = useState<string>("all");
+  const [previewDocument, setPreviewDocument] = useState<Document | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Filter and search logic
   const filteredDocuments = useMemo(() => {
@@ -270,17 +273,18 @@ export function DocumentList({ documents, onDelete, onPreview }: DocumentListPro
                 {/* Actions */}
                 <div className="flex items-center gap-2 flex-shrink-0 ml-3">
                   {/* Preview Button */}
-                  {onPreview && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onPreview(doc)}
-                      title="Preview document"
-                      className="h-8 w-8 p-0"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setPreviewDocument(doc);
+                      setIsPreviewOpen(true);
+                    }}
+                    title="Preview document"
+                    className="h-8 w-8 p-0"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
 
                   {/* Download Button */}
                   <Button
@@ -312,6 +316,16 @@ export function DocumentList({ documents, onDelete, onPreview }: DocumentListPro
             ))
           )}
         </div>
+
+        {/* Preview Modal */}
+        <DocumentPreviewModal
+          document={previewDocument}
+          isOpen={isPreviewOpen}
+          onClose={() => {
+            setIsPreviewOpen(false);
+            setPreviewDocument(null);
+          }}
+        />
       </CardContent>
     </Card>
   );
