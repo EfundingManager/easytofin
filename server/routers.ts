@@ -11,6 +11,7 @@ import { profileRouter } from "./routers/profile";
 import { profileProgressRouter } from "./routers/profile-progress";
 import { emailVerificationRouter } from "./routers/email-verification";
 import { documentsRouter } from "./routers/documents";
+import { documentReviewRouter } from "./routers/document-review";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -34,6 +35,7 @@ export const appRouter = router({
   profileProgress: profileProgressRouter,
   emailVerification: emailVerificationRouter,
   documents: documentsRouter,
+  documentReview: documentReviewRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({
