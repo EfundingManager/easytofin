@@ -207,3 +207,9 @@
 - [x] Create document preview modal component with PDF viewer (DocumentPreviewModal.tsx)
 - [x] Integrate preview modal into DocumentList component - preview button opens modal
 - [x] Test PDF preview functionality - modal renders correctly with all features
+
+## Phase 26: Client Dashboard Policies Widget
+- [x] Create policies widget component for client dashboard (ClientPoliciesWidget.tsx)
+- [x] Create policiesRouter with getClientPolicies procedure
+- [x] Integrate policies widget into client dashboard
+- [x] Test policies display on client dashboard - widget renders correctly with empty state

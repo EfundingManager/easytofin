@@ -8,6 +8,7 @@ import { useLocation } from 'wouter';
 import { Mail, Phone, User, FileText, Award, LogOut, Edit2 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import DocumentUpload from '@/components/DocumentUpload';
+import { ClientPoliciesWidget } from '@/components/ClientPoliciesWidget';
 
 export default function UserDashboard() {
   const { user, loading, logout } = useAuth();
@@ -15,6 +16,7 @@ export default function UserDashboard() {
 
   const profileQuery = trpc.profile.getProfile.useQuery();
   const progressQuery = trpc.profileProgress.getFormProgress.useQuery();
+  const policiesQuery = trpc.policies.getClientPolicies.useQuery();
 
   if (loading) {
     return (
@@ -44,6 +46,7 @@ export default function UserDashboard() {
 
   const profileData = profileQuery.data?.data;
   const progressData = progressQuery.data?.data;
+  const policiesData = policiesQuery.data?.data || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4">
@@ -221,10 +224,15 @@ export default function UserDashboard() {
             </Card>
           </div>
         </div>
+
+        {/* Policies Section */}
+        <div className="mt-8">
+          <ClientPoliciesWidget policies={policiesData} isLoading={policiesQuery.isLoading} />
+        </div>
       </div>
 
       {/* Document Upload Section */}
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto mt-8">
         <DocumentUpload />
       </div>
     </div>
