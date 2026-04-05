@@ -11,6 +11,7 @@ import { useState } from "react";
 import { AdminDocumentUpload } from "@/components/AdminDocumentUpload";
 import { AdminFormUpload } from "@/components/AdminFormUpload";
 import { PolicyDisplay } from "@/components/PolicyDisplay";
+import { DocumentList } from "@/components/DocumentList";
 
 export default function AdminCustomerDetail() {
   const { user, loading } = useAuth();
@@ -193,6 +194,7 @@ export default function AdminCustomerDetail() {
           {/* Documents Tab */}
           <TabsContent value="documents" className="space-y-4">
             <AdminDocumentUpload customerId={customer.id} onUploadSuccess={() => customerQuery.refetch()} />
+            <DocumentList documents={customer.documents || []} />
           </TabsContent>
 
           {/* Forms Tab */}

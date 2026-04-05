@@ -191,3 +191,8 @@
 - [x] Execute sandbox scripts and verify data is created
 - [x] Fix admin router to fetch from correct tables (policyAssignments, clientDocuments, factFindingForms)
 - [x] Test display on customer detail page - policies now showing correctly
+
+## Phase 23: Document List Component with Status Badges and Download Links
+- [x] Create document list component with status badges and download links (DocumentList.tsx)
+- [x] Integrate document list component into AdminCustomerDetail page
+- [x] Test document display and download functionality - component renders correctly with empty state
