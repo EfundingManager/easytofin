@@ -171,3 +171,10 @@
 - [ ] Integrate document review into customer detail page
 - [ ] Add document verification workflow with admin notes
 - [ ] Test document review and status update workflow
+
+## Phase 20: Admin Document and Form Upload on Customer Detail Page
+- [x] Create admin document upload component for Documents tab (AdminDocumentUpload.tsx)
+- [x] Create admin form upload component for Forms tab (AdminFormUpload.tsx)
+- [x] Integrate upload components into AdminCustomerDetail page
+- [x] Add API procedures for admin file uploads (using existing documents router)
+- [x] Test document and form uploads on customer detail page

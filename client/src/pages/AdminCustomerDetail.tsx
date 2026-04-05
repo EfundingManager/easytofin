@@ -8,6 +8,8 @@ import { AlertCircle, ArrowLeft, Mail, Phone, FileText, Award, Download } from "
 import { trpc } from "@/lib/trpc";
 import { useRoute, useLocation } from "wouter";
 import { useState } from "react";
+import { AdminDocumentUpload } from "@/components/AdminDocumentUpload";
+import { AdminFormUpload } from "@/components/AdminFormUpload";
 
 export default function AdminCustomerDetail() {
   const { user, loading } = useAuth();
@@ -255,75 +257,12 @@ export default function AdminCustomerDetail() {
 
           {/* Documents Tab */}
           <TabsContent value="documents" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Uploaded Documents</CardTitle>
-                <CardDescription>Documents submitted by the customer</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {customer.documents && customer.documents.length > 0 ? (
-                  <div className="space-y-3">
-                    {customer.documents.map((doc: any, idx: number) => (
-                      <div key={idx} className="p-3 border rounded-lg flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
-                          <div className="flex-1">
-                            <p className="font-medium text-sm">{doc.fileName}</p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <span className="capitalize">{doc.documentType}</span>
-                              <span>•</span>
-                              <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs capitalize">
-                            {doc.status || "pending"}
-                          </Badge>
-                          <Button size="sm" variant="ghost" className="gap-1">
-                            <Download className="h-3 w-3" />
-                            Download
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">No documents uploaded</p>
-                )}
-              </CardContent>
-            </Card>
+            <AdminDocumentUpload customerId={customer.id} onUploadSuccess={() => customerQuery.refetch()} />
           </TabsContent>
 
           {/* Forms Tab */}
           <TabsContent value="forms" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Fact-Finding Forms</CardTitle>
-                <CardDescription>Completed fact-finding forms</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {customer.forms && customer.forms.length > 0 ? (
-                  <div className="space-y-3">
-                    {customer.forms.map((form: any, idx: number) => (
-                      <div key={idx} className="p-3 border rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="font-medium capitalize">{form.product} Form</p>
-                          <Badge variant="outline" className="text-xs capitalize">
-                            {form.status || "completed"}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          Submitted: {new Date(form.submittedAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">No forms submitted</p>
-                )}
-              </CardContent>
-            </Card>
+            <AdminFormUpload customerId={customer.id} onUploadSuccess={() => customerQuery.refetch()} />
           </TabsContent>
         </Tabs>
       </div>
