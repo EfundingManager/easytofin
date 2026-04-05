@@ -1,6 +1,6 @@
 import { adminProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { phoneUsers, userProducts, factFindingForms } from "../../drizzle/schema";
+import { phoneUsers, userProducts, factFindingForms, policyAssignments, clientDocuments } from "../../drizzle/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { z } from "zod";
 
@@ -421,10 +421,23 @@ export const adminRouter = router({
           return null;
         }
 
+        // Fetch policies from policyAssignments table
         const policies: any = await db
           .select()
+          .from(policyAssignments)
+          .where(eq(policyAssignments.phoneUserId, input.customerId));
+
+        // Fetch documents from clientDocuments table
+        const documents: any = await db
+          .select()
+          .from(clientDocuments)
+          .where(eq(clientDocuments.phoneUserId, input.customerId));
+
+        // Fetch forms from factFindingForms table
+        const forms: any = await db
+          .select()
           .from(factFindingForms)
-          .where(eq(factFindingForms.userId, input.customerId));
+          .where(eq(factFindingForms.phoneUserId, input.customerId));
 
         return {
           id: customer.id,
@@ -433,23 +446,33 @@ export const adminRouter = router({
           phone: customer.phone,
           emailVerified: customer.emailVerified === "true",
           createdAt: customer.createdAt,
-          status: customer.status || "active",
+          status: customer.clientStatus || "active",
           policies: policies.map((p: any) => ({
             id: p.id,
             policyNumber: p.policyNumber,
             product: p.product,
-            insurer: p.insurer,
-            premium: p.premium,
-            status: p.status,
+            insurerName: p.insurerName,
+            premium: p.premiumAmount,
+            status: "active",
             startDate: p.startDate,
             endDate: p.endDate,
+            advisorName: p.advisorName,
+            advisorPhone: p.advisorPhone,
           })),
-          documents: [],
-          forms: policies.map((p: any) => ({
-            id: p.id,
-            product: p.product,
-            status: p.status,
-            submittedAt: p.submittedAt,
+          documents: documents.map((d: any) => ({
+            id: d.id,
+            documentType: d.documentType,
+            fileName: d.fileName,
+            fileUrl: d.fileUrl,
+            status: d.status,
+            uploadedAt: d.uploadedAt,
+          })),
+          forms: forms.map((f: any) => ({
+            id: f.id,
+            product: f.product,
+            status: f.status,
+            submittedAt: f.submittedAt,
+            policyNumber: f.policyNumber,
           })),
         };
       } catch (error) {

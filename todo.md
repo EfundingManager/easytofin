@@ -183,3 +183,11 @@
 - [x] Create enhanced policy display component with all required fields (PolicyDisplay.tsx)
 - [x] Update AdminCustomerDetail page to use enhanced policy display
 - [x] Test policy information display on customer detail page
+
+## Phase 22: Sandbox Data for Policies, Documents, and Forms
+- [x] Create sandbox script to populate policies with realistic data (sandbox-policies-documents-forms.ts)
+- [x] Create sandbox script to populate documents with realistic data (sandbox-policies-documents-forms.ts)
+- [x] Create sandbox script to populate forms with realistic data (sandbox-policies-documents-forms.ts)
+- [x] Execute sandbox scripts and verify data is created
+- [x] Fix admin router to fetch from correct tables (policyAssignments, clientDocuments, factFindingForms)
+- [x] Test display on customer detail page - policies now showing correctly
