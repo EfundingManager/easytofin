@@ -10,6 +10,7 @@ import { useRoute, useLocation } from "wouter";
 import { useState } from "react";
 import { AdminDocumentUpload } from "@/components/AdminDocumentUpload";
 import { AdminFormUpload } from "@/components/AdminFormUpload";
+import { PolicyDisplay } from "@/components/PolicyDisplay";
 
 export default function AdminCustomerDetail() {
   const { user, loading } = useAuth();
@@ -186,73 +187,7 @@ export default function AdminCustomerDetail() {
 
           {/* Policies Tab */}
           <TabsContent value="policies" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Assigned Policies</CardTitle>
-                <CardDescription>All policies assigned to this customer</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {customer.policies && customer.policies.length > 0 ? (
-                  <div className="space-y-3">
-                    {customer.policies.map((policy: any, idx: number) => (
-                      <div key={idx} className="p-3 border rounded-lg">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Award className="h-4 w-4 text-primary" />
-                              <p className="font-medium">{policy.policyNumber}</p>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                              <div>
-                                <p className="text-xs text-muted-foreground">Policy Type</p>
-                                <p className="capitalize">{policy.product}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-muted-foreground">Insurer Name</p>
-                                <p>{policy.insurerName || "N/A"}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-muted-foreground">Premium</p>
-                                <p>${policy.premium || "0.00"}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-muted-foreground">Status</p>
-                                <Badge variant="outline" className="text-xs">
-                                  {policy.status || "Active"}
-                                </Badge>
-                              </div>
-                              <div>
-                                <p className="text-xs text-muted-foreground">Effective Date</p>
-                                <p>{policy.startDate ? new Date(policy.startDate).toLocaleDateString() : "N/A"}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-muted-foreground">Renewal Date</p>
-                                <p>{policy.endDate ? new Date(policy.endDate).toLocaleDateString() : "N/A"}</p>
-                              </div>
-                            </div>
-                            <div className="border-t pt-2">
-                              <p className="text-xs text-muted-foreground mb-2 font-semibold">Advisor Information</p>
-                              <div className="grid grid-cols-2 gap-2 text-sm">
-                                <div>
-                                  <p className="text-xs text-muted-foreground">Advisor Name</p>
-                                  <p>{policy.advisorName || "N/A"}</p>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-muted-foreground">Advisor Phone</p>
-                                  <p>{policy.advisorPhone || "N/A"}</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">No policies assigned</p>
-                )}
-              </CardContent>
-            </Card>
+            <PolicyDisplay policies={customer.policies || []} />
           </TabsContent>
 
           {/* Documents Tab */}
