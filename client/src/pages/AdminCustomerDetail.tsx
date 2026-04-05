@@ -147,6 +147,10 @@ export default function AdminCustomerDetail() {
                       <p className="text-sm">{customer.phone}</p>
                     </div>
                   </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Address</p>
+                    <p className="text-sm">{customer.address || "Not provided"}</p>
+                  </div>
                 </div>
               </div>
 
@@ -196,14 +200,14 @@ export default function AdminCustomerDetail() {
                               <Award className="h-4 w-4 text-primary" />
                               <p className="font-medium">{policy.policyNumber}</p>
                             </div>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                               <div>
-                                <p className="text-xs text-muted-foreground">Product</p>
+                                <p className="text-xs text-muted-foreground">Policy Type</p>
                                 <p className="capitalize">{policy.product}</p>
                               </div>
                               <div>
-                                <p className="text-xs text-muted-foreground">Insurer</p>
-                                <p>{policy.insurer || "N/A"}</p>
+                                <p className="text-xs text-muted-foreground">Insurer Name</p>
+                                <p>{policy.insurerName || "N/A"}</p>
                               </div>
                               <div>
                                 <p className="text-xs text-muted-foreground">Premium</p>
@@ -214,6 +218,27 @@ export default function AdminCustomerDetail() {
                                 <Badge variant="outline" className="text-xs">
                                   {policy.status || "Active"}
                                 </Badge>
+                              </div>
+                              <div>
+                                <p className="text-xs text-muted-foreground">Effective Date</p>
+                                <p>{policy.startDate ? new Date(policy.startDate).toLocaleDateString() : "N/A"}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-muted-foreground">Renewal Date</p>
+                                <p>{policy.endDate ? new Date(policy.endDate).toLocaleDateString() : "N/A"}</p>
+                              </div>
+                            </div>
+                            <div className="border-t pt-2">
+                              <p className="text-xs text-muted-foreground mb-2 font-semibold">Advisor Information</p>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div>
+                                  <p className="text-xs text-muted-foreground">Advisor Name</p>
+                                  <p>{policy.advisorName || "N/A"}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-muted-foreground">Advisor Phone</p>
+                                  <p>{policy.advisorPhone || "N/A"}</p>
+                                </div>
                               </div>
                             </div>
                           </div>

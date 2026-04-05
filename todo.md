@@ -157,3 +157,10 @@
 - [x] Update admin dashboard customers table with clickable Customer ID and Full Name
 - [x] Add routing for customer detail pages (/admin/customers/:customerId)
 - [x] Add back button and navigation to customer detail page
+
+## Phase 18: Enhanced Customer Detail Page
+- [x] Update database schema to add address field to phoneUsers table
+- [x] Update database schema to add advisor information to policyAssignments table (advisorName, advisorPhone)
+- [x] Update API procedures to return enhanced customer and policy data (already returns all fields)
+- [x] Update AdminCustomerDetail page to display address and all policy details (effective date, renewal date, advisor info)
+- [x] Add advisor contact information display on customer detail page
