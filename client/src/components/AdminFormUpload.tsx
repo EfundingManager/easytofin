@@ -22,6 +22,7 @@ export function AdminFormUpload({ customerId, onUploadSuccess }: AdminFormUpload
   const deleteMutation = trpc.documents.deleteDocument.useMutation();
 
   const formTypes = [
+    { value: "kyc", label: "KYC Form" },
     { value: "protection", label: "Protection Form" },
     { value: "pensions", label: "Pensions Form" },
     { value: "healthInsurance", label: "Health Insurance Form" },

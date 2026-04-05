@@ -219,3 +219,7 @@
 - [x] Add getUpcomingRenewals procedure to policies router
 - [x] Integrate renewal reminder widget into client dashboard
 - [x] Test renewal reminder widget functionality - widget renders correctly with empty state
+
+## Phase 28: Add KYC Form Type
+- [x] Update AdminFormUpload component to include KYC form type
+- [x] Test KYC form option in dropdown - KYC Form now appears as first option
