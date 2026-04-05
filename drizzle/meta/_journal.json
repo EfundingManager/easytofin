@@ -64,6 +64,13 @@
       "when": 1775417494363,
       "tag": "0008_fresh_legion",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1775422449167,
+      "tag": "0009_careful_earthquake",
+      "breakpoints": true
     }
   ]
 }

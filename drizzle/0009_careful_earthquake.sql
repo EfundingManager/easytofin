@@ -1,0 +1,1 @@
+ALTER TABLE `phoneUsers` ADD `kycStatus` enum('pending','verified','rejected') DEFAULT 'pending' NOT NULL;

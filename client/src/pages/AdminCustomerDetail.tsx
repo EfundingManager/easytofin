@@ -12,6 +12,7 @@ import { AdminDocumentUpload } from "@/components/AdminDocumentUpload";
 import { AdminFormUpload } from "@/components/AdminFormUpload";
 import { PolicyDisplay } from "@/components/PolicyDisplay";
 import { DocumentList } from "@/components/DocumentList";
+import { KYCStatusDisplay } from "@/components/KYCStatusDisplay";
 
 export default function AdminCustomerDetail() {
   const { user, loading } = useAuth();
@@ -177,6 +178,13 @@ export default function AdminCustomerDetail() {
             </div>
           </CardContent>
         </Card>
+
+        {/* KYC Status */}
+        <KYCStatusDisplay
+          customerId={customer.id}
+          currentStatus={customer.kycStatus || "pending"}
+          onStatusUpdate={() => customerQuery.refetch()}
+        />
 
         {/* Tabs for Policies, Documents, Forms */}
         <Tabs defaultValue="policies" className="space-y-4">

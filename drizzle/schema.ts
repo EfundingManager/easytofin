@@ -44,6 +44,7 @@ export const phoneUsers = mysqlTable("phoneUsers", {
   picture: text("picture"),
   loginMethod: varchar("loginMethod", { length: 64 }),
   clientStatus: mysqlEnum("clientStatus", ["queue", "in_progress", "assigned", "customer"]).default("queue").notNull(),
+  kycStatus: mysqlEnum("kycStatus", ["pending", "verified", "rejected"]).default("pending").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn"),

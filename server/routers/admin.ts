@@ -545,4 +545,28 @@ export const adminRouter = router({
         };
       }
     }),
+  /**
+   * Update KYC status for a customer
+   */
+  updateKycStatus: adminProcedure
+    .input(z.object({
+      customerId: z.number(),
+      kycStatus: z.enum(["pending", "verified", "rejected"]),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        await db
+          .update(phoneUsers)
+          .set({ kycStatus: input.kycStatus })
+          .where(eq(phoneUsers.id, input.customerId));
+
+        return { success: true, message: `KYC status updated to ${input.kycStatus}` };
+      } catch (error) {
+        console.error("[Admin] Failed to update KYC status:", error);
+        throw new Error("Failed to update KYC status");
+      }
+    }),
 });

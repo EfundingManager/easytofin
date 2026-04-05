@@ -223,3 +223,10 @@
 ## Phase 28: Add KYC Form Type
 - [x] Update AdminFormUpload component to include KYC form type
 - [x] Test KYC form option in dropdown - KYC Form now appears as first option
+
+## Phase 29: KYC Verification Status Field
+- [x] Add kycStatus field to users table schema (phoneUsers table)
+- [x] Create KYC status update procedure in admin router (updateKycStatus mutation)
+- [x] Create KYC status component for admin customer detail page (KYCStatusDisplay.tsx)
+- [x] Integrate KYC status component into admin customer detail page
+- [x] Test KYC status update functionality - component renders and allows status changes
