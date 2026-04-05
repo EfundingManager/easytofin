@@ -150,3 +150,10 @@
 - [x] Create email template service for rendering templates (emailService.ts with 5 functions)
 - [x] Integrate email sending with branded templates (email-auth router updated)
 - [ ] Test email delivery and rendering
+
+## Phase 17: Admin Customer Detail Pages
+- [x] Create detailed customer page component showing all customer information (AdminCustomerDetail.tsx)
+- [x] Create API procedure to fetch customer details with associated policies and documents (getCustomerDetail in admin router)
+- [x] Update admin dashboard customers table with clickable Customer ID and Full Name
+- [x] Add routing for customer detail pages (/admin/customers/:customerId)
+- [x] Add back button and navigation to customer detail page

@@ -20,6 +20,7 @@ import PhoneAuth from "./pages/PhoneAuth";
 import AuthSelection from "./pages/AuthSelection";
 import EmailAuth from "./pages/EmailAuth";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminCustomerDetail from "./pages/AdminCustomerDetail";
 import UserProfile from "./pages/UserProfile";
 import VerifyEmail from "./pages/VerifyEmail";
 import FactFindingForm from "./pages/FactFindingForm";
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/terms-of-business" component={TermsOfBusiness} />
       <Route path="/terms" component={TermsOfBusiness} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/customers/:customerId" component={AdminCustomerDetail} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

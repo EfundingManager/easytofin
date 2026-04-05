@@ -9,9 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { PolicyAssignmentModal } from "@/components/PolicyAssignmentModal";
+import { useLocation } from "wouter";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [globalSearchQuery, setGlobalSearchQuery] = useState("");
@@ -363,10 +365,11 @@ export default function AdminDashboard() {
                     </div>
                     <div className="space-y-3">
                       {customersQuery.data.customers.map((customer: any) => (
-                        <div key={customer.id} className="p-3 border rounded-lg">
+                        <div key={customer.id} className="p-3 border rounded-lg hover:bg-muted/50 transition cursor-pointer" onClick={() => setLocation(`/admin/customers/${customer.id}`)}>
                           <div className="flex items-center justify-between mb-2">
-                            <div>
-                              <p className="font-medium">{customer.name}</p>
+                            <div className="flex-1">
+                              <p className="font-medium text-primary hover:underline">{customer.name}</p>
+                              <p className="text-sm text-muted-foreground">ID: <span className="font-mono text-primary hover:underline">{customer.id}</span></p>
                               <p className="text-sm text-muted-foreground">{customer.email}</p>
                             </div>
                             <Badge>Customer</Badge>

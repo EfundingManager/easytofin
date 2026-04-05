@@ -396,6 +396,69 @@ export const adminRouter = router({
     }),
 
   /**
+   * Get detailed customer information
+   */
+  getCustomerDetail: adminProcedure
+    .input(
+      z.object({
+        customerId: z.number().int().positive(),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        return null;
+      }
+
+      try {
+        const customer: any = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.id, input.customerId))
+          .then((res) => res[0]);
+
+        if (!customer) {
+          return null;
+        }
+
+        const policies: any = await db
+          .select()
+          .from(factFindingForms)
+          .where(eq(factFindingForms.userId, input.customerId));
+
+        return {
+          id: customer.id,
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone,
+          emailVerified: customer.emailVerified === "true",
+          createdAt: customer.createdAt,
+          status: customer.status || "active",
+          policies: policies.map((p: any) => ({
+            id: p.id,
+            policyNumber: p.policyNumber,
+            product: p.product,
+            insurer: p.insurer,
+            premium: p.premium,
+            status: p.status,
+            startDate: p.startDate,
+            endDate: p.endDate,
+          })),
+          documents: [],
+          forms: policies.map((p: any) => ({
+            id: p.id,
+            product: p.product,
+            status: p.status,
+            submittedAt: p.submittedAt,
+          })),
+        };
+      } catch (error) {
+        console.error("[Admin] Failed to get customer details:", error);
+        return null;
+      }
+    }),
+
+  /**
    * Global search by policy number or client name
    */
   globalSearch: adminProcedure
