@@ -213,3 +213,9 @@
 - [x] Create policiesRouter with getClientPolicies procedure
 - [x] Integrate policies widget into client dashboard
 - [x] Test policies display on client dashboard - widget renders correctly with empty state
+
+## Phase 27: Policy Renewal Reminder Widget
+- [x] Create policy renewal reminder widget component (PolicyRenewalReminder.tsx)
+- [x] Add getUpcomingRenewals procedure to policies router
+- [x] Integrate renewal reminder widget into client dashboard
+- [x] Test renewal reminder widget functionality - widget renders correctly with empty state

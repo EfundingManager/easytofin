@@ -9,6 +9,7 @@ import { Mail, Phone, User, FileText, Award, LogOut, Edit2 } from 'lucide-react'
 import { Loader2 } from 'lucide-react';
 import DocumentUpload from '@/components/DocumentUpload';
 import { ClientPoliciesWidget } from '@/components/ClientPoliciesWidget';
+import { PolicyRenewalReminder } from '@/components/PolicyRenewalReminder';
 
 export default function UserDashboard() {
   const { user, loading, logout } = useAuth();
@@ -17,6 +18,7 @@ export default function UserDashboard() {
   const profileQuery = trpc.profile.getProfile.useQuery();
   const progressQuery = trpc.profileProgress.getFormProgress.useQuery();
   const policiesQuery = trpc.policies.getClientPolicies.useQuery();
+  const renewalsQuery = trpc.policies.getUpcomingRenewals.useQuery();
 
   if (loading) {
     return (
@@ -47,6 +49,7 @@ export default function UserDashboard() {
   const profileData = profileQuery.data?.data;
   const progressData = progressQuery.data?.data;
   const policiesData = policiesQuery.data?.data || [];
+  const renewalsData = renewalsQuery.data?.data || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4">
@@ -223,6 +226,11 @@ export default function UserDashboard() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Renewal Reminders Section */}
+        <div className="mt-8">
+          <PolicyRenewalReminder renewals={renewalsData} isLoading={renewalsQuery.isLoading} />
         </div>
 
         {/* Policies Section */}
