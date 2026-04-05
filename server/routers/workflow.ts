@@ -147,9 +147,9 @@ export const workflowRouter = router({
       const db = await getDb();
       if (!db) return null;
       try {
-        const clientResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.clientId));
-        if (clientResult.length === 0) return null;
-        const client = clientResult[0];
+        const clientDetailsResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.clientId));
+        if (clientDetailsResult.length === 0) return null;
+        const client = clientDetailsResult[0];
         const forms: any = await db.select().from(factFindingForms).where(eq(factFindingForms.phoneUserId, input.clientId));
         const policies: any = await db.select().from(policyAssignments).where(eq(policyAssignments.phoneUserId, input.clientId));
         return {

@@ -444,6 +444,8 @@ export const adminRouter = router({
           name: customer.name,
           email: customer.email,
           phone: customer.phone,
+          address: customer.address || "",
+          kycStatus: customer.kycStatus || "pending",
           emailVerified: customer.emailVerified === "true",
           createdAt: customer.createdAt,
           status: customer.clientStatus || "active",

@@ -235,3 +235,9 @@
 - [x] Add KYC verification check to policy assignment procedure (workflow router)
 - [x] Create UI validation to prevent policy assignment when KYC is not verified (PolicyAssignmentModal)
 - [x] Test policy assignment with KYC verification requirement - warning displays and button disabled
+
+## Phase 31: Fix Email Registration Display
+- [x] Review AuthSelection page and identify missing email option - email option already present
+- [x] Fix admin router getCustomerDetail to return address and kycStatus fields
+- [x] Fix workflow router duplicate variable declaration (clientResult → clientDetailsResult)
+- [x] Test email registration option displays correctly - both Phone and Email options visible
