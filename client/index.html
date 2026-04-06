@@ -17,15 +17,90 @@
       defer
       src="%VITE_ANALYTICS_ENDPOINT%/umami"
       data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
-    <!-- WeCom Live Chat Widget -->
+    <!-- WeCom Live Chat Widget with Customer Contact Secret -->
     <script>
       (function() {
         var corpId = 'wwd347ac3e0b84cbf7';
-        var url = 'https://open.work.weixin.qq.com/wwopen/js/code/web/0.0.1/jssdk.js?corpId=' + corpId;
+        var contactSecret = '%VITE_WECOM_CONTACT_SECRET%';
+        
+        // Load WeCom SDK
         var script = document.createElement('script');
-        script.src = url;
+        script.src = 'https://open.work.weixin.qq.com/wwopen/js/code/web/0.0.1/jssdk.js';
         script.async = true;
+        
+        script.onload = function() {
+          // Initialize WeCom after SDK loads
+          if (window.wx && window.wx.config) {
+            window.wx.config({
+              corpId: corpId,
+              agentId: 1000002,
+              jsApiList: [],
+            });
+            
+            // Create WeCom widget button
+            createWeComButton(contactSecret);
+          }
+        };
+        
         document.head.appendChild(script);
+        
+        // Create WeCom widget button function
+        function createWeComButton(secret) {
+          var container = document.createElement('div');
+          container.id = 'wecom-widget-container';
+          container.style.position = 'fixed';
+          container.style.bottom = '20px';
+          container.style.right = '20px';
+          container.style.zIndex = '9999';
+          document.body.appendChild(container);
+          
+          var button = document.createElement('button');
+          button.id = 'wecom-widget-button';
+          button.textContent = 'Contact Us';
+          button.style.padding = '12px 16px';
+          button.style.backgroundColor = '#1f6f4a';
+          button.style.color = 'white';
+          button.style.border = 'none';
+          button.style.borderRadius = '8px';
+          button.style.fontSize = '14px';
+          button.style.fontWeight = '500';
+          button.style.cursor = 'pointer';
+          button.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+          button.style.transition = 'all 0.3s ease';
+          button.style.fontFamily = 'inherit';
+          
+          button.onmouseover = function() {
+            button.style.backgroundColor = '#155a3a';
+            button.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+            button.style.transform = 'translateY(-2px)';
+          };
+          
+          button.onmouseout = function() {
+            button.style.backgroundColor = '#1f6f4a';
+            button.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+            button.style.transform = 'translateY(0)';
+          };
+          
+          button.onclick = function() {
+            openWeComChat(corpId, secret);
+          };
+          
+          container.appendChild(button);
+        }
+        
+        // Open WeCom chat window
+        function openWeComChat(corpId, secret) {
+          var chatUrl = 'https://open.work.weixin.qq.com/wwopen/js/code/web/0.0.1/jssdk.js?corpId=' + corpId + '&secret=' + encodeURIComponent(secret);
+          
+          if (window.wx && window.wx.openWindow) {
+            window.wx.openWindow({
+              url: chatUrl,
+              title: 'Contact Us'
+            });
+          } else {
+            window.open('https://work.weixin.qq.com/', '_blank');
+          }
+        }
       })();
     </script>
   </body>

@@ -10,6 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
  * - Position: bottom-right
  * - Trigger Text: Contact Us (localized)
  * - Languages: English, Chinese, Polish
+ * - Authentication: Customer Contact Secret
  */
 export function WeComWidget() {
   const { language } = useLanguage();
@@ -31,7 +32,15 @@ function initializeWeComWidget(language: string) {
     return;
   }
 
-  // Create and inject WeCom widget script
+  // Get Customer Contact Secret from environment
+  const contactSecret = import.meta.env.VITE_WECOM_CONTACT_SECRET;
+  
+  if (!contactSecret) {
+    console.warn('[WeCom] Customer Contact Secret not configured');
+    return;
+  }
+
+  // Create and inject WeCom widget script with authentication
   const script = document.createElement('script');
   script.id = 'wecom-widget-script';
   script.src = 'https://open.work.weixin.qq.com/wwopen/js/code/web/0.0.1/jssdk.js';
@@ -39,7 +48,7 @@ function initializeWeComWidget(language: string) {
   
   script.onload = () => {
     // Initialize WeCom after script loads
-    initializeWeComAfterLoad(language);
+    initializeWeComAfterLoad(language, contactSecret);
   };
 
   document.head.appendChild(script);
@@ -48,13 +57,14 @@ function initializeWeComWidget(language: string) {
 /**
  * Initialize WeCom after SDK loads
  */
-function initializeWeComAfterLoad(language: string) {
+function initializeWeComAfterLoad(language: string, contactSecret: string) {
   // WeCom configuration
   const wecomConfig = {
     corpId: 'wwd347ac3e0b84cbf7',
     position: 'bottom-right',
     triggerText: getTriggerText(language),
     language: getWeComLanguage(language),
+    contactSecret: contactSecret,
   };
 
   // Create WeCom widget container
@@ -69,7 +79,7 @@ function initializeWeComAfterLoad(language: string) {
   // Inject WeCom widget using official API
   if (window.wx && window.wx.config) {
     try {
-      // Initialize WeCom widget
+      // Initialize WeCom widget with authentication
       window.wx.config({
         corpId: wecomConfig.corpId,
         agentId: 1000002,
@@ -129,22 +139,31 @@ function createWeComButton(container: HTMLElement, config: any) {
 }
 
 /**
- * Open WeCom chat window
+ * Open WeCom chat window with authentication
  */
 function openWeComChat(config: any) {
-  // WeCom chat URL
-  const chatUrl = `https://open.work.weixin.qq.com/wwopen/js/code/web/0.0.1/jssdk.js?corpId=${config.corpId}`;
+  // Build WeCom chat URL with authentication
+  const params = new URLSearchParams({
+    corpId: config.corpId,
+    secret: config.contactSecret,
+    lang: config.language,
+  });
+
+  // WeCom chat URL with authentication
+  const chatUrl = `https://open.work.weixin.qq.com/wwopen/js/code/web/0.0.1/jssdk.js?${params.toString()}`;
 
   // Open WeCom chat in new window or modal
   try {
     if (window.wx && window.wx.openWindow) {
       window.wx.openWindow({
         url: chatUrl,
+        title: config.triggerText,
       });
     } else {
-      // Fallback: Open WeCom portal
+      // Fallback: Open WeCom portal with authentication
+      const wecomPortalUrl = `https://work.weixin.qq.com/wework_admin/frame#contacts/profile`;
       window.open(
-        `https://work.weixin.qq.com/wework_admin/frame#contacts`,
+        wecomPortalUrl,
         'wecom_chat',
         'width=800,height=600,resizable=yes,scrollbars=yes'
       );
