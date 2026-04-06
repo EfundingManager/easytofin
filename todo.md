@@ -258,3 +258,8 @@
 - [x] Debug WeCom widget initialization and display issues
 - [x] Implement simplified WeCom widget that displays reliably (WeComWidgetSimple.tsx)
 - [x] Test WeCom widget visibility on multiple pages - widget displays on home and admin pages
+
+## Phase 35: Fix WeCom Widget 404 Error
+- [x] Investigate 404 error in WeCom widget network requests - SDK URL was being opened as chat URL
+- [x] Fix WeCom chat URL and authentication parameters - updated to use proper WeCom SDK initialization
+- [x] Rewrite WeComWidgetSimple component with proper SDK loading and error handling
