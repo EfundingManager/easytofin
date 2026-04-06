@@ -88,16 +88,13 @@ function initializeWeComWidget() {
 
 /**
  * Open WeCom chat window using direct URL approach
- * This approach doesn't require SDK loading
+ * Uses the official WeCom API link with kfid for proper customer service routing
  */
 function openWeComChat() {
-  const corpId = 'wwd347ac3e0b84cbf7';
+  // WeCom API link with kfid for customer service routing
+  const wecomChatUrl = 'https://work.weixin.qq.com/kfid/kfc17931e7a2589a51a';
 
-  // WeCom official chat URL - use the simple format without redirect_uri
-  // This opens WeCom's web interface directly
-  const wecomChatUrl = `https://work.weixin.qq.com/wework_admin/`;
-
-  console.log('Opening WeCom chat window');
+  console.log('Opening WeCom chat window with kfid');
 
   try {
     // Try to open WeCom in a new window
@@ -124,8 +121,8 @@ function openWeComChat() {
  * Fallback method to open WeCom if popup is blocked
  */
 function openWeComFallback() {
-  // Use WeCom's official web interface
-  const fallbackUrl = `https://work.weixin.qq.com/`;
+  // Use WeCom's official API link with kfid as fallback
+  const fallbackUrl = 'https://work.weixin.qq.com/kfid/kfc17931e7a2589a51a';
   
   console.log('Using WeCom fallback URL:', fallbackUrl);
   
@@ -134,7 +131,7 @@ function openWeComFallback() {
   } catch (error) {
     console.error('Error opening WeCom fallback:', error);
     // Last resort: Show alert with WeCom info
-    alert('Please visit https://work.weixin.qq.com/ to contact us via WeCom');
+    alert('Please visit https://work.weixin.qq.com/kfid/kfc17931e7a2589a51a to contact us via WeCom');
   }
 }
 

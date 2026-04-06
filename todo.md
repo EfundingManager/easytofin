@@ -273,3 +273,10 @@
 - [x] Diagnose redirect_uri parameter error - parameter was causing URL format issues
 - [x] Fix WeCom chat URL and redirect_uri parameter format - removed problematic redirect_uri
 - [x] Test WeCom chat window functionality - widget works without errors
+
+## Phase 38: Update WeCom API Link and kfid Configuration
+- [x] Update WeComWidgetSimple component with new API link (https://work.weixin.qq.com/kfid/kfc17931e7a2589a51a)
+- [x] Configure WeCom widget with correct kfid (kfc17931e7a2589a51a) for customer service routing
+- [x] Update fallback URL to use WeCom API link with kfid
+- [x] Test WeCom widget with new configuration - widget displays and opens correctly
+- [x] Verify multi-language support (English, Chinese, Polish) with new configuration
