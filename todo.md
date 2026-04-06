@@ -268,3 +268,8 @@
 - [x] Diagnose WeCom SDK loading failure - SDK URL was being blocked/not loading
 - [x] Implement improved WeCom SDK loading with error recovery - removed SDK dependency
 - [x] Test WeCom widget without SDK dependency - widget works and displays without errors
+
+## Phase 37: Fix WeCom redirect_uri Parameter Error
+- [x] Diagnose redirect_uri parameter error - parameter was causing URL format issues
+- [x] Fix WeCom chat URL and redirect_uri parameter format - removed problematic redirect_uri
+- [x] Test WeCom chat window functionality - widget works without errors

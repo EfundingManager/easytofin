@@ -92,30 +92,17 @@ function initializeWeComWidget() {
  */
 function openWeComChat() {
   const corpId = 'wwd347ac3e0b84cbf7';
-  const contactSecret = import.meta.env.VITE_WECOM_CONTACT_SECRET || '';
 
-  // WeCom official chat URL format
-  // Using the web interface URL directly
-  const wecomBaseUrl = 'https://open.work.weixin.qq.com/wwopen/sso/qrConnect';
-  
-  // Build the chat URL with parameters
-  const params = new URLSearchParams();
-  params.append('appid', corpId);
-  params.append('agentid', '1000001'); // Default agent ID
-  params.append('redirect_uri', window.location.origin);
-  params.append('state', 'wecom_contact');
-  params.append('usertype', 'member');
-
-  // Alternative: Use WeCom's direct chat URL if available
-  // This is the standard way to open WeCom in a new window
-  const chatUrl = `https://work.weixin.qq.com/wework_admin/loginpage_wx?redirect_uri=${encodeURIComponent(window.location.origin)}`;
+  // WeCom official chat URL - use the simple format without redirect_uri
+  // This opens WeCom's web interface directly
+  const wecomChatUrl = `https://work.weixin.qq.com/wework_admin/`;
 
   console.log('Opening WeCom chat window');
 
   try {
     // Try to open WeCom in a new window
     const wecomWindow = window.open(
-      chatUrl,
+      wecomChatUrl,
       'wecom_chat',
       'width=800,height=600,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,status=no'
     );
@@ -137,10 +124,8 @@ function openWeComChat() {
  * Fallback method to open WeCom if popup is blocked
  */
 function openWeComFallback() {
-  const corpId = 'wwd347ac3e0b84cbf7';
-  
   // Use WeCom's official web interface
-  const fallbackUrl = `https://work.weixin.qq.com/wework_admin/`;
+  const fallbackUrl = `https://work.weixin.qq.com/`;
   
   console.log('Using WeCom fallback URL:', fallbackUrl);
   
