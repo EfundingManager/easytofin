@@ -253,3 +253,8 @@
 - [x] Update WeCom widget with Customer Contact Secret (B8sEti5rjXgsG6nDSa7ozQMmJ-kAB1c3S19UXJmyES8)
 - [x] Implement WeCom widget button with proper authentication in index.html
 - [x] Configure WeCom SDK initialization with authentication parameters
+
+## Phase 34: Fix WeCom Widget Display
+- [x] Debug WeCom widget initialization and display issues
+- [x] Implement simplified WeCom widget that displays reliably (WeComWidgetSimple.tsx)
+- [x] Test WeCom widget visibility on multiple pages - widget displays on home and admin pages
