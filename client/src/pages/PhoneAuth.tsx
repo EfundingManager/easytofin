@@ -20,6 +20,7 @@ export default function PhoneAuth() {
   const [isNewUser, setIsNewUser] = useState(false);
   const [loading, setLoading] = useState(false);
   const [devCode, setDevCode] = useState("");
+  const [googleLoaded, setGoogleLoaded] = useState(false);
 
   const requestOtpMutation = trpc.phoneAuth.requestOtp.useMutation();
   const verifyOtpMutation = trpc.phoneAuth.verifyOtp.useMutation();
@@ -76,32 +77,62 @@ export default function PhoneAuth() {
   const initializeGoogleSignIn = () => {
     const googleWindow = window as any;
     if (googleWindow.google && googleWindow.google.accounts) {
-      googleWindow.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
-        callback: handleGoogleSignIn,
-      });
-      const buttonElement = document.getElementById("google-signin-button");
-      if (buttonElement) {
-        googleWindow.google.accounts.id.renderButton(buttonElement, {
-          theme: "outline",
-          size: "large",
-          width: "100%",
+      try {
+        googleWindow.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
+          callback: handleGoogleSignIn,
+          ux_mode: "popup",
+          auto_select: false,
+          itp_support: true,
         });
+
+        const buttonElement = document.getElementById("google-signin-button");
+        if (buttonElement) {
+          googleWindow.google.accounts.id.renderButton(buttonElement, {
+            type: "standard",
+            theme: "outline",
+            size: "large",
+            width: "100%",
+            text: "signin_with",
+          });
+          setGoogleLoaded(true);
+        }
+      } catch (error) {
+        console.error("Error initializing Google Sign-In:", error);
+        setGoogleLoaded(false);
       }
     }
   };
 
   // Load Google Sign-In script on mount
   useEffect(() => {
+    // Check if script already exists to avoid duplicate loading
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+    if (existingScript) {
+      // Wait a bit for the script to be ready
+      setTimeout(() => {
+        initializeGoogleSignIn();
+      }, 100);
+      return;
+    }
+
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
     script.defer = true;
-    script.onload = initializeGoogleSignIn;
+    script.onload = () => {
+      setTimeout(() => {
+        initializeGoogleSignIn();
+      }, 100);
+    };
+    script.onerror = () => {
+      console.error("Failed to load Google Sign-In script");
+      setGoogleLoaded(false);
+    };
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      // Keep script for other components that might need it
     };
   }, []);
 
@@ -158,8 +189,8 @@ export default function PhoneAuth() {
           // New user - redirect to profile page to complete information and select services
           window.location.href = "/profile";
         } else {
-          // Existing user - redirect to home
-          window.location.href = "/";
+          // Existing user - redirect to dashboard
+          window.location.href = "/dashboard";
         }
       }
     } catch (error: any) {
@@ -197,7 +228,14 @@ export default function PhoneAuth() {
             {step === "phone" && (
               <div className="space-y-4">
                 {/* Google Sign-In Button */}
-                <div id="google-signin-button" className="flex justify-center" />
+                {googleLoaded && (
+                  <div id="google-signin-button" className="flex justify-center" />
+                )}
+                {!googleLoaded && (
+                  <div className="text-center text-sm text-[oklch(0.52_0.015_240)]">
+                    Loading Google Sign-In...
+                  </div>
+                )}
 
                 {/* Divider */}
                 <div className="relative">

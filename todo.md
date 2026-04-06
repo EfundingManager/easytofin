@@ -292,3 +292,9 @@
 - [x] Update EmailAuth component to redirect to /dashboard after successful login
 - [x] Verify redirect happens automatically without manual navigation
 - [x] Test redirect flow on both phone and email authentication
+
+## Phase 41: Fix Google Sign-In Popup Blocking Errors
+- [x] Investigate Google Sign-In popup blocking issue in PhoneAuth
+- [x] Update Google Sign-In implementation with better error handling and configuration
+- [x] Add proper script loading detection and error handling
+- [x] Test Google Sign-In on PhoneAuth page - no more popup blocking errors
