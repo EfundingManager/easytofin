@@ -20,10 +20,121 @@ export default function EmailAuth() {
   const [phone, setPhone] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoaded, setGoogleLoaded] = useState(false);
   const [, setLocation] = useLocation();
 
   const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation();
   const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
+  const handleGoogleCallbackMutation = trpc.gmailAuth.handleGoogleCallback.useMutation();
+
+  const handleGoogleSignIn = async (response: any) => {
+    if (!response.credential) {
+      toast.error("Google Sign-in failed");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Decode the JWT token to get user info
+      const base64Url = response.credential.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      const data = JSON.parse(jsonPayload);
+
+      // Call backend to handle Google callback
+      const result = await handleGoogleCallbackMutation.mutateAsync({
+        googleId: data.sub,
+        email: data.email,
+        name: data.name,
+        picture: data.picture,
+      });
+
+      if (result.success) {
+        toast.success(result.message);
+        localStorage.setItem("emailUserId", result.userId.toString());
+        localStorage.setItem("emailUserData", JSON.stringify(result.user));
+
+        if (result.isNewRegistration) {
+          window.location.href = "/profile";
+        } else {
+          // Existing user - redirect to dashboard
+          window.location.href = "/dashboard";
+        }
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Google Sign-in failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initialize Google Sign-In button
+  const initializeGoogleSignIn = () => {
+    const googleWindow = window as any;
+    if (googleWindow.google && googleWindow.google.accounts) {
+      try {
+        googleWindow.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
+          callback: handleGoogleSignIn,
+          ux_mode: "popup",
+          auto_select: false,
+          itp_support: true,
+        });
+
+        const buttonElement = document.getElementById("google-signin-button");
+        if (buttonElement) {
+          googleWindow.google.accounts.id.renderButton(buttonElement, {
+            type: "standard",
+            theme: "outline",
+            size: "large",
+            width: "100%",
+            text: "signin_with",
+          });
+          setGoogleLoaded(true);
+        }
+      } catch (error) {
+        console.error("Error initializing Google Sign-In:", error);
+        setGoogleLoaded(false);
+      }
+    }
+  };
+
+  // Load Google Sign-In script on mount
+  useEffect(() => {
+    // Check if script already exists to avoid duplicate loading
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+    if (existingScript) {
+      // Wait a bit for the script to be ready
+      setTimeout(() => {
+        initializeGoogleSignIn();
+      }, 100);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      setTimeout(() => {
+        initializeGoogleSignIn();
+      }, 100);
+    };
+    script.onerror = () => {
+      console.error("Failed to load Google Sign-In script");
+      setGoogleLoaded(false);
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      // Keep script for other components that might need it
+    };
+  }, []);
 
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,7 +222,7 @@ export default function EmailAuth() {
                 {step === "register" && "Complete Registration"}
               </CardTitle>
               <CardDescription className="text-[oklch(0.52_0.015_240)]">
-                {step === "email" && "Enter your email address"}
+                {step === "email" && "Choose your preferred sign-in method"}
                 {step === "otp" && "Enter the 6-digit code sent to your email"}
                 {step === "register" && "Complete your profile"}
               </CardDescription>
@@ -119,36 +230,59 @@ export default function EmailAuth() {
 
             <CardContent>
               {step === "email" && (
-                <form onSubmit={handleRequestOtp} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
-                      Email Address
-                    </label>
-                    <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                      className="border-[oklch(0.88_0.008_240)]"
-                    />
+                <div className="space-y-4">
+                  {/* Google Sign-In Button */}
+                  {googleLoaded && (
+                    <div id="google-signin-button" className="flex justify-center" />
+                  )}
+                  {!googleLoaded && (
+                    <div className="text-center text-sm text-[oklch(0.52_0.015_240)]">
+                      Loading Google Sign-In...
+                    </div>
+                  )}
+
+                  {/* Divider */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-[oklch(0.88_0.008_240)]" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-2 bg-white text-[oklch(0.52_0.015_240)]">or</span>
+                    </div>
                   </div>
 
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Sending OTP...
-                      </>
-                    ) : (
-                      "Send OTP"
-                    )}
-                  </Button>
-                </form>
+                  {/* Email Sign-In Form */}
+                  <form onSubmit={handleRequestOtp} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
+                        Email Address
+                      </label>
+                      <Input
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={loading}
+                        className="border-[oklch(0.88_0.008_240)]"
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Sending OTP...
+                        </>
+                      ) : (
+                        "Send OTP"
+                      )}
+                    </Button>
+                  </form>
+                </div>
               )}
 
               {step === "otp" && (
@@ -221,7 +355,12 @@ export default function EmailAuth() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setStep("email")}
+                    onClick={() => {
+                      setStep("email");
+                      setOtp("");
+                      setName("");
+                      setPhone("");
+                    }}
                     disabled={loading}
                     className="w-full"
                   >
@@ -231,6 +370,17 @@ export default function EmailAuth() {
               )}
             </CardContent>
           </Card>
+
+          <p className="text-center text-sm text-[oklch(0.52_0.015_240)] mt-6">
+            By continuing, you agree to our{" "}
+            <a href="/terms" className="text-[oklch(0.40_0.11_195)] hover:underline">
+              Terms of Business
+            </a>{" "}
+            and{" "}
+            <a href="/privacy" className="text-[oklch(0.40_0.11_195)] hover:underline">
+              Privacy Policy
+            </a>
+          </p>
         </div>
       </div>
       <Footer />
