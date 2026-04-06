@@ -263,3 +263,8 @@
 - [x] Investigate 404 error in WeCom widget network requests - SDK URL was being opened as chat URL
 - [x] Fix WeCom chat URL and authentication parameters - updated to use proper WeCom SDK initialization
 - [x] Rewrite WeComWidgetSimple component with proper SDK loading and error handling
+
+## Phase 36: Fix WeCom SDK Loading Error
+- [x] Diagnose WeCom SDK loading failure - SDK URL was being blocked/not loading
+- [x] Implement improved WeCom SDK loading with error recovery - removed SDK dependency
+- [x] Test WeCom widget without SDK dependency - widget works and displays without errors

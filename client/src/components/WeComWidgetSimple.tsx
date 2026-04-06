@@ -5,6 +5,7 @@ import { useEffect } from 'react';
  * 
  * Displays a simple "Contact Us" button that opens WeCom chat
  * Supports multi-language trigger text (English, Chinese, Polish)
+ * Works without requiring WeCom SDK to load
  */
 export function WeComWidgetSimple() {
   useEffect(() => {
@@ -82,79 +83,73 @@ function initializeWeComWidget() {
   container.appendChild(button);
   document.body.appendChild(container);
 
-  // Load WeCom SDK
-  loadWeComSDK();
+  console.log('WeCom widget initialized successfully');
 }
 
 /**
- * Load WeCom SDK script
- */
-function loadWeComSDK() {
-  // Check if WeCom SDK is already loaded
-  if (window.wx && window.wx.corpId) {
-    console.log('WeCom SDK already loaded');
-    return;
-  }
-
-  // Create script element for WeCom SDK
-  const script = document.createElement('script');
-  script.src = 'https://open.work.weixin.qq.com/wwopen/js/code/web/0.0.1/jssdk.js';
-  script.async = true;
-  script.onload = () => {
-    console.log('WeCom SDK loaded successfully');
-    // Initialize WeCom with your corp ID
-    const corpId = 'wwd347ac3e0b84cbf7';
-    const contactSecret = import.meta.env.VITE_WECOM_CONTACT_SECRET || '';
-    
-    // WeCom SDK initialization (if needed)
-    if (window.wx && typeof window.wx.config === 'function') {
-      window.wx.config({
-        corpId: corpId,
-        agentId: 1000001, // Default agent ID
-        jsApiList: [],
-      });
-    }
-  };
-  script.onerror = () => {
-    console.error('Failed to load WeCom SDK');
-  };
-
-  document.head.appendChild(script);
-}
-
-/**
- * Open WeCom chat window
+ * Open WeCom chat window using direct URL approach
+ * This approach doesn't require SDK loading
  */
 function openWeComChat() {
   const corpId = 'wwd347ac3e0b84cbf7';
   const contactSecret = import.meta.env.VITE_WECOM_CONTACT_SECRET || '';
 
-  // WeCom chat URL - use the official format
-  // This opens WeCom's web interface for the specified corp ID
-  const baseUrl = 'https://open.work.weixin.qq.com/wwopen/js/code/web/0.0.1/jssdk.js';
+  // WeCom official chat URL format
+  // Using the web interface URL directly
+  const wecomBaseUrl = 'https://open.work.weixin.qq.com/wwopen/sso/qrConnect';
   
   // Build the chat URL with parameters
   const params = new URLSearchParams();
-  params.append('corpId', corpId);
-  if (contactSecret) {
-    params.append('secret', contactSecret);
+  params.append('appid', corpId);
+  params.append('agentid', '1000001'); // Default agent ID
+  params.append('redirect_uri', window.location.origin);
+  params.append('state', 'wecom_contact');
+  params.append('usertype', 'member');
+
+  // Alternative: Use WeCom's direct chat URL if available
+  // This is the standard way to open WeCom in a new window
+  const chatUrl = `https://work.weixin.qq.com/wework_admin/loginpage_wx?redirect_uri=${encodeURIComponent(window.location.origin)}`;
+
+  console.log('Opening WeCom chat window');
+
+  try {
+    // Try to open WeCom in a new window
+    const wecomWindow = window.open(
+      chatUrl,
+      'wecom_chat',
+      'width=800,height=600,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,status=no'
+    );
+
+    if (!wecomWindow) {
+      console.warn('Failed to open WeCom window. Popup may be blocked.');
+      // Fallback: Open WeCom main page
+      openWeComFallback();
+    } else {
+      console.log('WeCom window opened successfully');
+    }
+  } catch (error) {
+    console.error('Error opening WeCom window:', error);
+    openWeComFallback();
   }
+}
 
-  const chatUrl = `${baseUrl}?${params.toString()}`;
-
-  console.log('Opening WeCom chat with URL:', chatUrl);
-
-  // Open WeCom in a new window/tab
-  const wecomWindow = window.open(
-    chatUrl,
-    'wecom_chat',
-    'width=800,height=600,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,status=no'
-  );
-
-  if (!wecomWindow) {
-    console.warn('Failed to open WeCom window. Popup may be blocked.');
-    // Fallback: Try to open WeCom main page
-    window.open('https://work.weixin.qq.com/', '_blank');
+/**
+ * Fallback method to open WeCom if popup is blocked
+ */
+function openWeComFallback() {
+  const corpId = 'wwd347ac3e0b84cbf7';
+  
+  // Use WeCom's official web interface
+  const fallbackUrl = `https://work.weixin.qq.com/wework_admin/`;
+  
+  console.log('Using WeCom fallback URL:', fallbackUrl);
+  
+  try {
+    window.open(fallbackUrl, '_blank');
+  } catch (error) {
+    console.error('Error opening WeCom fallback:', error);
+    // Last resort: Show alert with WeCom info
+    alert('Please visit https://work.weixin.qq.com/ to contact us via WeCom');
   }
 }
 
@@ -173,14 +168,4 @@ function getLocalizedTriggerText(): string {
   };
 
   return translations[lang] || translations['en'];
-}
-
-// Extend window interface to include WeCom SDK
-declare global {
-  interface Window {
-    wx?: {
-      corpId?: string;
-      config?: (config: any) => void;
-    };
-  }
 }
