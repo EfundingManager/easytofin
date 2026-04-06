@@ -5,6 +5,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { WeComWidget } from "./components/WeComWidget";
 import Home from "./pages/Home";
 import Protection from "./pages/Protection";
 import Pensions from "./pages/Pensions";
@@ -69,6 +70,7 @@ function App() {
         >
           <TooltipProvider>
             <Toaster />
+            <WeComWidget />
             <Router />
           </TooltipProvider>
         </ThemeProvider>

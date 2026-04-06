@@ -241,3 +241,10 @@
 - [x] Fix admin router getCustomerDetail to return address and kycStatus fields
 - [x] Fix workflow router duplicate variable declaration (clientResult → clientDetailsResult)
 - [x] Test email registration option displays correctly - both Phone and Email options visible
+
+## Phase 32: WeCom Live Chat Widget Integration
+- [x] Research WeCom integration requirements and obtain WeCom ID (wwd347ac3e0b84cbf7)
+- [x] Create WeCom configuration component with settings (WeComWidget.tsx)
+- [x] Integrate WeCom widget into main layout for all pages (App.tsx + index.html)
+- [x] Configure WeCom for multi-language support (English: Contact Us, Chinese: 联系我们, Polish: Skontaktuj się z nami)
+- [x] Add WeCom embed code to index.html with official SDK initialization

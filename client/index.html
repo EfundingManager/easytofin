@@ -17,5 +17,16 @@
       defer
       src="%VITE_ANALYTICS_ENDPOINT%/umami"
       data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
+    <!-- WeCom Live Chat Widget -->
+    <script>
+      (function() {
+        var corpId = 'wwd347ac3e0b84cbf7';
+        var url = 'https://open.work.weixin.qq.com/wwopen/js/code/web/0.0.1/jssdk.js?corpId=' + corpId;
+        var script = document.createElement('script');
+        script.src = url;
+        script.async = true;
+        document.head.appendChild(script);
+      })();
+    </script>
   </body>
 </html>
