@@ -280,3 +280,9 @@
 - [x] Update fallback URL to use WeCom API link with kfid
 - [x] Test WeCom widget with new configuration - widget displays and opens correctly
 - [x] Verify multi-language support (English, Chinese, Polish) with new configuration
+
+## Phase 39: WeCom Widget Chinese-Only Display
+- [x] Update WeComWidgetSimple to detect language and only display on Chinese pages
+- [x] Change button text to "企业微信" (WeCom in Chinese)
+- [x] Hide widget on English and Polish pages
+- [x] Test widget visibility on different language pages

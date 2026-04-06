@@ -1,22 +1,30 @@
 import { useEffect } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
  * WeComWidgetSimple Component
  * 
- * Displays a simple "Contact Us" button that opens WeCom chat
- * Supports multi-language trigger text (English, Chinese, Polish)
+ * Displays a "企业微信" (WeCom) button that opens WeCom chat
+ * Only displays on Chinese language pages
  * Works without requiring WeCom SDK to load
  */
 export function WeComWidgetSimple() {
+  const { language } = useLanguage();
+
   useEffect(() => {
-    // Initialize WeCom widget when component mounts
-    initializeWeComWidget();
+    // Only initialize widget if language is Chinese
+    if (language === 'zh') {
+      initializeWeComWidget();
+    } else {
+      // Remove widget if language is not Chinese
+      removeWeComWidget();
+    }
 
     // Cleanup on unmount
     return () => {
-      // Remove event listeners if needed
+      removeWeComWidget();
     };
-  }, []);
+  }, [language]);
 
   return null; // This component doesn't render anything, it injects HTML directly
 }
@@ -45,7 +53,7 @@ function initializeWeComWidget() {
   // Create button
   const button = document.createElement('button');
   button.id = 'wecom-widget-button-simple';
-  button.textContent = getLocalizedTriggerText();
+  button.textContent = '企业微信';
   button.style.cssText = `
     background-color: #2ecc71;
     color: white;
@@ -83,7 +91,18 @@ function initializeWeComWidget() {
   container.appendChild(button);
   document.body.appendChild(container);
 
-  console.log('WeCom widget initialized successfully');
+  console.log('WeCom widget initialized successfully for Chinese language');
+}
+
+/**
+ * Remove WeCom widget from DOM
+ */
+function removeWeComWidget() {
+  const widget = document.getElementById('wecom-widget-container-simple');
+  if (widget) {
+    widget.remove();
+    console.log('WeCom widget removed - not Chinese language');
+  }
 }
 
 /**
@@ -133,21 +152,4 @@ function openWeComFallback() {
     // Last resort: Show alert with WeCom info
     alert('Please visit https://work.weixin.qq.com/kfid/kfc17931e7a2589a51a to contact us via WeCom');
   }
-}
-
-/**
- * Get localized trigger text based on language
- */
-function getLocalizedTriggerText(): string {
-  // Detect language from HTML lang attribute or navigator
-  const htmlLang = document.documentElement.lang || navigator.language || 'en';
-  const lang = htmlLang.toLowerCase().split('-')[0];
-
-  const translations: Record<string, string> = {
-    en: 'Contact Us',
-    zh: '联系我们',
-    pl: 'Skontaktuj się z nami',
-  };
-
-  return translations[lang] || translations['en'];
 }
