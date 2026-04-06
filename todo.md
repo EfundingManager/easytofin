@@ -286,3 +286,9 @@
 - [x] Change button text to "企业微信" (WeCom in Chinese)
 - [x] Hide widget on English and Polish pages
 - [x] Test widget visibility on different language pages
+
+## Phase 40: Auto-Redirect to Client Dashboard After Login
+- [x] Update PhoneAuth component to redirect to /dashboard after successful login
+- [x] Update EmailAuth component to redirect to /dashboard after successful login
+- [x] Verify redirect happens automatically without manual navigation
+- [x] Test redirect flow on both phone and email authentication

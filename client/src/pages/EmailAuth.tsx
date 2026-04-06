@@ -82,7 +82,8 @@ export default function EmailAuth() {
         if (result.isNewRegistration) {
           window.location.href = "/profile";
         } else {
-          window.location.href = "/";
+          // Existing user - redirect to dashboard
+          window.location.href = "/dashboard";
         }
       }
     } catch (error: any) {

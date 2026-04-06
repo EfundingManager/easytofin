@@ -61,8 +61,8 @@ export default function PhoneAuth() {
           // New user - redirect to profile page to complete information and select services
           window.location.href = "/profile";
         } else {
-          // Existing user - redirect to home
-          window.location.href = "/";
+          // Existing user - redirect to dashboard
+          window.location.href = "/dashboard";
         }
       }
     } catch (error: any) {
