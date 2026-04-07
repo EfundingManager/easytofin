@@ -496,7 +496,7 @@ export const translations = {
     home: {
       tagline: '您的财务未来，简单明了。',
       headline: '您的财务未来，简单明了。',
-      description: 'EasyToFin金融服务公司提供关于保障保险、养老金、健康保险和投资理财的专业建议 — 一切尽在一处。',
+         description: 'EasyToFin金融服务公司提供关于人身保险、养老金、医疗保险和投资理财的专业建议 — 专业服务，一站尽享。',
       learnMore: '了解更多',
       callNow: '立即致电',
       yearsExp: '',
