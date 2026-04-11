@@ -1,4 +1,3 @@
-import { useAuth } from '@/_core/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +9,7 @@ import { Loader2 } from 'lucide-react';
 import DocumentUpload from '@/components/DocumentUpload';
 import { ClientPoliciesWidget } from '@/components/ClientPoliciesWidget';
 import { PolicyRenewalReminder } from '@/components/PolicyRenewalReminder';
+import { useAuth } from '@/_core/hooks/useAuth';
 
 export default function UserDashboard() {
   const { user, loading, logout } = useAuth();
