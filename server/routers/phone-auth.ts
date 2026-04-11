@@ -11,6 +11,7 @@ import {
   updatePhoneUser,
   getPhoneUserById,
 } from "../db";
+import { sendSMSVerification, verifySMSCode } from "../verification";
 
 // Generate a random 6-digit OTP code
 function generateOtpCode(): string {
@@ -52,10 +53,17 @@ export const phoneAuthRouter = router({
             attempts: 0,
           });
 
-          // In production, send SMS here:
-          // await sendSMS(input.phone, `Your EasyToFin verification code is: ${code}`);
+          // Send SMS verification using Twilio
+          const smsResult = await sendSMSVerification(input.phone);
+          if (!smsResult.success) {
+            console.error(`[SMS] Failed to send SMS to ${input.phone}:`, smsResult.error);
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to send verification SMS",
+            });
+          }
 
-          console.log(`[OTP] Login OTP for ${input.phone}: ${code}`);
+          console.log(`[OTP] Login OTP sent via SMS to ${input.phone}`);
 
           return {
             success: true,
@@ -117,23 +125,27 @@ export const phoneAuthRouter = router({
           const otp = await getValidOtpCode(user.id, input.code);
 
           if (!otp) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Invalid or expired OTP",
-            });
-          }
+            // Try to verify with Twilio Verify API
+            const twilioResult = await verifySMSCode(input.phone, input.code);
+            if (!twilioResult.success) {
+              throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "Invalid or expired OTP",
+              });
+            }
+          } else {
+            // Check attempt limit for database OTP
+            if (otp.attempts >= 3) {
+              await deleteOtpCode(otp.id);
+              throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "Too many failed attempts. Please request a new OTP.",
+              });
+            }
 
-          // Check attempt limit
-          if (otp.attempts >= 3) {
+            // Mark OTP as used and update user login time
             await deleteOtpCode(otp.id);
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Too many failed attempts. Please request a new OTP.",
-            });
           }
-
-          // Mark OTP as used and update user login time
-          await deleteOtpCode(otp.id);
           await updatePhoneUser(user.id, {
             lastSignedIn: new Date(),
             verified: "true",

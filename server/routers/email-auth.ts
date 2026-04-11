@@ -154,6 +154,15 @@ export const emailAuthRouter = router({
             message: "Invalid or expired OTP",
           });
         }
+        
+        // Verify code with SendGrid verification (optional - for redundancy)
+        // const verifyResult = verifyEmailCode(input.code, otpRecord.code);
+        // if (!verifyResult) {
+        //   throw new TRPCError({
+        //     code: "UNAUTHORIZED",
+        //     message: "Invalid verification code",
+        //   });
+        // }
 
         // Delete OTP after successful verification
         await deleteOtpCode(otpRecord.id);

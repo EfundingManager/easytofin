@@ -7,4 +7,11 @@ export const ENV = {
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+  twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ?? "",
+  twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ?? "",
+  twilioPhoneNumber: process.env.TWILIO_PHONE_NUMBER ?? "",
+  twilioVerifyServiceSid: process.env.TWILIO_VERIFY_SERVICE_SID ?? "",
+  sendgridApiKey: process.env.SENDGRID_API_KEY ?? "",
+  sendgridFromEmail: process.env.SENDGRID_FROM_EMAIL ?? "",
+  sendgridFromName: process.env.SENDGRID_FROM_NAME ?? "",
 };
