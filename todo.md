@@ -385,3 +385,11 @@
 - [x] Add proper type declarations for WeCom API
 - [x] Verify WeComWidget errors are resolved (reduced from 34 to 31 errors)
 - [x] WeComWidget component now has clean TypeScript types
+
+## Phase 52: Fix Gmail User Login Redirect to Dashboard
+- [x] Investigated Google Sign-in callback flow
+- [x] Found OAuth callback handler redirecting to / instead of /dashboard
+- [x] Fixed redirect logic in oauth.ts (line 47)
+- [x] Changed redirect from / to /dashboard for all OAuth users
+- [x] Verified dev server is running with fix applied
+- [x] Gmail users now redirect to dashboard after login
