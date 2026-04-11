@@ -109,33 +109,57 @@ export default function EmailAuth() {
 
   // Load Google Sign-In script on mount
   useEffect(() => {
-    // Check if script already exists to avoid duplicate loading
-    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
-    if (existingScript) {
-      // Wait a bit for the script to be ready
-      setTimeout(() => {
-        initializeGoogleSignIn();
-      }, 100);
-      return;
-    }
+    let retryCount = 0;
+    const maxRetries = 5;
+    let timeoutId: NodeJS.Timeout;
 
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      setTimeout(() => {
+    const loadGoogleSignIn = () => {
+      const googleWindow = window as any;
+
+      // Check if Google API is already loaded
+      if (googleWindow.google && googleWindow.google.accounts) {
+        console.log("Google API already available, initializing...");
         initializeGoogleSignIn();
-      }, 100);
+        return;
+      }
+
+      // Check if script already exists
+      const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+      if (existingScript) {
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(`Retrying Google Sign-In initialization (${retryCount}/${maxRetries})`);
+          timeoutId = setTimeout(loadGoogleSignIn, 600);
+        } else {
+          console.error("Failed to load Google Sign-In after retries");
+          setGoogleLoaded(false);
+        }
+        return;
+      }
+
+      // Create and load the script
+      console.log("Loading Google Sign-In script...");
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = false;
+      script.onload = () => {
+        console.log("Google Sign-In script loaded, initializing...");
+        timeoutId = setTimeout(() => {
+          initializeGoogleSignIn();
+        }, 400);
+      };
+      script.onerror = () => {
+        console.error("Failed to load Google Sign-In script");
+        setGoogleLoaded(false);
+      };
+      document.head.appendChild(script);
     };
-    script.onerror = () => {
-      console.error("Failed to load Google Sign-In script");
-      setGoogleLoaded(false);
-    };
-    document.head.appendChild(script);
+
+    loadGoogleSignIn();
 
     return () => {
-      // Keep script for other components that might need it
+      if (timeoutId) clearTimeout(timeoutId);
     };
   }, []);
 
