@@ -164,3 +164,25 @@ export const clientDocuments = mysqlTable("clientDocuments", {
 
 export type ClientDocument = typeof clientDocuments.$inferSelect;
 export type InsertClientDocument = typeof clientDocuments.$inferInsert;
+
+/**
+ * Rate limit violation logs for admin monitoring
+ */
+export const rateLimitLogs = mysqlTable("rateLimitLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  identifier: varchar("identifier", { length: 320 }).notNull(), // phone number or email
+  identifierType: mysqlEnum("identifierType", ["phone", "email"]).notNull(),
+  violationType: mysqlEnum("violationType", ["send_otp", "verify_otp"]).notNull(),
+  attemptCount: int("attemptCount").default(1).notNull(),
+  ipAddress: varchar("ipAddress", { length: 45 }), // IPv4 or IPv6
+  userAgent: text("userAgent"),
+  isWhitelisted: mysqlEnum("isWhitelisted", ["true", "false"]).default("false").notNull(),
+  resolvedAt: timestamp("resolvedAt"),
+  resolvedBy: int("resolvedBy"), // admin user ID who resolved it
+  notes: text("notes"), // admin notes
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RateLimitLog = typeof rateLimitLogs.$inferSelect;
+export type InsertRateLimitLog = typeof rateLimitLogs.$inferInsert;

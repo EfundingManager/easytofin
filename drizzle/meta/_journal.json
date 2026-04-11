@@ -71,6 +71,13 @@
       "when": 1775422449167,
       "tag": "0009_careful_earthquake",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1775947568869,
+      "tag": "0010_gifted_mongoose",
+      "breakpoints": true
     }
   ]
 }

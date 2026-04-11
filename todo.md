@@ -341,3 +341,14 @@
 - [x] Update EmailAuth to display rate limit errors with countdown
 - [x] Add rate limit alert to EmailAuth OTP step
 - [x] Disable verify button during rate limit with countdown
+
+## Phase 47: Admin Rate Limit Monitoring Dashboard
+- [x] Create rate limit logging service to track violations
+- [x] Store rate limit events in database with timestamps (rateLimitLogs table)
+- [x] Build admin dashboard UI to view rate limit violations
+- [x] Add filtering by phone number, email, violation type
+- [x] Implement rate limit reset functionality for admins
+- [x] Add whitelist feature to exclude users from rate limiting
+- [x] Create admin API endpoints for rate limit management
+- [x] Add pagination and sorting to rate limit logs
+- [x] Display rate limit statistics and top violators

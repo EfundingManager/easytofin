@@ -3,6 +3,7 @@ import { getDb } from "../db";
 import { phoneUsers, userProducts, factFindingForms, policyAssignments, clientDocuments } from "../../drizzle/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { z } from "zod";
+import { getRateLimitViolations, whitelistIdentifier, resetRateLimit, getRateLimitStats } from "../rate-limit-logger";
 
 /**
  * Admin router for managing client submissions, configurations, and analytics
@@ -570,5 +571,92 @@ export const adminRouter = router({
         console.error("[Admin] Failed to update KYC status:", error);
         throw new Error("Failed to update KYC status");
       }
+    }),
+
+  /**
+   * Get rate limit violations for admin dashboard
+   */
+  getRateLimitViolationsData: adminProcedure
+    .input(
+      z.object({
+        identifier: z.string().optional(),
+        identifierType: z.enum(["phone", "email"]).optional(),
+        violationType: z.enum(["send_otp", "verify_otp"]).optional(),
+        resolved: z.boolean().optional(),
+        limit: z.number().int().positive().max(100).default(50),
+        offset: z.number().int().nonnegative().default(0),
+        sortBy: z.enum(["createdAt", "attemptCount"]).default("createdAt"),
+      })
+    )
+    .query(async ({ input }) => {
+      const violations = await getRateLimitViolations({
+        identifier: input.identifier,
+        identifierType: input.identifierType,
+        violationType: input.violationType,
+        resolved: input.resolved,
+        limit: input.limit,
+        offset: input.offset,
+        sortBy: input.sortBy,
+      });
+      return violations;
+    }),
+
+  /**
+   * Get rate limit statistics
+   */
+  getRateLimitStatsData: adminProcedure.query(async () => {
+    return await getRateLimitStats();
+  }),
+
+  /**
+   * Whitelist an identifier to exclude from rate limiting
+   */
+  whitelistIdentifierFromRateLimit: adminProcedure
+    .input(
+      z.object({
+        identifier: z.string(),
+        identifierType: z.enum(["phone", "email"]),
+        notes: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const success = await whitelistIdentifier(
+        input.identifier,
+        input.identifierType,
+        ctx.user.id,
+        input.notes
+      );
+      return {
+        success,
+        message: success
+          ? `${input.identifier} has been whitelisted`
+          : "Failed to whitelist identifier",
+      };
+    }),
+
+  /**
+   * Reset rate limit for an identifier
+   */
+  resetRateLimitForIdentifier: adminProcedure
+    .input(
+      z.object({
+        identifier: z.string(),
+        identifierType: z.enum(["phone", "email"]),
+        notes: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const success = await resetRateLimit(
+        input.identifier,
+        input.identifierType,
+        ctx.user.id,
+        input.notes
+      );
+      return {
+        success,
+        message: success
+          ? `Rate limit for ${input.identifier} has been reset`
+          : "Failed to reset rate limit",
+      };
     }),
 });
