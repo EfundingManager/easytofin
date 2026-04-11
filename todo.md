@@ -420,3 +420,13 @@
 - [x] Fix emailService.ts to implement actual SendGrid email sending
 - [x] Create email templates for OTP, confirmation, and policy assignment
 - [x] Integrate SendGrid with proper HTML email templates
+
+## Phase 56: Add Resend Code Button with Cooldown Timer
+- [x] Create ResendCodeButton component with 60-second cooldown logic
+- [x] Add countdown timer display to ResendCodeButton
+- [x] Integrate ResendCodeButton into PhoneAuth OTP verification step
+- [x] Integrate ResendCodeButton into EmailAuth OTP verification step
+- [x] Write vitest tests for ResendCodeButton component (14 tests passing)
+- [x] Test resend functionality end-to-end in both auth flows
+- [x] Verify cooldown timer works correctly (60 seconds)
+- [x] Verify rate limiting still enforced on resend requests

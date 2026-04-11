@@ -11,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useRateLimit } from "@/_core/hooks/useRateLimit";
 import { RateLimitAlert } from "@/components/RateLimitAlert";
+import { ResendCodeButton } from "@/components/ResendCodeButton";
 
 type AuthStep = "email" | "otp" | "register";
 
@@ -397,6 +398,27 @@ export default function EmailAuth() {
                     )}
                   </Button>
 
+                  <ResendCodeButton
+                    onResend={async () => {
+                      setLoading(true);
+                      try {
+                        await requestOtpMutation.mutateAsync({ email });
+                        toast.success("OTP resent to your email!");
+                      } catch (error: any) {
+                        if (error.data?.code === "TOO_MANY_REQUESTS") {
+                          rateLimit.setRateLimit(3600, "Too many requests. Please try again later.");
+                          toast.error("Too many requests. Please try again later.");
+                        } else {
+                          toast.error(error.message || "Failed to resend OTP");
+                        }
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={rateLimit.isLimited}
+                    isLoading={loading}
+                    cooldownSeconds={60}
+                  />
                   <Button
                     type="button"
                     variant="outline"
