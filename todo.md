@@ -338,5 +338,6 @@
 - [x] Add visual feedback (disabled button, error message) during rate limit
 - [x] Integrate rate limit error handling into PhoneAuth
 - [x] Display countdown timer on disabled button
-- [ ] Update EmailAuth to display rate limit errors with countdown
-- [ ] Test countdown timer functionality in browser
+- [x] Update EmailAuth to display rate limit errors with countdown
+- [x] Add rate limit alert to EmailAuth OTP step
+- [x] Disable verify button during rate limit with countdown

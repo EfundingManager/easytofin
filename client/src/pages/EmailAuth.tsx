@@ -9,6 +9,8 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useRateLimit } from "@/_core/hooks/useRateLimit";
+import { RateLimitAlert } from "@/components/RateLimitAlert";
 
 type AuthStep = "email" | "otp" | "register";
 
@@ -22,6 +24,7 @@ export default function EmailAuth() {
   const [loading, setLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const [, setLocation] = useLocation();
+  const rateLimit = useRateLimit();
 
   const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation();
   const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
@@ -150,6 +153,11 @@ export default function EmailAuth() {
       return;
     }
 
+    if (rateLimit.isLimited) {
+      toast.error(`Too many requests. Please try again in ${rateLimit.formatTimeRemaining(rateLimit.timeRemaining)}`);
+      return;
+    }
+
     setLoading(true);
     try {
       const result = await requestOtpMutation.mutateAsync({ email });
@@ -157,7 +165,14 @@ export default function EmailAuth() {
       setStep("otp");
       toast.success("OTP sent to your email!");
     } catch (error: any) {
-      toast.error(error.message || "Failed to send OTP");
+      // Check if it's a rate limit error
+      if (error.data?.code === "TOO_MANY_REQUESTS") {
+        const retryAfter = parseInt(error.message.match(/\d+/)?.[0] || "3600");
+        rateLimit.setRateLimit(retryAfter, error.message);
+        toast.error(error.message);
+      } else {
+        toast.error(error.message || "Failed to send OTP");
+      }
     } finally {
       setLoading(false);
     }
@@ -172,6 +187,11 @@ export default function EmailAuth() {
 
     if (isNewUser && (!name.trim() || !phone.trim())) {
       toast.error("Please enter your name and phone number");
+      return;
+    }
+
+    if (rateLimit.isLimited) {
+      toast.error(`Too many verification attempts. Please try again in ${rateLimit.formatTimeRemaining(rateLimit.timeRemaining)}`);
       return;
     }
 
@@ -198,11 +218,18 @@ export default function EmailAuth() {
         }
       }
     } catch (error: any) {
-      toast.error(error.message || "Failed to verify OTP");
+      // Check if it's a rate limit error
+      if (error.data?.code === "TOO_MANY_REQUESTS") {
+        const retryAfter = parseInt(error.message.match(/\d+/)?.[0] || "3600");
+        rateLimit.setRateLimit(retryAfter, error.message);
+        toast.error(error.message);
+      } else {
+        toast.error(error.message || "Failed to verify OTP");
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -287,6 +314,13 @@ export default function EmailAuth() {
 
               {step === "otp" && (
                 <form onSubmit={handleVerifyOtp} className="space-y-4">
+                  {rateLimit.isLimited && (
+                    <RateLimitAlert
+                      message={rateLimit.message}
+                      timeRemaining={rateLimit.timeRemaining}
+                      onFormatTime={rateLimit.formatTimeRemaining}
+                    />
+                  )}
                   <div>
                     <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
                       Enter OTP
@@ -339,14 +373,16 @@ export default function EmailAuth() {
 
                   <Button
                     type="submit"
-                    disabled={loading}
-                    className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white"
+                    disabled={loading || rateLimit.isLimited}
+                    className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Verifying...
                       </>
+                    ) : rateLimit.isLimited ? (
+                      `Try again in ${rateLimit.formatTimeRemaining(rateLimit.timeRemaining)}`
                     ) : (
                       "Verify OTP"
                     )}
