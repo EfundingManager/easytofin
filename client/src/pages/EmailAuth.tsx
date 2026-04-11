@@ -383,6 +383,37 @@ export default function EmailAuth() {
                     />
                   </div>
 
+                  {isNewUser && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
+                          Full Name
+                        </label>
+                        <Input
+                          type="text"
+                          placeholder="John Doe"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          disabled={loading}
+                          className="border-[oklch(0.88_0.008_240)]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
+                          Phone Number
+                        </label>
+                        <Input
+                          type="tel"
+                          placeholder="+353 1 234 5678"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          disabled={loading}
+                          className="border-[oklch(0.88_0.008_240)]"
+                        />
+                      </div>
+                    </>
+                  )}
+
                   <Button
                     type="submit"
                     disabled={loading}

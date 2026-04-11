@@ -430,3 +430,11 @@
 - [x] Test resend functionality end-to-end in both auth flows
 - [x] Verify cooldown timer works correctly (60 seconds)
 - [x] Verify rate limiting still enforced on resend requests
+
+## Phase 57: Fix Email OTP Verification Flow
+- [x] Add name and phone input fields to EmailAuth OTP step for new users
+- [x] Verify redirect logic for existing users (to /dashboard)
+- [x] Verify redirect logic for new users (to /profile)
+- [x] Test email OTP flow for new user registration
+- [x] Test email OTP flow for existing user login
+- [x] Verify name and phone fields only show for new users
