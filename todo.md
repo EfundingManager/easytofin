@@ -438,3 +438,10 @@
 - [x] Test email OTP flow for new user registration
 - [x] Test email OTP flow for existing user login
 - [x] Verify name and phone fields only show for new users
+
+## Phase 58: Fix Phone OTP Delivery for New Users
+- [x] Add SMS sending for new users in phone-auth router
+- [x] Improve createOtpCode function error handling and logging
+- [x] Test phone OTP request for new user registration
+- [x] Test phone OTP request for existing user login
+- [x] Verify SMS codes are received via Twilio

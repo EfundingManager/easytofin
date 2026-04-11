@@ -90,10 +90,17 @@ export const phoneAuthRouter = router({
           };
         } else {
           // New user - we'll create the account after OTP verification
-          // For now, just generate and return OTP
-          // The actual user account will be created during verification
+          // Send SMS verification using Twilio
+          const smsResult = await sendSMSVerification(input.phone);
+          if (!smsResult.success) {
+            console.error(`[SMS] Failed to send SMS to ${input.phone}:`, smsResult.error);
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to send verification SMS",
+            });
+          }
 
-          console.log(`[OTP] Registration OTP for ${input.phone}: ${code}`);
+          console.log(`[OTP] Registration OTP sent via SMS to ${input.phone}`);
 
           return {
             success: true,

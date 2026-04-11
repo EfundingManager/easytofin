@@ -146,15 +146,26 @@ export async function createOtpCode(data: InsertOtpCode): Promise<OtpCode> {
     throw new Error("Database not available");
   }
 
-  const result = await db.insert(otpCodes).values(data);
-  const insertedId = (result as any).insertId;
-  
-  const otp = await db.select().from(otpCodes).where(eq(otpCodes.id, insertedId)).limit(1);
-  if (!otp.length) {
-    throw new Error("Failed to create OTP code");
+  try {
+    const result = await db.insert(otpCodes).values(data);
+    const insertedId = (result as any).insertId;
+    
+    if (!insertedId) {
+      console.error("[OTP] Insert result:", result);
+      throw new Error("Failed to get inserted OTP ID");
+    }
+    
+    const otp = await db.select().from(otpCodes).where(eq(otpCodes.id, insertedId)).limit(1);
+    if (!otp.length) {
+      console.error(`[OTP] Failed to retrieve OTP with ID ${insertedId} after insertion`);
+      throw new Error("Failed to retrieve created OTP code");
+    }
+    
+    return otp[0];
+  } catch (error) {
+    console.error("[OTP] Error in createOtpCode:", error);
+    throw error;
   }
-  
-  return otp[0];
 }
 
 export async function getValidOtpCode(phoneUserId: number, code: string): Promise<OtpCode | undefined> {
