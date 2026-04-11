@@ -154,8 +154,8 @@ function openWeComChat(config: any) {
 
   // Open WeCom chat in new window or modal
   try {
-    if (window.wx && window.wx.openWindow) {
-      window.wx.openWindow({
+    if (window.wx && typeof window.wx.openWindow === 'function') {
+      (window.wx.openWindow as (options: { url: string; title: string }) => void)({
         url: chatUrl,
         title: config.triggerText,
       });
@@ -204,8 +204,8 @@ declare global {
   interface Window {
     wx?: {
       config?: (config: any) => void;
-      openWindow?: (config: any) => void;
+      openWindow?: (options: { url: string; title: string }) => void;
       [key: string]: any;
-    };
+    } | undefined;
   }
 }
