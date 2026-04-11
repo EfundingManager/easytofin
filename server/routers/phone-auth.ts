@@ -12,6 +12,7 @@ import {
   getPhoneUserById,
 } from "../db";
 import { sendSMSVerification, verifySMSCode } from "../verification";
+import { rateLimiter, RATE_LIMIT_CONFIG } from "../rate-limiter";
 
 // Generate a random 6-digit OTP code
 function generateOtpCode(): string {
@@ -37,6 +38,21 @@ export const phoneAuthRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
+        // Check rate limit for SMS requests
+        const rateLimitCheck = rateLimiter.isAllowed(
+          input.phone,
+          RATE_LIMIT_CONFIG.SMS_REQUEST.maxRequests,
+          RATE_LIMIT_CONFIG.SMS_REQUEST.windowMs
+        );
+
+        if (!rateLimitCheck.allowed) {
+          const retryAfter = rateLimitCheck.retryAfter || 3600;
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `Too many SMS requests. Please try again in ${retryAfter} seconds.`,
+          });
+        }
+
         // Check if user already exists
         const existingUser = await getPhoneUserByPhone(input.phone);
 
@@ -111,6 +127,21 @@ export const phoneAuthRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
+        // Check rate limit for verification attempts
+        const rateLimitCheck = rateLimiter.isVerificationAllowed(
+          `${input.phone}-verify`,
+          RATE_LIMIT_CONFIG.VERIFICATION_ATTEMPT.maxAttempts,
+          RATE_LIMIT_CONFIG.VERIFICATION_ATTEMPT.windowMs
+        );
+
+        if (!rateLimitCheck.allowed) {
+          const retryAfter = rateLimitCheck.retryAfter || 3600;
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `Too many verification attempts. Please try again in ${retryAfter} seconds.`,
+          });
+        }
+
         const user = await getPhoneUserByPhone(input.phone);
 
         if (!user && !input.isNewUser) {

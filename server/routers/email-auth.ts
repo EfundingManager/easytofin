@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../_core/trpc";
 import { sendOtpEmail, sendAccountConfirmationEmail, sendWelcomeEmail } from "../_core/emailService";
+import { rateLimiter, RATE_LIMIT_CONFIG } from "../rate-limiter";
 import {
   createPhoneUser,
   getPhoneUserByEmail,
@@ -37,6 +38,21 @@ export const emailAuthRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
+        // Check rate limit for email requests
+        const rateLimitCheck = rateLimiter.isAllowed(
+          input.email,
+          RATE_LIMIT_CONFIG.EMAIL_REQUEST.maxRequests,
+          RATE_LIMIT_CONFIG.EMAIL_REQUEST.windowMs
+        );
+
+        if (!rateLimitCheck.allowed) {
+          const retryAfter = rateLimitCheck.retryAfter || 3600;
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `Too many email requests. Please try again in ${retryAfter} seconds.`,
+          });
+        }
+
         // Check if user already exists by email
         const existingUser = await getPhoneUserByEmail(input.email);
 
@@ -107,6 +123,21 @@ export const emailAuthRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
+        // Check rate limit for verification attempts
+        const rateLimitCheck = rateLimiter.isVerificationAllowed(
+          `${input.email}-verify`,
+          RATE_LIMIT_CONFIG.VERIFICATION_ATTEMPT.maxAttempts,
+          RATE_LIMIT_CONFIG.VERIFICATION_ATTEMPT.windowMs
+        );
+
+        if (!rateLimitCheck.allowed) {
+          const retryAfter = rateLimitCheck.retryAfter || 3600;
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `Too many verification attempts. Please try again in ${retryAfter} seconds.`,
+          });
+        }
+
         // Check if user exists
         let user = await getPhoneUserByEmail(input.email);
 
