@@ -76,36 +76,62 @@ export default function EmailAuth() {
     }
   };
 
-  // Initialize Google Sign-In button
+  // Initialize Google Sign-In API
   const initializeGoogleSignIn = () => {
     const googleWindow = window as any;
     if (googleWindow.google && googleWindow.google.accounts) {
       try {
+        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+        if (!clientId) {
+          console.error("Google Client ID not configured");
+          return false;
+        }
+
         googleWindow.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
+          client_id: clientId,
           callback: handleGoogleSignIn,
           ux_mode: "popup",
           auto_select: false,
           itp_support: true,
         });
-
-        const buttonElement = document.getElementById("google-signin-button");
-        if (buttonElement) {
-          googleWindow.google.accounts.id.renderButton(buttonElement, {
-            type: "standard",
-            theme: "outline",
-            size: "large",
-            width: "100%",
-            text: "signin_with",
-          });
-          setGoogleLoaded(true);
-        }
+        console.log("Google Sign-In API initialized successfully");
+        return true;
       } catch (error) {
-        console.error("Error initializing Google Sign-In:", error);
-        setGoogleLoaded(false);
+        console.error("Error initializing Google Sign-In API:", error);
+        return false;
       }
     }
+    return false;
   };
+
+  // Render Google button after it's mounted in DOM
+  useEffect(() => {
+    if (!googleLoaded) return;
+
+    const googleWindow = window as any;
+    if (!googleWindow.google || !googleWindow.google.accounts) {
+      console.warn("Google API not available for rendering button");
+      return;
+    }
+
+    const buttonElement = document.getElementById("google-signin-button");
+    if (buttonElement) {
+      try {
+        googleWindow.google.accounts.id.renderButton(buttonElement, {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          width: "100%",
+          text: "signin_with",
+        });
+        console.log("Google Sign-In button rendered successfully");
+      } catch (error) {
+        console.error("Error rendering Google button:", error);
+      }
+    } else {
+      console.warn("Google button element not found in DOM");
+    }
+  }, [googleLoaded]);
 
   // Load Google Sign-In script on mount
   useEffect(() => {
@@ -119,7 +145,9 @@ export default function EmailAuth() {
       // Check if Google API is already loaded
       if (googleWindow.google && googleWindow.google.accounts) {
         console.log("Google API already available, initializing...");
-        initializeGoogleSignIn();
+        if (initializeGoogleSignIn()) {
+          setGoogleLoaded(true);
+        }
         return;
       }
 
@@ -132,7 +160,6 @@ export default function EmailAuth() {
           timeoutId = setTimeout(loadGoogleSignIn, 600);
         } else {
           console.error("Failed to load Google Sign-In after retries");
-          setGoogleLoaded(false);
         }
         return;
       }
@@ -146,12 +173,13 @@ export default function EmailAuth() {
       script.onload = () => {
         console.log("Google Sign-In script loaded, initializing...");
         timeoutId = setTimeout(() => {
-          initializeGoogleSignIn();
-        }, 400);
+          if (initializeGoogleSignIn()) {
+            setGoogleLoaded(true);
+          }
+        }, 300);
       };
       script.onerror = () => {
-        console.error("Failed to load Google Sign-In script");
-        setGoogleLoaded(false);
+        console.error("Failed to load Google Sign-In script from CDN");
       };
       document.head.appendChild(script);
     };
@@ -283,13 +311,14 @@ export default function EmailAuth() {
               {step === "email" && (
                 <div className="space-y-4">
                   {/* Google Sign-In Button */}
-                  {googleLoaded && (
-                    <div id="google-signin-button" className="flex justify-center" />
-                  )}
                   {!googleLoaded && (
-                    <div className="text-center text-sm text-[oklch(0.52_0.015_240)]">
+                    <div className="text-center text-sm text-[oklch(0.52_0.015_240)] flex items-center justify-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
                       Loading Google Sign-In...
                     </div>
+                  )}
+                  {googleLoaded && (
+                    <div id="google-signin-button" className="flex justify-center" />
                   )}
 
                   {/* Divider */}
@@ -338,75 +367,31 @@ export default function EmailAuth() {
 
               {step === "otp" && (
                 <form onSubmit={handleVerifyOtp} className="space-y-4">
-                  {rateLimit.isLimited && (
-                    <RateLimitAlert
-                      message={rateLimit.message}
-                      timeRemaining={rateLimit.timeRemaining}
-                      onFormatTime={rateLimit.formatTimeRemaining}
-                    />
-                  )}
                   <div>
                     <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
-                      Enter OTP
+                      Enter 6-Digit OTP
                     </label>
                     <Input
                       type="text"
                       placeholder="000000"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                      disabled={loading}
                       maxLength={6}
-                      className="border-[oklch(0.88_0.008_240)] text-center text-2xl tracking-widest font-mono"
+                      disabled={loading}
+                      className="border-[oklch(0.88_0.008_240)] text-center text-2xl tracking-widest"
                     />
                   </div>
 
-                  {isNewUser && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
-                          Full Name
-                        </label>
-                        <Input
-                          type="text"
-                          placeholder="John Doe"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          disabled={loading}
-                          className="border-[oklch(0.88_0.008_240)]"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
-                          Phone Number
-                        </label>
-                        <Input
-                          type="tel"
-                          placeholder="+353 1 234 5678"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          disabled={loading}
-                          className="border-[oklch(0.88_0.008_240)]"
-                        />
-                        <p className="text-xs text-[oklch(0.52_0.015_240)] mt-1">
-                          Include country code (e.g., +353 for Ireland)
-                        </p>
-                      </div>
-                    </>
-                  )}
-
                   <Button
                     type="submit"
-                    disabled={loading || rateLimit.isLimited}
-                    className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={loading}
+                    className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white"
                   >
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Verifying...
                       </>
-                    ) : rateLimit.isLimited ? (
-                      `Try again in ${rateLimit.formatTimeRemaining(rateLimit.timeRemaining)}`
                     ) : (
                       "Verify OTP"
                     )}
@@ -415,13 +400,7 @@ export default function EmailAuth() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => {
-                      setStep("email");
-                      setOtp("");
-                      setName("");
-                      setPhone("");
-                    }}
-                    disabled={loading}
+                    onClick={() => setStep("email")}
                     className="w-full"
                   >
                     Back
@@ -430,17 +409,6 @@ export default function EmailAuth() {
               )}
             </CardContent>
           </Card>
-
-          <p className="text-center text-sm text-[oklch(0.52_0.015_240)] mt-6">
-            By continuing, you agree to our{" "}
-            <a href="/terms" className="text-[oklch(0.40_0.11_195)] hover:underline">
-              Terms of Business
-            </a>{" "}
-            and{" "}
-            <a href="/privacy" className="text-[oklch(0.40_0.11_195)] hover:underline">
-              Privacy Policy
-            </a>
-          </p>
         </div>
       </div>
       <Footer />
