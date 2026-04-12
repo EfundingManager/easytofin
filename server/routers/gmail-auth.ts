@@ -1,5 +1,6 @@
 import { publicProcedure, router } from "../_core/trpc";
 import { z } from "zod";
+import * as db from "../db";
 import { createPhoneUser, getPhoneUserByEmail } from "../db";
 import { TRPCError } from "@trpc/server";
 
@@ -28,6 +29,7 @@ export const gmailAuthRouter = router({
 
         if (existingUser) {
           // User exists - return login success
+          // Note: lastSignedIn is updated by the OAuth flow in server/_core/oauth.ts
           return {
             success: true,
             message: "Login successful",
@@ -40,12 +42,11 @@ export const gmailAuthRouter = router({
 
         // Create new user from Google profile
         const newUser = await createPhoneUser({
-          phone: "", // Phone not required for Google OAuth
           email: input.email,
           name: input.name,
           googleId: input.googleId,
           picture: input.picture,
-          verified: "true", // Google-verified email
+          emailVerified: "true", // Google-verified email
           role: "user",
           loginMethod: "google",
         });
