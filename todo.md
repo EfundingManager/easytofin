@@ -577,3 +577,18 @@
 - [x] Implement product navigation with routing
 - [x] Test customer dashboard routing and redirect logic
 - [x] Verify all dashboard widgets display correctly
+
+
+## Phase 71: Fix OAuth Callback Redirect to Customer Dashboard
+- [x] Analyze current OAuth callback flow in server/_core/oauth.ts
+- [x] Update OAuth callback to check user's clientStatus and set appropriate redirect
+- [x] Get user by openId after upsert to retrieve user ID
+- [x] Check phoneUser record for clientStatus
+- [x] Redirect to /customer/{userId} if clientStatus === 'customer'
+- [x] Redirect to /user/{userId} for unverified users
+- [x] Fallback to /dashboard if no phoneUser record exists
+- [ ] Test Manus OAuth callback with customer account
+- [ ] Test Manus OAuth callback with unverified user account
+- [ ] Verify customer users are redirected to /customer/{userId}
+- [ ] Verify unverified users are redirected to /user/{userId}
+- [ ] Test OAuth flow on production domain (easytofin.com)
