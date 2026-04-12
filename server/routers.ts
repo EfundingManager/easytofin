@@ -15,6 +15,7 @@ import { documentReviewRouter } from "./routers/document-review";
 import { policiesRouter } from "./routers/policies";
 import { twoFactorAuthRouter } from "./routers/two-factor-auth";
 import { kycDocumentsRouter } from "./routers/kyc-documents";
+import { featureFlagsRouter } from "./routers/feature-flags";
 import * as db from "./db";
 
 export const appRouter = router({
@@ -60,6 +61,7 @@ export const appRouter = router({
   policies: policiesRouter,
   twoFactorAuth: twoFactorAuthRouter,
   kycDocuments: kycDocumentsRouter,
+  featureFlags: featureFlagsRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({

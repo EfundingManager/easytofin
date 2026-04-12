@@ -186,3 +186,23 @@ export const rateLimitLogs = mysqlTable("rateLimitLogs", {
 
 export type RateLimitLog = typeof rateLimitLogs.$inferSelect;
 export type InsertRateLimitLog = typeof rateLimitLogs.$inferInsert;
+
+/**
+ * Feature flags for controlling feature visibility and behavior
+ */
+export const featureFlags = mysqlTable("featureFlags", {
+  id: int("id").autoincrement().primaryKey(),
+  flagName: varchar("flagName", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  enabled: mysqlEnum("enabled", ["true", "false"]).default("false").notNull(),
+  targetAudience: varchar("targetAudience", { length: 100 }).default("all"),
+  rolloutPercentage: int("rolloutPercentage").default(100),
+  metadata: text("metadata"),
+  changedBy: int("changedBy"),
+  changeReason: text("changeReason"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FeatureFlag = typeof featureFlags.$inferSelect;
+export type InsertFeatureFlag = typeof featureFlags.$inferInsert;

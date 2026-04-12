@@ -622,3 +622,16 @@
 - [ ] Schedule automated task to re-enable Client Login on April 17, 2026
 - [ ] Test hidden state and verify Client Login is inaccessible
 - [ ] Test scheduled re-publication logic
+
+
+## Phase 74: Admin Control Panel for Client Login Visibility
+- [x] Create featureFlags table in database schema
+- [x] Add backend API endpoints for feature flag management (getFeatureFlags, updateFeatureFlag, isEnabled, createFlag, deleteFlag)
+- [x] Create admin control panel UI component for feature flag toggles (FeatureFlagsPanel.tsx)
+- [x] Implement client-side hook to check feature flag status (useFeatureFlag.ts)
+- [x] Add feature flag toggle to admin dashboard (Feature Flags tab)
+- [x] Implement audit logging for feature flag changes (changedBy, changeReason fields)
+- [ ] Update Navbar to conditionally render Client Login button based on feature flag
+- [ ] Write vitest tests for feature flag system
+- [ ] Test toggling Client Login visibility from admin panel
+- [ ] Verify feature flag changes take effect immediately on frontend
