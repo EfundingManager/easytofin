@@ -610,3 +610,15 @@
 - [ ] Test document validation and security checks
 - [ ] Integrate KycDocumentUpload component into UserPortal
 - [ ] Add DocumentReview tab to admin dashboard
+
+
+## Phase 73: Hide Client Login and Schedule Re-publication
+- [x] Hide Client Login button from navigation/header (commented out in Navbar.tsx)
+- [x] Create coming soon/maintenance page for Client Login (ClientLoginComingSoon.tsx)
+- [x] Add countdown timer showing April 17, 2026 re-publication date
+- [x] Update App.tsx to redirect Client Login route to coming soon page
+- [x] Add multilingual support (English, Chinese, Polish) to coming soon page
+- [x] Include contact information on coming soon page
+- [ ] Schedule automated task to re-enable Client Login on April 17, 2026
+- [ ] Test hidden state and verify Client Login is inaccessible
+- [ ] Test scheduled re-publication logic

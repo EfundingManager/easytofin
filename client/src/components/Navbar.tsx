@@ -175,10 +175,11 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link href="/auth-selection" className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-base">
+            {/* Client Login - Hidden until April 17, 2026 */}
+            {/* <Link href="/auth-selection" className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-base">
               <LogIn size={18} />
               {t(language, 'nav.clientLogin')}
-            </Link>
+            </Link> */}
             <Link href="/contact" className="btn-gold text-base px-5 py-2.5">
               {t(language, 'nav.getQuote')}
             </Link>
@@ -219,10 +220,11 @@ export default function Navbar() {
               {t(language, 'nav.contact')}
             </Link>
             <div className="pt-2 space-y-2">
-              <Link href="/auth-selection" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-sm">
+              {/* Client Login - Hidden until April 17, 2026 */}
+              {/* <Link href="/auth-selection" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-sm">
                 <LogIn size={16} />
                 {t(language, 'nav.clientLogin')}
-              </Link>
+              </Link> */}
               <Link href="/contact" className="btn-gold w-full justify-center text-sm">
                 {t(language, 'nav.getQuote')}
               </Link>

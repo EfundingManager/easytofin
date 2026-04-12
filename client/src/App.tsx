@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
@@ -29,13 +28,14 @@ import UserDashboard from "./pages/UserDashboard";
 import TwoFactorAuth from "./pages/TwoFactorAuth";
 import UserPortal from "./pages/UserPortal";
 import CustomerPortal from "./pages/CustomerPortal";
+import ClientLoginComingSoon from "./pages/ClientLoginComingSoon";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/auth-selection" component={AuthSelection} />
+      <Route path="/auth-selection" component={ClientLoginComingSoon} />
       <Route path="/phone-auth" component={PhoneAuth} />
       <Route path="/email-auth" component={EmailAuth} />
       <Route path="/profile" component={UserProfile} />
@@ -77,7 +77,6 @@ function App() {
           // switchable
         >
           <TooltipProvider>
-            <Toaster />
             <WeComWidgetSimple />
             <Router />
           </TooltipProvider>
