@@ -85,7 +85,24 @@ export const emailAuthRouter = router({
             devCode: code,
           };
         } else {
-          // New user - we'll create the account after OTP verification
+          // New user - create temporary user record to store the OTP
+          const tempUser = await createPhoneUser({
+            email: input.email,
+            phone: null,
+            name: null,
+            verified: "false",
+            loginMethod: "email",
+            role: "user",
+          });
+
+          // Create OTP code for new user
+          const otp = await createOtpCode({
+            phoneUserId: tempUser.id,
+            code,
+            expiresAt,
+            attempts: 0,
+          });
+
           console.log(`[OTP] Registration OTP for ${input.email}: ${code}`);
 
           // Send OTP email
@@ -95,6 +112,7 @@ export const emailAuthRouter = router({
             success: true,
             message: "OTP sent to your email",
             isNewUser: true,
+            phoneUserId: tempUser.id,
             // For development only - remove in production
             devCode: code,
           };

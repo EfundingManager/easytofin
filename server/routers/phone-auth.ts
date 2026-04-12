@@ -89,7 +89,24 @@ export const phoneAuthRouter = router({
             devCode: code,
           };
         } else {
-          // New user - we'll create the account after OTP verification
+          // New user - create temporary user record to store the OTP
+          const tempUser = await createPhoneUser({
+            phone: input.phone,
+            email: null,
+            name: null,
+            verified: "false",
+            loginMethod: "phone",
+            role: "user",
+          });
+
+          // Create OTP code for new user
+          const otp = await createOtpCode({
+            phoneUserId: tempUser.id,
+            code,
+            expiresAt,
+            attempts: 0,
+          });
+
           // Send SMS verification using Twilio
           const smsResult = await sendSMSVerification(input.phone);
           if (!smsResult.success) {
@@ -106,6 +123,7 @@ export const phoneAuthRouter = router({
             success: true,
             message: "OTP sent to your phone",
             isNewUser: true,
+            phoneUserId: tempUser.id,
             // For development only - remove in production
             devCode: code,
           };

@@ -155,11 +155,26 @@ export async function createOtpCode(data: InsertOtpCode): Promise<OtpCode> {
   }
 
   try {
+    console.log("[OTP] Creating OTP code with data:", { ...data, code: '***' });
+    
     const result = await db.insert(otpCodes).values(data);
-    const insertedId = (result as any).insertId;
+    console.log("[OTP] Insert result:", result);
+    
+    const insertedId = (result as any).insertId || (result as any)[0]?.insertId;
     
     if (!insertedId) {
-      console.error("[OTP] Insert result:", result);
+      console.error("[OTP] No insertId in result:", result);
+      // Try to find the most recent OTP for this phoneUserId
+      const recentOtps = await db.select().from(otpCodes)
+        .where(eq(otpCodes.phoneUserId, data.phoneUserId))
+        .orderBy((t) => t.id)
+        .limit(1);
+      
+      if (recentOtps.length > 0) {
+        console.log("[OTP] Found recent OTP, returning it");
+        return recentOtps[0];
+      }
+      
       throw new Error("Failed to get inserted OTP ID");
     }
     
