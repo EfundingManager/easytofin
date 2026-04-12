@@ -533,3 +533,16 @@
 - [ ] Test complete user lifecycle (registration → KYC approval → customer portal)
 - [ ] Test routing for all three authentication methods
 - [ ] Verify users cannot access customer portal before KYC approval
+
+
+## Phase 68: Admin KYC Review Dashboard
+- [x] Create backend API endpoints for KYC review (getKycApplications, getKycApplicationDetail, approveKycApplication, rejectKycApplication)
+- [x] Build KYC Review Dashboard tab in admin dashboard
+- [x] Create KYC Application list with status filtering (pending, submitted, verified, rejected)
+- [x] Implement KYC detail view with user information and documents
+- [x] Add approval/rejection interface with reason/notes
+- [x] Update clientStatus when KYC is approved (queue → customer)
+- [x] Send notification email when KYC is approved or rejected
+- [x] Write vitest tests for KYC review procedures (13 tests passing)
+- [ ] Test end-to-end KYC approval workflow
+- [ ] Test end-to-end KYC rejection workflow
