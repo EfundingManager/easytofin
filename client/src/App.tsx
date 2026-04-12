@@ -26,6 +26,7 @@ import UserProfile from "./pages/UserProfile";
 import VerifyEmail from "./pages/VerifyEmail";
 import FactFindingForm from "./pages/FactFindingForm";
 import UserDashboard from "./pages/UserDashboard";
+import TwoFactorAuth from "./pages/TwoFactorAuth";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -52,6 +53,7 @@ function Router() {
       <Route path="/privacy" component={PrivacyPolicy} />
       <Route path="/terms-of-business" component={TermsOfBusiness} />
       <Route path="/terms" component={TermsOfBusiness} />
+      <Route path="/2fa" component={TwoFactorAuth} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/customers/:customerId" component={AdminCustomerDetail} />
       <Route path="/404" component={NotFound} />

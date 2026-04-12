@@ -5,3 +5,5 @@ export const UNAUTHED_ERR_MSG = 'Please login (10001)';
 export const NOT_ADMIN_ERR_MSG = 'You do not have required permission (10002)';
 export const NOT_MANAGER_ERR_MSG = 'Manager or Admin role required (10003)';
 export const NOT_STAFF_ERR_MSG = 'Staff, Manager, or Admin role required (10004)';
+export const TWO_FA_REQUIRED_ERR_MSG = 'Phone 2FA verification required (10005)';
+export const PENDING_2FA_COOKIE_NAME = 'pending_2fa_token';

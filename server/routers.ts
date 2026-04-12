@@ -13,6 +13,7 @@ import { emailVerificationRouter } from "./routers/email-verification";
 import { documentsRouter } from "./routers/documents";
 import { documentReviewRouter } from "./routers/document-review";
 import { policiesRouter } from "./routers/policies";
+import { twoFactorAuthRouter } from "./routers/two-factor-auth";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -38,6 +39,7 @@ export const appRouter = router({
   documents: documentsRouter,
   documentReview: documentReviewRouter,
   policies: policiesRouter,
+  twoFactorAuth: twoFactorAuthRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({

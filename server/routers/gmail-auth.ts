@@ -5,16 +5,20 @@ import { createPhoneUser, getPhoneUserByEmail } from "../db";
 import { TRPCError } from "@trpc/server";
 import { sdk } from "../_core/sdk";
 import { ONE_YEAR_MS } from "@shared/const";
+import { roleRequires2FA, createPending2FAToken } from "../_core/twoFactor";
 
 /**
  * Gmail OAuth Authentication Router
- * Handles Google Sign-in for client registration and login
+ * Handles Google Sign-in for client registration and login.
+ *
+ * For privileged roles (admin, manager, staff), login is NOT completed here.
+ * Instead a short-lived pendingToken is returned and the frontend must redirect
+ * the user to /2fa for phone OTP verification before a real session is issued.
  */
 export const gmailAuthRouter = router({
   /**
-   * Handle Google OAuth callback
-   * Creates or updates user account based on Google profile data
-   * Returns session token for client-side cookie setup
+   * Handle Google OAuth callback.
+   * Returns either a full sessionToken (regular users) or a pendingToken (privileged roles).
    */
   handleGoogleCallback: publicProcedure
     .input(
@@ -32,7 +36,7 @@ export const gmailAuthRouter = router({
         let isNewRegistration = false;
 
         if (!existingUser) {
-          // Create new user from Google profile
+          // Create new user from Google profile — always starts as 'user' role
           existingUser = await createPhoneUser({
             email: input.email,
             name: input.name,
@@ -45,7 +49,35 @@ export const gmailAuthRouter = router({
           isNewRegistration = true;
         }
 
-        // Create session token using Google ID as identifier
+        const userRole = existingUser.role ?? "user";
+
+        // ── Privileged role: require phone 2FA before issuing a real session ──
+        if (roleRequires2FA(userRole)) {
+          if (!existingUser.phone) {
+            throw new TRPCError({
+              code: "PRECONDITION_FAILED",
+              message:
+                "Your account requires phone 2FA but no phone number is registered. " +
+                "Please contact an administrator to add your phone number.",
+            });
+          }
+
+          const pendingToken = await createPending2FAToken({
+            phoneUserId: existingUser.id,
+            phone: existingUser.phone,
+            role: userRole,
+          });
+
+          return {
+            success: true,
+            requires2FA: true,
+            pendingToken,
+            message: "Phone 2FA required. Please verify your phone number.",
+            loginMethod: "google",
+          };
+        }
+
+        // ── Regular user: issue session immediately ──
         const sessionToken = await sdk.createSessionToken(input.googleId, {
           name: input.name || "",
           expiresInMs: ONE_YEAR_MS,
@@ -53,14 +85,16 @@ export const gmailAuthRouter = router({
 
         return {
           success: true,
+          requires2FA: false,
           message: isNewRegistration ? "Registration successful" : "Login successful",
           userId: existingUser.id,
           user: existingUser,
-          isNewRegistration: isNewRegistration,
+          isNewRegistration,
           loginMethod: "google",
-          sessionToken: sessionToken,
+          sessionToken,
         };
       } catch (error: any) {
+        if (error instanceof TRPCError) throw error;
         console.error("[Gmail Auth] Error handling Google callback:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -71,7 +105,6 @@ export const gmailAuthRouter = router({
 
   /**
    * Verify Google ID token (optional - for additional security)
-   * Can be used to verify the token on the backend
    */
   verifyGoogleToken: publicProcedure
     .input(
@@ -81,10 +114,6 @@ export const gmailAuthRouter = router({
     )
     .query(async ({ input }) => {
       try {
-        // In a production app, you would verify the token here
-        // using Google's tokeninfo endpoint or a JWT library
-        // For now, we'll just return success if token is provided
-
         return {
           valid: true,
           message: "Token verified",
@@ -100,7 +129,6 @@ export const gmailAuthRouter = router({
 
   /**
    * Get Google OAuth configuration for frontend
-   * Returns the necessary configuration for Google Sign-in button
    */
   getGoogleConfig: publicProcedure.query(() => {
     const clientId = process.env.VITE_GOOGLE_CLIENT_ID;

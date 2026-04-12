@@ -59,19 +59,27 @@ export default function EmailAuth() {
       });
 
       if (result.success) {
+        // Privileged role: redirect to phone 2FA challenge
+        if (result.requires2FA && result.pendingToken) {
+          toast.info("Phone verification required for your account.");
+          window.location.href = `/2fa?token=${encodeURIComponent(result.pendingToken)}`;
+          return;
+        }
+
         toast.success(result.message);
-        
+
         // Set session token as cookie for authentication
         if (result.sessionToken) {
           const oneYearSeconds = 365 * 24 * 60 * 60;
+
           const isSecure = window.location.protocol === 'https:';
           // Set cookie without domain restriction for better compatibility
           const cookieString = `app_session_id=${result.sessionToken}; path=/; max-age=${oneYearSeconds}; SameSite=None${isSecure ? '; Secure' : ''}`;
           document.cookie = cookieString;
         }
-        
-        localStorage.setItem("emailUserId", result.userId.toString());
-        localStorage.setItem("emailUserData", JSON.stringify(result.user));
+
+        if (result.userId) localStorage.setItem("emailUserId", result.userId.toString());
+        if (result.user) localStorage.setItem("emailUserData", JSON.stringify(result.user));
 
         // Redirect based on registration status
         const redirectUrl = result.isNewRegistration ? "/profile" : "/dashboard";

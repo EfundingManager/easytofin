@@ -58,15 +58,20 @@ export default function PhoneAuth() {
       });
 
       if (result.success) {
+        // Privileged role: redirect to phone 2FA challenge
+        if (result.requires2FA && result.pendingToken) {
+          toast.info("Phone verification required for your account.");
+          window.location.href = `/2fa?token=${encodeURIComponent(result.pendingToken)}`;
+          return;
+        }
+
         toast.success(result.message);
-        localStorage.setItem("phoneUserId", result.userId.toString());
-        localStorage.setItem("phoneUserData", JSON.stringify(result.user));
+        if (result.userId) localStorage.setItem("phoneUserId", result.userId.toString());
+        if (result.user) localStorage.setItem("phoneUserData", JSON.stringify(result.user));
 
         if (result.isNewRegistration) {
-          // New user - redirect to profile page to complete information and select services
           window.location.href = "/profile";
         } else {
-          // Existing user - redirect to dashboard
           window.location.href = "/dashboard";
         }
       }
