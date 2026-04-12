@@ -68,7 +68,21 @@ export const emailVerificationRouter = router({
         });
 
         // Get user info
-        const user: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, ctx.user.id));
+        const user: any = await db.select({
+          id: phoneUsers.id,
+          name: phoneUsers.name,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          address: phoneUsers.address,
+          verified: phoneUsers.verified,
+          emailVerified: phoneUsers.emailVerified,
+          role: phoneUsers.role,
+          clientStatus: phoneUsers.clientStatus,
+          kycStatus: phoneUsers.kycStatus,
+          createdAt: phoneUsers.createdAt,
+          updatedAt: phoneUsers.updatedAt,
+          lastSignedIn: phoneUsers.lastSignedIn,
+        }).from(phoneUsers).where(eq(phoneUsers.id, ctx.user.id));
         
         if (!user || user.length === 0) {
           return { success: false, error: 'User not found' };
@@ -167,7 +181,21 @@ export const emailVerificationRouter = router({
         }
 
         // Check if email already verified
-        const user: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, ctx.user.id));
+        const user: any = await db.select({
+          id: phoneUsers.id,
+          name: phoneUsers.name,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          address: phoneUsers.address,
+          verified: phoneUsers.verified,
+          emailVerified: phoneUsers.emailVerified,
+          role: phoneUsers.role,
+          clientStatus: phoneUsers.clientStatus,
+          kycStatus: phoneUsers.kycStatus,
+          createdAt: phoneUsers.createdAt,
+          updatedAt: phoneUsers.updatedAt,
+          lastSignedIn: phoneUsers.lastSignedIn,
+        }).from(phoneUsers).where(eq(phoneUsers.id, ctx.user.id));
         
         if (!user || user.length === 0) {
           return { success: false, error: 'User not found' };
@@ -220,7 +248,21 @@ export const emailVerificationRouter = router({
         return { success: false, error: 'Database not available' };
       }
 
-      const user: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, ctx.user.id));
+      const user: any = await db.select({
+        id: phoneUsers.id,
+        name: phoneUsers.name,
+        email: phoneUsers.email,
+        phone: phoneUsers.phone,
+        address: phoneUsers.address,
+        verified: phoneUsers.verified,
+        emailVerified: phoneUsers.emailVerified,
+        role: phoneUsers.role,
+        clientStatus: phoneUsers.clientStatus,
+        kycStatus: phoneUsers.kycStatus,
+        createdAt: phoneUsers.createdAt,
+        updatedAt: phoneUsers.updatedAt,
+        lastSignedIn: phoneUsers.lastSignedIn,
+      }).from(phoneUsers).where(eq(phoneUsers.id, ctx.user.id));
       
       if (!user || user.length === 0) {
         return { success: false, error: 'User not found' };

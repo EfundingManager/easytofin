@@ -13,7 +13,17 @@ export const workflowRouter = router({
       if (!db) return { clients: [], total: 0, page: input.page, limit: input.limit };
       try {
         const offset = (input.page - 1) * input.limit;
-        const queueClients: any = await db.select().from(phoneUsers).where(eq(phoneUsers.clientStatus, "queue")).limit(input.limit).offset(offset);
+        const queueClients: any = await db.select({
+          id: phoneUsers.id,
+          name: phoneUsers.name,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          loginMethod: phoneUsers.loginMethod,
+          verified: phoneUsers.verified,
+          createdAt: phoneUsers.createdAt,
+          clientStatus: phoneUsers.clientStatus,
+          kycStatus: phoneUsers.kycStatus,
+        }).from(phoneUsers).where(eq(phoneUsers.clientStatus, "queue")).limit(input.limit).offset(offset);
         const totalResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.clientStatus, "queue"));
         return {
           clients: queueClients.map((client: any) => ({
@@ -42,7 +52,17 @@ export const workflowRouter = router({
       if (!db) return { customers: [], total: 0, page: input.page, limit: input.limit };
       try {
         const offset = (input.page - 1) * input.limit;
-        const customers: any = await db.select().from(phoneUsers).where(eq(phoneUsers.clientStatus, "customer")).limit(input.limit).offset(offset);
+        const customers: any = await db.select({
+          id: phoneUsers.id,
+          name: phoneUsers.name,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          loginMethod: phoneUsers.loginMethod,
+          verified: phoneUsers.verified,
+          createdAt: phoneUsers.createdAt,
+          clientStatus: phoneUsers.clientStatus,
+          kycStatus: phoneUsers.kycStatus,
+        }).from(phoneUsers).where(eq(phoneUsers.clientStatus, "customer")).limit(input.limit).offset(offset);
         const totalResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.clientStatus, "customer"));
         const customersWithPolicies = await Promise.all(
           customers.map(async (customer: any) => {
@@ -174,10 +194,10 @@ export const workflowRouter = router({
     const db = await getDb();
     if (!db) return { queueCount: 0, inProgressCount: 0, assignedCount: 0, customerCount: 0 };
     try {
-      const queueResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.clientStatus, "queue"));
-      const inProgressResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.clientStatus, "in_progress"));
-      const assignedResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.clientStatus, "assigned"));
-      const customerResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.clientStatus, "customer"));
+      const queueResult: any = await db.select({ id: phoneUsers.id }).from(phoneUsers).where(eq(phoneUsers.clientStatus, "queue"));
+      const inProgressResult: any = await db.select({ id: phoneUsers.id }).from(phoneUsers).where(eq(phoneUsers.clientStatus, "in_progress"));
+      const assignedResult: any = await db.select({ id: phoneUsers.id }).from(phoneUsers).where(eq(phoneUsers.clientStatus, "assigned"));
+      const customerResult: any = await db.select({ id: phoneUsers.id }).from(phoneUsers).where(eq(phoneUsers.clientStatus, "customer"));
       return { queueCount: queueResult.length, inProgressCount: inProgressResult.length, assignedCount: assignedResult.length, customerCount: customerResult.length };
     } catch (error) {
       console.error("[Workflow] Failed to get workflow stats:", error);

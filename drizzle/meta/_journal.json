@@ -1,89 +1,26 @@
 {
-  "version": "7",
+  "version": "5",
   "dialect": "mysql",
   "entries": [
     {
       "idx": 0,
       "version": "5",
-      "when": 1774850480190,
-      "tag": "0000_gorgeous_jackal",
+      "when": 1776022518352,
+      "tag": "0000_aromatic_inhumans",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "5",
-      "when": 1774850666013,
-      "tag": "0001_strange_corsair",
+      "when": 1776022557806,
+      "tag": "0001_magenta_smasher",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "5",
-      "when": 1775217575704,
-      "tag": "0002_handy_felicia_hardy",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1775217619022,
-      "tag": "0003_common_meteorite",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1775341089456,
-      "tag": "0004_flashy_moira_mactaggert",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1775341769453,
-      "tag": "0005_absent_gabe_jones",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1775344207033,
-      "tag": "0006_lowly_lyja",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1775345286438,
-      "tag": "0007_spooky_gargoyle",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "5",
-      "when": 1775417494363,
-      "tag": "0008_fresh_legion",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "5",
-      "when": 1775422449167,
-      "tag": "0009_careful_earthquake",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "5",
-      "when": 1775947568869,
-      "tag": "0010_gifted_mongoose",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "5",
-      "when": 1775954676681,
-      "tag": "0011_add_manager_staff_roles",
+      "when": 1776022940530,
+      "tag": "0002_eager_virginia_dare",
       "breakpoints": true
     }
   ]

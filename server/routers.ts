@@ -14,12 +14,30 @@ import { documentsRouter } from "./routers/documents";
 import { documentReviewRouter } from "./routers/document-review";
 import { policiesRouter } from "./routers/policies";
 import { twoFactorAuthRouter } from "./routers/two-factor-auth";
+import * as db from "./db";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    getFullUserInfo: publicProcedure.query(async (opts) => {
+      const user = opts.ctx.user;
+      if (!user) return null;
+      
+      const phoneUser = await db.getPhoneUserById(user.id);
+      if (phoneUser) {
+        return {
+          ...user,
+          clientStatus: phoneUser.clientStatus,
+          kycStatus: phoneUser.kycStatus,
+          phone: phoneUser.phone,
+          address: phoneUser.address,
+        };
+      }
+      
+      return user;
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });

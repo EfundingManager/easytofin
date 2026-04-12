@@ -26,7 +26,7 @@ export const adminRouter = router({
 
     try {
       // Get total clients
-      const clientsResult = await db.select().from(phoneUsers);
+      const clientsResult = await db.select({ id: phoneUsers.id }).from(phoneUsers);
       const totalClients = clientsResult.length;
 
       // Get total submissions
@@ -90,7 +90,15 @@ export const adminRouter = router({
       }
 
       try {
-        let query = db.select().from(phoneUsers);
+        let query = db.select({
+          id: phoneUsers.id,
+          name: phoneUsers.name,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          verified: phoneUsers.verified,
+          createdAt: phoneUsers.createdAt,
+          lastSignedIn: phoneUsers.lastSignedIn,
+        }).from(phoneUsers);
 
         // Apply search filter if provided
         if (input.search) {
@@ -102,7 +110,7 @@ export const adminRouter = router({
         const offset = (input.page - 1) * input.limit;
         const submissions = await query.limit(input.limit).offset(offset);
 
-        const totalResult = await db.select().from(phoneUsers);
+        const totalResult = await db.select({ id: phoneUsers.id }).from(phoneUsers);
         const total = totalResult.length;
 
         return {
@@ -518,7 +526,13 @@ export const adminRouter = router({
           }));
 
         // Search clients by name
-        const clientsResult: any = await db.select().from(phoneUsers);
+        const clientsResult: any = await db.select({
+          id: phoneUsers.id,
+          name: phoneUsers.name,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          verified: phoneUsers.verified,
+        }).from(phoneUsers);
         const matchedClients = clientsResult
           .filter(
             (client: any) =>
@@ -718,7 +732,15 @@ export const adminRouter = router({
           ? [input.role]
           : ["admin", "manager", "staff"];
 
-        const allUsers = await db.select().from(phoneUsers);
+        const allUsers = await db.select({
+          id: phoneUsers.id,
+          name: phoneUsers.name,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          role: phoneUsers.role,
+          createdAt: phoneUsers.createdAt,
+          lastSignedIn: phoneUsers.lastSignedIn,
+        }).from(phoneUsers);
         const filtered = allUsers.filter((u) => staffRoles.includes(u.role as any));
         const offset = (input.page - 1) * input.limit;
         const paginated = filtered.slice(offset, offset + input.limit);

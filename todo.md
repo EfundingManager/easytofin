@@ -510,3 +510,26 @@
 - [x] Ensure links open in new tab (target="_blank") with rel="noopener noreferrer"
 - [x] Update link text from "Terms of Service" to "Terms of Business"
 - [x] Test all links on production domain
+
+## Phase 66: Create Admin Account with Email and Phone
+- [ ] Create Admin user in database with email info@efunding.ie
+- [ ] Set phone number to +353879158817
+- [ ] Verify Admin account creation
+- [ ] Test Admin login with email
+- [ ] Test Admin login with phone
+- [ ] Verify 2FA is required for Admin login
+
+
+## Phase 67: Implement User and Customer Identity Management System
+- [x] Use existing `id` field with prefixes (user_{id}, customer_{id})
+- [x] Use existing `clientStatus` field to determine routing (queue/in_progress/assigned/customer)
+- [x] Create UserPortal page for unverified users (/user/:userId)
+- [x] Create CustomerPortal page for KYC-approved customers (/customer/:customerId)
+- [x] Update login redirect logic in phone-auth.ts based on clientStatus
+- [x] Update login redirect logic in email-auth.ts based on clientStatus
+- [x] Update login redirect logic in gmail-auth.ts based on clientStatus
+- [x] Add route guards to protect /user/:userId and /customer/:customerId
+- [x] Update useAuth hook to return userId and customerId derived from id
+- [ ] Test complete user lifecycle (registration → KYC approval → customer portal)
+- [ ] Test routing for all three authentication methods
+- [ ] Verify users cannot access customer portal before KYC approval
