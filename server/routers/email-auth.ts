@@ -240,10 +240,17 @@ export const emailAuthRouter = router({
           await sendWelcomeEmail(user.email || input.email, user.name || "User", dashboardUrl);
         }
 
+        // Determine redirect URL based on clientStatus
+        const redirectUrl = user.clientStatus === 'customer' 
+          ? `/customer/${user.id}`
+          : `/user/${user.id}`;
+
         return {
           success: true,
           message: "Email verified successfully",
           userId: user.id,
+          clientStatus: user.clientStatus,
+          redirectUrl,
           user: {
             id: user.id,
             email: user.email,

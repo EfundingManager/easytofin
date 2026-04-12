@@ -81,8 +81,13 @@ export default function EmailAuth() {
         if (result.userId) localStorage.setItem("emailUserId", result.userId.toString());
         if (result.user) localStorage.setItem("emailUserData", JSON.stringify(result.user));
 
-        // Redirect based on registration status
-        const redirectUrl = result.isNewRegistration ? "/profile" : "/dashboard";
+        // Redirect based on registration status and clientStatus
+        let redirectUrl = "/dashboard";
+        if (result.isNewRegistration) {
+          redirectUrl = "/profile";
+        } else if (result.redirectUrl) {
+          redirectUrl = result.redirectUrl;
+        }
         window.location.href = redirectUrl;
       }
     } catch (error: any) {
@@ -281,8 +286,9 @@ export default function EmailAuth() {
         if (result.isNewRegistration) {
           window.location.href = "/profile";
         } else {
-          // Existing user - redirect to dashboard
-          window.location.href = "/dashboard";
+          // Redirect to user or customer portal based on clientStatus
+          const redirectUrl = result.redirectUrl || "/dashboard";
+          window.location.href = redirectUrl;
         }
       }
     } catch (error: any) {

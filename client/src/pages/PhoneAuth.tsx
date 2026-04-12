@@ -72,7 +72,9 @@ export default function PhoneAuth() {
         if (result.isNewRegistration) {
           window.location.href = "/profile";
         } else {
-          window.location.href = "/dashboard";
+          // Redirect to user or customer portal based on clientStatus
+          const redirectUrl = result.redirectUrl || "/dashboard";
+          window.location.href = redirectUrl;
         }
       }
     } catch (error: any) {
@@ -255,7 +257,9 @@ export default function PhoneAuth() {
         if (result.isNewRegistration) {
           setStep("register");
         } else {
-          window.location.href = "/dashboard";
+          // Redirect to user or customer portal based on clientStatus
+          const redirectUrl = result.redirectUrl || "/dashboard";
+          window.location.href = redirectUrl;
         }
       }
     } catch (error: any) {

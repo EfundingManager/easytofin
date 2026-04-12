@@ -83,11 +83,18 @@ export const gmailAuthRouter = router({
           expiresInMs: ONE_YEAR_MS,
         });
 
+        // Determine redirect URL based on clientStatus
+        const redirectUrl = existingUser.clientStatus === 'customer' 
+          ? `/customer/${existingUser.id}`
+          : `/user/${existingUser.id}`;
+
         return {
           success: true,
           requires2FA: false,
           message: isNewRegistration ? "Registration successful" : "Login successful",
           userId: existingUser.id,
+          clientStatus: existingUser.clientStatus,
+          redirectUrl,
           user: existingUser,
           isNewRegistration,
           loginMethod: "google",

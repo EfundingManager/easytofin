@@ -546,3 +546,18 @@
 - [x] Write vitest tests for KYC review procedures (13 tests passing)
 - [ ] Test end-to-end KYC approval workflow
 - [ ] Test end-to-end KYC rejection workflow
+
+
+## Phase 69: Smart Login Redirect Based on User Identity
+- [x] Update phone-auth router to redirect to /user/{userId} or /customer/{customerId}
+- [x] Update email-auth router to redirect to /user/{userId} or /customer/{customerId}
+- [x] Update gmail-auth router to redirect to /user/{userId} or /customer/{customerId}
+- [x] Update PhoneAuth component to use redirectUrl from response
+- [x] Update EmailAuth component to use redirectUrl from response
+- [x] Update Gmail callback handlers to use redirectUrl from response
+- [ ] Write vitest tests for redirect logic
+- [ ] Test phone auth login redirect
+- [ ] Test email auth login redirect
+- [ ] Test gmail auth login redirect
+- [ ] Verify unverified users go to /user/{userId}
+- [ ] Verify verified customers go to /customer/{customerId}

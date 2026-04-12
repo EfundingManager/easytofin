@@ -207,10 +207,17 @@ export const phoneAuthRouter = router({
             verified: "true",
           });
 
+          // Determine redirect URL based on clientStatus
+          const redirectUrl = user.clientStatus === 'customer' 
+            ? `/customer/${user.id}`
+            : `/user/${user.id}`;
+
           return {
             success: true,
             message: "Login successful",
             userId: user.id,
+            clientStatus: user.clientStatus,
+            redirectUrl,
             user: {
               id: user.id,
               phone: user.phone,
@@ -236,10 +243,15 @@ export const phoneAuthRouter = router({
             role: "user",
           });
 
+          // New users always start in queue status
+          const redirectUrl = `/user/${newUser.id}`;
+
           return {
             success: true,
             message: "Registration successful",
             userId: newUser.id,
+            clientStatus: newUser.clientStatus,
+            redirectUrl,
             isNewRegistration: true,
             user: {
               id: newUser.id,

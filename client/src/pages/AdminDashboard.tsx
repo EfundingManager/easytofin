@@ -246,6 +246,7 @@ export default function AdminDashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="kyc">KYC Review</TabsTrigger>
             <TabsTrigger value="queue">Clients Queue</TabsTrigger>
             <TabsTrigger value="customers">Customers</TabsTrigger>
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
