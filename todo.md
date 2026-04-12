@@ -502,3 +502,11 @@
 - [x] Fix cookie settings to not include domain restriction for better compatibility
 - [x] Test all authentication methods (phone, email, Gmail)
 - [x] Verify users can access dashboard after login
+
+## Phase 65: Fix Terms of Service and Privacy Policy Links on Login Pages
+- [x] Find all Terms of Service and Privacy Policy links in login components
+- [x] Identify correct URLs for Terms of Business and Privacy Policy on website
+- [x] Update AuthSelection page to link to /terms-of-business and /privacy-policy
+- [x] Ensure links open in new tab (target="_blank") with rel="noopener noreferrer"
+- [x] Update link text from "Terms of Service" to "Terms of Business"
+- [x] Test all links on production domain

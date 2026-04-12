@@ -68,11 +68,11 @@ export default function AuthSelection() {
               {/* Terms */}
               <p className="text-xs text-center text-[oklch(0.52_0.015_240)]">
                 By signing in, you agree to our{" "}
-                <a href="#" className="text-[oklch(0.40_0.11_195)] hover:underline">
-                  Terms of Service
+                <a href="/terms-of-business" target="_blank" rel="noopener noreferrer" className="text-[oklch(0.40_0.11_195)] hover:underline">
+                  Terms of Business
                 </a>{" "}
                 and{" "}
-                <a href="#" className="text-[oklch(0.40_0.11_195)] hover:underline">
+                <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-[oklch(0.40_0.11_195)] hover:underline">
                   Privacy Policy
                 </a>
               </p>
