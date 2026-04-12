@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, phoneUsers, InsertPhoneUser, PhoneUser, otpCodes, InsertOtpCode, OtpCode } from "../drizzle/schema";
+import { InsertUser, users, phoneUsers, InsertPhoneUser, PhoneUser, otpCodes, InsertOtpCode, OtpCode, InsertClientDocument, ClientDocument, clientDocuments } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -228,3 +228,70 @@ export async function deleteOtpCode(id: number): Promise<void> {
 
   await db.delete(otpCodes).where(eq(otpCodes.id, id));
 }
+
+
+// Client Documents (KYC) Helpers
+export async function createClientDocument(data: InsertClientDocument): Promise<ClientDocument> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(clientDocuments).values(data);
+  const insertedId = (result as any).insertId;
+  
+  const inserted = await db.select().from(clientDocuments).where(eq(clientDocuments.id, insertedId)).limit(1);
+  if (inserted.length === 0) {
+    throw new Error("Failed to retrieve inserted document");
+  }
+  
+  return inserted[0];
+}
+
+export async function getClientDocuments(phoneUserId: number): Promise<ClientDocument[]> {
+  const db = await getDb();
+  if (!db) {
+    return [];
+  }
+
+  return await db.select().from(clientDocuments).where(eq(clientDocuments.phoneUserId, phoneUserId));
+}
+
+export async function getClientDocumentById(documentId: number): Promise<ClientDocument | undefined> {
+  const db = await getDb();
+  if (!db) {
+    return undefined;
+  }
+
+  const result = await db.select().from(clientDocuments).where(eq(clientDocuments.id, documentId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateClientDocument(documentId: number, updates: Partial<ClientDocument>): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(clientDocuments).set(updates).where(eq(clientDocuments.id, documentId));
+}
+
+export async function deleteClientDocument(documentId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(clientDocuments).where(eq(clientDocuments.id, documentId));
+}
+
+export async function getClientDocumentsByStatus(phoneUserId: number, status: "pending" | "verified" | "rejected"): Promise<ClientDocument[]> {
+  const db = await getDb();
+  if (!db) {
+    return [];
+  }
+
+  return await db.select().from(clientDocuments).where(
+    and(
+      eq(clientDocuments.phoneUserId, phoneUserId),
+      eq(clientDocuments.status, status)
+    )
+  );
+}
+

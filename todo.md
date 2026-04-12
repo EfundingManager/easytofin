@@ -592,3 +592,21 @@
 - [ ] Verify customer users are redirected to /customer/{userId}
 - [ ] Verify unverified users are redirected to /user/{userId}
 - [ ] Test OAuth flow on production domain (easytofin.com)
+
+
+## Phase 72: KYC Document Upload Interface
+- [x] Design database schema for storing document metadata (clientDocuments table already exists)
+- [x] Create backend API endpoint for document upload (uploadDocument procedure)
+- [x] Implement file validation (type, size, format)
+- [x] Create S3 storage integration for document files
+- [x] Build frontend document upload component with drag-and-drop
+- [x] Implement document preview functionality
+- [x] Add document status tracking (pending, verified, rejected)
+- [x] Create admin interface for document review and verification (DocumentReview component)
+- [x] Implement document deletion and re-upload functionality
+- [x] Add document retrieval endpoints (getDocuments, getDocument)
+- [x] Write vitest tests for document upload features (65+ test cases)
+- [ ] Test end-to-end document upload workflow
+- [ ] Test document validation and security checks
+- [ ] Integrate KycDocumentUpload component into UserPortal
+- [ ] Add DocumentReview tab to admin dashboard
