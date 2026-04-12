@@ -270,7 +270,26 @@ class SDKServer {
     const signedInAt = new Date();
     let user = await db.getUserByOpenId(sessionUserId);
 
-    // If user not in DB, sync from OAuth server automatically
+    // If user not in regular users table, check phoneUsers table (for Gmail/Email/Phone auth)
+    if (!user) {
+      const phoneUser = await db.getPhoneUserByGoogleId(sessionUserId);
+      if (phoneUser) {
+        // Convert phoneUser to User type for consistency
+        return {
+          id: phoneUser.id,
+          openId: phoneUser.googleId || phoneUser.email || sessionUserId,
+          name: phoneUser.name,
+          email: phoneUser.email,
+          loginMethod: phoneUser.loginMethod,
+          role: phoneUser.role as 'user' | 'admin',
+          createdAt: phoneUser.createdAt,
+          updatedAt: phoneUser.updatedAt,
+          lastSignedIn: signedInAt,
+        } as any;
+      }
+    }
+
+    // If still not found, try to sync from OAuth server
     if (!user) {
       try {
         const userInfo = await this.getUserInfoWithJwt(sessionCookie ?? "");

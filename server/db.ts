@@ -131,6 +131,14 @@ export async function getPhoneUserById(id: number): Promise<PhoneUser | undefine
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getPhoneUserByGoogleId(googleId: string): Promise<PhoneUser | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(phoneUsers).where(eq(phoneUsers.googleId, googleId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function updatePhoneUser(id: number, data: Partial<InsertPhoneUser>): Promise<PhoneUser | undefined> {
   const db = await getDb();
   if (!db) return undefined;

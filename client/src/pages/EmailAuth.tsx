@@ -64,7 +64,18 @@ export default function EmailAuth() {
         // Set session token as cookie for authentication
         if (result.sessionToken) {
           const oneYearSeconds = 365 * 24 * 60 * 60;
-          document.cookie = `app_session_id=${result.sessionToken}; path=/; max-age=${oneYearSeconds}; SameSite=Lax`;
+          // Get domain from current location
+          const domain = window.location.hostname;
+          const isSecure = window.location.protocol === 'https:';
+          const cookieOptions = [
+            `app_session_id=${result.sessionToken}`,
+            'path=/',
+            `max-age=${oneYearSeconds}`,
+            `domain=${domain}`,
+            'SameSite=None',
+            isSecure ? 'Secure' : ''
+          ].filter(Boolean).join('; ');
+          document.cookie = cookieOptions;
         }
         
         localStorage.setItem("emailUserId", result.userId.toString());
