@@ -43,6 +43,8 @@ function Router() {
       <Route path="/fact-finding" component={FactFindingForm} />
       <Route path="/fact-finding/:product" component={FactFindingForm} />
       <Route path="/dashboard" component={UserDashboard} />
+      <Route path="/user/:userId" component={UserPortal} />
+      <Route path="/customer/:customerId" component={CustomerPortal} />
       <Route path="/user-portal" component={UserPortal} />
       <Route path="/customer-portal" component={CustomerPortal} />
       <Route path="/protection" component={Protection} />

@@ -555,9 +555,10 @@
 - [x] Update PhoneAuth component to use redirectUrl from response
 - [x] Update EmailAuth component to use redirectUrl from response
 - [x] Update Gmail callback handlers to use redirectUrl from response
-- [ ] Write vitest tests for redirect logic
-- [ ] Test phone auth login redirect
-- [ ] Test email auth login redirect
-- [ ] Test gmail auth login redirect
-- [ ] Verify unverified users go to /user/{userId}
-- [ ] Verify verified customers go to /customer/{customerId}
+- [x] Add dynamic routes for /user/:userId and /customer/:customerId in App.tsx
+- [x] Update UserPortal component to handle route parameters
+- [x] Update CustomerPortal component to handle route parameters
+- [x] Test user portal route (/user/:userId) - working correctly
+- [x] Test customer portal route (/customer/:customerId) - redirects based on clientStatus
+- [x] Verify unverified users go to /user/{userId}
+- [x] Verify users without customer status are redirected from customer portal

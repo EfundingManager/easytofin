@@ -25,8 +25,8 @@ export default function CustomerPortal() {
   // If user is not a customer, redirect to user portal
   useEffect(() => {
     const fullUser = fullUserQuery.data as any;
-    if (fullUser && fullUser.clientStatus !== "customer") {
-      navigate("/user-portal");
+    if (fullUser && fullUser.clientStatus !== "customer" && fullUser?.id) {
+      navigate(`/user/${fullUser.id}`);
     }
   }, [fullUserQuery.data, navigate]);
 
