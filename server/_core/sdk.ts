@@ -281,7 +281,7 @@ class SDKServer {
           name: phoneUser.name,
           email: phoneUser.email,
           loginMethod: phoneUser.loginMethod,
-          role: phoneUser.role as 'user' | 'admin',
+          role: phoneUser.role as 'user' | 'admin' | 'manager' | 'staff',
           createdAt: phoneUser.createdAt,
           updatedAt: phoneUser.updatedAt,
           lastSignedIn: signedInAt,

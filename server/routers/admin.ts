@@ -1,7 +1,7 @@
-import { adminProcedure, router } from "../_core/trpc";
+import { adminProcedure, managerProcedure, staffProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { phoneUsers, userProducts, factFindingForms, policyAssignments, clientDocuments } from "../../drizzle/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, clientDocuments } from "../../drizzle/schema";
+import { eq, desc, and, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { getRateLimitViolations, whitelistIdentifier, resetRateLimit, getRateLimitStats } from "../rate-limit-logger";
 
@@ -659,4 +659,101 @@ export const adminRouter = router({
           : "Failed to reset rate limit",
       };
     }),
+
+  // ─── Role Management ─────────────────────────────────────────────────────────
+
+  /**
+   * Update a user's role (Admin only)
+   * Allows assigning manager, staff, user, or admin roles to any user.
+   */
+  updateUserRole: adminProcedure
+    .input(
+      z.object({
+        userId: z.number().int().positive(),
+        userType: z.enum(["user", "phoneUser"]),
+        role: z.enum(["user", "admin", "manager", "staff"]),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      try {
+        if (input.userType === "phoneUser") {
+          await db
+            .update(phoneUsers)
+            .set({ role: input.role, updatedAt: new Date() })
+            .where(eq(phoneUsers.id, input.userId));
+        } else {
+          await db
+            .update(users)
+            .set({ role: input.role, updatedAt: new Date() })
+            .where(eq(users.id, input.userId));
+        }
+        return { success: true, message: `User role updated to ${input.role}` };
+      } catch (error) {
+        console.error("[Admin] Failed to update user role:", error);
+        throw new Error("Failed to update user role");
+      }
+    }),
+
+  /**
+   * List all staff members (users with manager or staff role)
+   * Accessible by Admin and Manager roles.
+   */
+  listStaffUsers: managerProcedure
+    .input(
+      z.object({
+        role: z.enum(["manager", "staff", "admin"]).optional(),
+        page: z.number().int().positive().default(1),
+        limit: z.number().int().positive().max(100).default(20),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { users: [], total: 0, page: input.page, limit: input.limit };
+
+      try {
+        const staffRoles: Array<"user" | "admin" | "manager" | "staff"> = input.role
+          ? [input.role]
+          : ["admin", "manager", "staff"];
+
+        const allUsers = await db.select().from(phoneUsers);
+        const filtered = allUsers.filter((u) => staffRoles.includes(u.role as any));
+        const offset = (input.page - 1) * input.limit;
+        const paginated = filtered.slice(offset, offset + input.limit);
+
+        return {
+          users: paginated.map((u) => ({
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            phone: u.phone,
+            role: u.role,
+            createdAt: u.createdAt,
+            lastSignedIn: u.lastSignedIn,
+          })),
+          total: filtered.length,
+          page: input.page,
+          limit: input.limit,
+        };
+      } catch (error) {
+        console.error("[Admin] Failed to list staff users:", error);
+        return { users: [], total: 0, page: input.page, limit: input.limit };
+      }
+    }),
+
+  /**
+   * Get the current authenticated user's role and profile
+   * Accessible by Staff, Manager, and Admin roles.
+   */
+  getMyRoleInfo: staffProcedure.query(async ({ ctx }) => {
+    return {
+      id: ctx.user.id,
+      name: ctx.user.name,
+      email: ctx.user.email,
+      role: ctx.user.role,
+      loginMethod: ctx.user.loginMethod,
+    };
+  }),
 });
