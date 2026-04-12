@@ -460,3 +460,11 @@
 - [x] Add db import to gmail-auth.ts
 - [x] Test Gmail login flow with fixes applied
 - [x] Verify dev server compiles without critical errors
+
+## Phase 61: Fix Gmail Login Session Token Issue
+- [x] Add session token creation to handleGoogleCallback in gmail-auth.ts
+- [x] Import sdk and ONE_YEAR_MS in gmail-auth.ts
+- [x] Update EmailAuth to set session cookie from returned token
+- [x] Use correct cookie name (app_session_id) for authentication
+- [x] Test Gmail login flow with session cookie
+- [x] Verify redirect to dashboard after successful login

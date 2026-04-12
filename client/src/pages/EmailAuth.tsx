@@ -60,15 +60,19 @@ export default function EmailAuth() {
 
       if (result.success) {
         toast.success(result.message);
+        
+        // Set session token as cookie for authentication
+        if (result.sessionToken) {
+          const oneYearSeconds = 365 * 24 * 60 * 60;
+          document.cookie = `app_session_id=${result.sessionToken}; path=/; max-age=${oneYearSeconds}; SameSite=Lax`;
+        }
+        
         localStorage.setItem("emailUserId", result.userId.toString());
         localStorage.setItem("emailUserData", JSON.stringify(result.user));
 
-        if (result.isNewRegistration) {
-          window.location.href = "/profile";
-        } else {
-          // Existing user - redirect to dashboard
-          window.location.href = "/dashboard";
-        }
+        // Redirect based on registration status
+        const redirectUrl = result.isNewRegistration ? "/profile" : "/dashboard";
+        window.location.href = redirectUrl;
       }
     } catch (error: any) {
       toast.error(error.message || "Google Sign-in failed");

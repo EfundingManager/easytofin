@@ -3,6 +3,8 @@ import { z } from "zod";
 import * as db from "../db";
 import { createPhoneUser, getPhoneUserByEmail } from "../db";
 import { TRPCError } from "@trpc/server";
+import { sdk } from "../_core/sdk";
+import { ONE_YEAR_MS } from "@shared/const";
 
 /**
  * Gmail OAuth Authentication Router
@@ -12,6 +14,7 @@ export const gmailAuthRouter = router({
   /**
    * Handle Google OAuth callback
    * Creates or updates user account based on Google profile data
+   * Returns session token for client-side cookie setup
    */
   handleGoogleCallback: publicProcedure
     .input(
@@ -25,39 +28,37 @@ export const gmailAuthRouter = router({
     .mutation(async ({ input }) => {
       try {
         // Check if user already exists by email
-        const existingUser = await getPhoneUserByEmail(input.email);
+        let existingUser = await getPhoneUserByEmail(input.email);
+        let isNewRegistration = false;
 
-        if (existingUser) {
-          // User exists - return login success
-          // Note: lastSignedIn is updated by the OAuth flow in server/_core/oauth.ts
-          return {
-            success: true,
-            message: "Login successful",
-            userId: existingUser.id,
-            user: existingUser,
-            isNewRegistration: false,
+        if (!existingUser) {
+          // Create new user from Google profile
+          existingUser = await createPhoneUser({
+            email: input.email,
+            name: input.name,
+            googleId: input.googleId,
+            picture: input.picture,
+            emailVerified: "true", // Google-verified email
+            role: "user",
             loginMethod: "google",
-          };
+          });
+          isNewRegistration = true;
         }
 
-        // Create new user from Google profile
-        const newUser = await createPhoneUser({
-          email: input.email,
-          name: input.name,
-          googleId: input.googleId,
-          picture: input.picture,
-          emailVerified: "true", // Google-verified email
-          role: "user",
-          loginMethod: "google",
+        // Create session token using Google ID as identifier
+        const sessionToken = await sdk.createSessionToken(input.googleId, {
+          name: input.name || "",
+          expiresInMs: ONE_YEAR_MS,
         });
 
         return {
           success: true,
-          message: "Registration successful",
-          userId: newUser.id,
-          user: newUser,
-          isNewRegistration: true,
+          message: isNewRegistration ? "Registration successful" : "Login successful",
+          userId: existingUser.id,
+          user: existingUser,
+          isNewRegistration: isNewRegistration,
           loginMethod: "google",
+          sessionToken: sessionToken,
         };
       } catch (error: any) {
         console.error("[Gmail Auth] Error handling Google callback:", error);
