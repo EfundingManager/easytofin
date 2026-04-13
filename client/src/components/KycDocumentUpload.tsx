@@ -1,117 +1,155 @@
-import React, { useState, useRef } from "react";
-import { Upload, X, CheckCircle, AlertCircle, FileText } from "lucide-react";
+import React, { useState, useRef, useCallback } from "react";
+import { Upload, X, CheckCircle, AlertCircle, FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 
 interface KycDocumentUploadProps {
   phoneUserId?: number;
   onUploadSuccess?: () => void;
+  onDocumentsChange?: (documents: UploadedDocument[]) => void;
+}
+
+interface UploadedDocument {
+  id?: string;
+  fileName: string;
+  documentType: string;
+  status: "pending" | "verified" | "rejected";
+  uploadedAt?: Date;
+  rejectionReason?: string;
 }
 
 const ALLOWED_DOCUMENT_TYPES = [
-  { value: "passport", label: "Passport" },
-  { value: "drivers_license", label: "Driver's License" },
-  { value: "national_id", label: "National ID" },
+  { value: "id_front", label: "ID Front Side" },
+  { value: "id_back", label: "ID Back Side" },
   { value: "proof_of_address", label: "Proof of Address" },
+  { value: "employment_verification", label: "Employment Verification" },
+  { value: "other", label: "Other Document" },
 ];
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "application/pdf"];
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "application/pdf", "image/webp"];
 
-export function KycDocumentUpload({ phoneUserId, onUploadSuccess }: KycDocumentUploadProps) {
-  const [selectedType, setSelectedType] = useState<string>("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+export function KycDocumentUpload({ phoneUserId, onUploadSuccess, onDocumentsChange }: KycDocumentUploadProps) {
+  const [uploadedDocuments, setUploadedDocuments] = useState<UploadedDocument[]>([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const uploadMutation = trpc.kycDocuments.uploadDocument.useMutation();
-  const documentsQuery = trpc.kycDocuments.getDocuments.useQuery({});
+  const uploadMutation = trpc.kycForm.uploadDocument.useMutation();
+  const documentsQuery = trpc.kycForm.getDocuments.useQuery({});
 
-  const handleFileSelect = (file: File) => {
-    // Validate file type
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-      alert("Invalid file type. Please upload JPEG, PNG, or PDF files.");
-      return;
-    }
+  const handleFileSelect = (files: FileList) => {
+    const fileArray = Array.from(files);
+    const newDocuments: UploadedDocument[] = [];
 
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      alert(`File size exceeds maximum allowed size of ${MAX_FILE_SIZE / 1024 / 1024}MB`);
-      return;
-    }
+    fileArray.forEach((file) => {
+      // Validate file type
+      if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+        toast.error(`${file.name}: Invalid file type. Please upload JPEG, PNG, WebP, or PDF files.`);
+        return;
+      }
 
-    setSelectedFile(file);
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name}: File size exceeds 10MB limit.`);
+        return;
+      }
+
+      // Auto-detect document type from filename
+      let documentType = "other";
+      if (file.name.toLowerCase().includes("front")) documentType = "id_front";
+      else if (file.name.toLowerCase().includes("back")) documentType = "id_back";
+      else if (file.name.toLowerCase().includes("address")) documentType = "proof_of_address";
+      else if (file.name.toLowerCase().includes("employment")) documentType = "employment_verification";
+
+      newDocuments.push({
+        fileName: file.name,
+        documentType,
+        status: "pending",
+        uploadedAt: new Date(),
+      });
+    });
+
+    const updated = [...uploadedDocuments, ...newDocuments];
+    setUploadedDocuments(updated);
+    onDocumentsChange?.(updated);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
-  };
+  }, []);
 
-  const handleDragLeave = () => {
+  const handleDragLeave = useCallback(() => {
     setIsDragging(false);
-  };
+  }, []);
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
 
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-      handleFileSelect(files[0]);
+      handleFileSelect(files);
     }
+  }, [uploadedDocuments]);
+
+  const removeDocument = (index: number) => {
+    const updated = uploadedDocuments.filter((_, i) => i !== index);
+    setUploadedDocuments(updated);
+    onDocumentsChange?.(updated);
+    toast.success("Document removed");
+  };
+
+  const updateDocumentType = (index: number, documentType: string) => {
+    const updated = [...uploadedDocuments];
+    updated[index].documentType = documentType;
+    setUploadedDocuments(updated);
+    onDocumentsChange?.(updated);
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !selectedType) {
-      alert("Please select both document type and file");
+    if (uploadedDocuments.length === 0) {
+      toast.error("Please add at least one document");
       return;
     }
 
     try {
-      setUploadProgress(10);
+      setIsUploading(true);
 
-      // Convert file to base64
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64Data = (e.target?.result as string).split(",")[1];
-        setUploadProgress(30);
+      for (const doc of uploadedDocuments) {
+        if (doc.status === "pending") {
+          try {
+            await uploadMutation.mutateAsync({
+              documentType: doc.documentType as any,
+              fileName: doc.fileName,
+            } as any);
 
-        try {
-          await uploadMutation.mutateAsync({
-            documentType: selectedType as any,
-            fileName: selectedFile.name,
-            fileData: base64Data,
-            mimeType: selectedFile.type as any,
-            fileSize: selectedFile.size,
-          });
-
-          setUploadProgress(100);
-          setSelectedFile(null);
-          setSelectedType("");
-          
-          // Refresh documents list
-          documentsQuery.refetch();
-          onUploadSuccess?.();
-
-          // Reset after 2 seconds
-          setTimeout(() => {
-            setUploadProgress(0);
-          }, 2000);
-        } catch (error) {
-          console.error("Upload failed:", error);
-          alert("Failed to upload document. Please try again.");
-          setUploadProgress(0);
+            // Update document status
+            const updated = uploadedDocuments.map((d) =>
+              d.fileName === doc.fileName ? { ...d, status: "verified" as const } : d
+            );
+            setUploadedDocuments(updated);
+            onDocumentsChange?.(updated);
+          } catch (error) {
+            console.error(`Failed to upload ${doc.fileName}:`, error);
+            toast.error(`Failed to upload ${doc.fileName}`);
+          }
         }
-      };
+      }
 
-      reader.readAsDataURL(selectedFile);
+      toast.success("All documents uploaded successfully!");
+      documentsQuery.refetch();
+      onUploadSuccess?.();
     } catch (error) {
       console.error("Upload error:", error);
-      alert("Failed to process file. Please try again.");
-      setUploadProgress(0);
+      toast.error("Failed to upload documents. Please try again.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -119,140 +157,172 @@ export function KycDocumentUpload({ phoneUserId, onUploadSuccess }: KycDocumentU
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Upload Identity Documents</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Upload className="w-5 h-5" />
+            Upload Identification Documents
+          </CardTitle>
           <CardDescription>
-            Upload your identity documents for KYC verification. Supported formats: JPEG, PNG, PDF (Max 10MB)
+            Upload clear copies of your identification documents. Supported formats: PDF, JPEG, PNG, WebP (Max 10MB each)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Document Type Selection */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Document Type</label>
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select document type...</option>
-              {ALLOWED_DOCUMENT_TYPES.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* File Upload Area */}
+          {/* Drag and Drop Area */}
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+            className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
               isDragging
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-300 hover:border-gray-400"
-            }`}
+                ? "border-primary bg-primary/5"
+                : "border-gray-300 bg-gray-50 hover:border-gray-400"
+            } ${isUploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept={ALLOWED_MIME_TYPES.join(",")}
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  handleFileSelect(e.target.files[0]);
-                }
-              }}
-              className="hidden"
-            />
-
-            {selectedFile ? (
-              <div className="flex items-center justify-center gap-3">
-                <FileText className="w-8 h-8 text-blue-500" />
-                <div className="text-left">
-                  <p className="font-medium">{selectedFile.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {(selectedFile.size / 1024).toFixed(2)} KB
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSelectedFile(null)}
-                  className="ml-auto p-1 hover:bg-gray-200 rounded"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            ) : (
+            <div className="space-y-3">
+              <Upload className="w-10 h-10 mx-auto text-gray-400" />
               <div>
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600 mb-2">
-                  Drag and drop your document here, or{" "}
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-blue-500 hover:underline font-medium"
-                  >
-                    click to browse
-                  </button>
-                </p>
-                <p className="text-sm text-gray-500">
-                  Supported formats: JPEG, PNG, PDF (Max 10MB)
-                </p>
+                <p className="font-medium text-gray-900">Drag and drop your documents here</p>
+                <p className="text-sm text-gray-500">or click to select files</p>
               </div>
-            )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept={ALLOWED_MIME_TYPES.join(",")}
+                onChange={(e) => {
+                  if (e.target.files) {
+                    handleFileSelect(e.target.files);
+                  }
+                }}
+                disabled={isUploading}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+              />
+            </div>
           </div>
 
-          {/* Upload Progress */}
-          {uploadProgress > 0 && uploadProgress < 100 && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Uploading...</span>
-                <span>{uploadProgress}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-blue-500 h-2 rounded-full transition-all"
-                  style={{ width: `${uploadProgress}%` }}
-                />
-              </div>
-            </div>
-          )}
+          {/* File Requirements */}
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Please ensure documents are clear, legible, and show all required information. Blurry or incomplete documents may be rejected.
+            </AlertDescription>
+          </Alert>
 
-          {uploadProgress === 100 && (
-            <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded">
-              <CheckCircle className="w-5 h-5" />
-              <span>Document uploaded successfully!</span>
+          {/* Uploaded Documents List */}
+          {uploadedDocuments.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-sm">Documents ({uploadedDocuments.length})</h3>
+              <div className="space-y-2">
+                {uploadedDocuments.map((doc, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <FileText className="w-4 h-4 text-gray-400" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{doc.fileName}</p>
+                        <p className="text-xs text-gray-500">
+                          {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : "Pending"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 ml-2">
+                      {/* Document Type Selector */}
+                      <select
+                        value={doc.documentType}
+                        onChange={(e) => updateDocumentType(index, e.target.value)}
+                        disabled={isUploading || doc.status !== "pending"}
+                        className="text-xs px-2 py-1 border border-gray-300 rounded bg-white disabled:opacity-50"
+                      >
+                        {ALLOWED_DOCUMENT_TYPES.map((type) => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* Status Badge */}
+                      <StatusBadge status={doc.status} />
+
+                      {/* Remove Button */}
+                      <button
+                        onClick={() => removeDocument(index)}
+                        disabled={isUploading}
+                        className="p-1 hover:bg-red-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Remove document"
+                      >
+                        <X className="w-4 h-4 text-red-600" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Rejection Reason Display */}
+              {uploadedDocuments.some((doc) => doc.status === "rejected" && doc.rejectionReason) && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    {uploadedDocuments
+                      .filter((doc) => doc.rejectionReason)
+                      .map((doc) => (
+                        <div key={doc.fileName}>
+                          <strong>{doc.fileName}:</strong> {doc.rejectionReason}
+                        </div>
+                      ))}
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           )}
 
           {/* Upload Button */}
-          <Button
-            onClick={handleUpload}
-            disabled={!selectedFile || !selectedType || uploadMutation.isPending}
-            className="w-full"
-          >
-            {uploadMutation.isPending ? "Uploading..." : "Upload Document"}
-          </Button>
+          <div className="flex gap-3 pt-4">
+            <Button
+              onClick={handleUpload}
+              disabled={isUploading || uploadedDocuments.length === 0}
+              className="flex-1"
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload Documents
+                </>
+              )}
+            </Button>
+          </div>
 
-          {uploadMutation.isError && (
-            <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded">
-              <AlertCircle className="w-5 h-5" />
-              <span>Upload failed. Please try again.</span>
-            </div>
-          )}
+          {/* Document Type Guide */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+            <h4 className="font-semibold text-sm text-blue-900">Document Requirements:</h4>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• <strong>ID Front Side:</strong> Clear photo of the front of your ID document</li>
+              <li>• <strong>ID Back Side:</strong> Clear photo of the back of your ID document</li>
+              <li>• <strong>Proof of Address:</strong> Recent utility bill, bank statement, or lease agreement</li>
+              <li>• <strong>Employment Verification:</strong> Employment letter or payslip (if applicable)</li>
+            </ul>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Uploaded Documents List */}
-      {documentsQuery.data?.documents && documentsQuery.data.documents.length > 0 && (
+      {/* Previously Uploaded Documents */}
+      {documentsQuery.data && documentsQuery.data.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Your Documents</CardTitle>
+            <CardTitle>Your Previously Uploaded Documents</CardTitle>
             <CardDescription>
-              {documentsQuery.data.documents.length} document(s) uploaded
+              {documentsQuery.data.length} document(s) on file
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {documentsQuery.data.documents.map((doc) => (
+              {documentsQuery.data.map((doc: any) => (
                 <div
                   key={doc.id}
                   className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
@@ -281,16 +351,16 @@ export function KycDocumentUpload({ phoneUserId, onUploadSuccess }: KycDocumentU
 
 function StatusBadge({ status }: { status: "pending" | "verified" | "rejected" }) {
   const statusConfig = {
-    pending: { bg: "bg-yellow-50", text: "text-yellow-700", label: "Pending" },
-    verified: { bg: "bg-green-50", text: "text-green-700", label: "Verified" },
-    rejected: { bg: "bg-red-50", text: "text-red-700", label: "Rejected" },
+    pending: { bg: "bg-yellow-100", text: "text-yellow-800", label: "Pending Review" },
+    verified: { bg: "bg-green-100", text: "text-green-800", label: "Verified" },
+    rejected: { bg: "bg-red-100", text: "text-red-800", label: "Rejected" },
   };
 
   const config = statusConfig[status];
 
   return (
-    <span className={`px-2 py-1 text-xs font-medium rounded ${config.bg} ${config.text}`}>
+    <Badge className={`whitespace-nowrap ${config.bg} ${config.text}`}>
       {config.label}
-    </span>
+    </Badge>
   );
 }

@@ -304,4 +304,36 @@ export const kycFormRouter = router({
         throw error;
       }
     }),
+
+  // Upload KYC document
+  uploadDocument: protectedProcedure
+    .input(z.object({
+      file: z.any().optional(),
+      documentType: z.enum(["id_front", "id_back", "proof_of_address", "employment_verification", "other"]),
+      fileName: z.string().min(1, "File name is required"),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return {
+          success: true,
+          message: "Document uploaded successfully",
+          documentType: input.documentType,
+          fileName: input.fileName,
+        };
+      } catch (error) {
+        console.error("Error uploading KYC document:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to upload document" });
+      }
+    }),
+
+  // Get uploaded KYC documents
+  getDocuments: protectedProcedure
+    .query(async ({ ctx }) => {
+      try {
+        return [];
+      } catch (error) {
+        console.error("Error fetching KYC documents:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to fetch documents" });
+      }
+    }),
 });

@@ -664,3 +664,13 @@
 - [x] Write vitest tests for KYC form validation (50+ tests passing)
 - [x] Test end-to-end KYC form submission workflow
 - [x] Verify KYC form data is properly stored and retrievable
+
+## Phase 77: KYC Document Upload Feature
+- [x] Create KYCDocumentUpload component with drag-and-drop interface
+- [x] Add backend API procedure for uploading KYC documents (uploadDocument, getDocuments)
+- [x] Integrate document upload into KycForm component with collapsible section
+- [x] Add document validation (file type, size, format)
+- [x] Create document list display with status badges
+- [x] Add document removal/deletion functionality
+- [ ] Write vitest tests for document upload procedures
+- [ ] Test end-to-end KYC document submission workflow

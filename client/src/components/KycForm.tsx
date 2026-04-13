@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { KycDocumentUpload } from "./KycDocumentUpload";
 
 // KYC Form validation schema
 const kycFormSchema = z.object({
@@ -46,6 +47,8 @@ interface KycFormProps {
 export function KycForm({ onSuccess, onCancel }: KycFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [uploadedDocuments, setUploadedDocuments] = useState<any[]>([]);
+  const [showDocumentUpload, setShowDocumentUpload] = useState(false);
 
   const form = useForm<KYCFormData>({
     resolver: zodResolver(kycFormSchema) as any,
@@ -437,6 +440,35 @@ export function KycForm({ onSuccess, onCancel }: KycFormProps) {
                     </FormItem>
                   )}
                 />
+              )}
+            </div>
+
+            {/* Document Upload Section */}
+            <div className="space-y-4 border-t pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900">Supporting Documents</h3>
+                  <p className="text-xs text-gray-500 mt-1">Upload identification documents to complete your KYC verification</p>
+                </div>
+                <Button
+                  type="button"
+                  variant={showDocumentUpload ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowDocumentUpload(!showDocumentUpload)}
+                >
+                  {showDocumentUpload ? "Hide" : "Show"} Documents
+                </Button>
+              </div>
+
+              {showDocumentUpload && (
+                <div className="mt-4">
+                  <KycDocumentUpload
+                    onDocumentsChange={setUploadedDocuments}
+                    onUploadSuccess={() => {
+                      toast.success("Documents uploaded successfully!");
+                    }}
+                  />
+                </div>
               )}
             </div>
 
