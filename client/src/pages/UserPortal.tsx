@@ -1,10 +1,11 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, CheckCircle2, Clock, FileText, LogOut } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { KycForm } from "@/components/KycForm";
 
 /**
  * User Portal - For registered users who haven't been approved as customers yet
@@ -13,6 +14,7 @@ import { trpc } from "@/lib/trpc";
 export default function UserPortal() {
   const { user, loading, logout } = useAuth();
   const [, navigate] = useLocation();
+  const [showKycForm, setShowKycForm] = useState(false);
   const fullUserQuery = trpc.auth.getFullUserInfo.useQuery();
 
   useEffect(() => {
@@ -151,79 +153,112 @@ export default function UserPortal() {
           </Card>
         </div>
 
-        {/* Progress Steps */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Your Journey to Verified Customer</CardTitle>
-            <CardDescription>
-              Follow these steps to complete your registration and become a verified customer
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Step 1 */}
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-semibold text-sm">
-                    ✓
+        {/* KYC Form or Progress Steps */}
+        {showKycForm ? (
+          <KycForm
+            onSuccess={() => {
+              setShowKycForm(false);
+              fullUserQuery.refetch();
+            }}
+            onCancel={() => setShowKycForm(false)}
+          />
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Your Journey to Verified Customer</CardTitle>
+              <CardDescription>
+                Follow these steps to complete your registration and become a verified customer
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Step 1 */}
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-semibold text-sm">
+                      ✓
+                    </div>
+                    <div className="w-0.5 h-12 bg-muted my-2"></div>
                   </div>
-                  <div className="w-0.5 h-12 bg-muted my-2"></div>
+                  <div className="pb-4">
+                    <p className="font-medium">Step 1: Account Created</p>
+                    <p className="text-sm text-muted-foreground">Your account has been successfully created</p>
+                  </div>
                 </div>
-                <div className="pb-4">
-                  <p className="font-medium">Step 1: Account Created</p>
-                  <p className="text-sm text-muted-foreground">Your account has been successfully created</p>
-                </div>
-              </div>
 
-              {/* Step 2 */}
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-semibold text-sm">
-                    2
+                {/* Step 2 */}
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-semibold text-sm">
+                      2
+                    </div>
+                    <div className="w-0.5 h-12 bg-muted my-2"></div>
                   </div>
-                  <div className="w-0.5 h-12 bg-muted my-2"></div>
+                  <div className="pb-4">
+                    <p className="font-medium">Step 2: KYC Verification</p>
+                    <p className="text-sm text-muted-foreground">
+                      Complete your KYC (Know Your Customer) verification to proceed.
+                    </p>
+                    <Button
+                      onClick={() => setShowKycForm(true)}
+                      className="mt-3"
+                      size="sm"
+                    >
+                      Start KYC Verification
+                    </Button>
+                  </div>
                 </div>
-                <div className="pb-4">
-                  <p className="font-medium">Step 2: Under Review</p>
-                  <p className="text-sm text-muted-foreground">
-                    Our team is reviewing your application. This typically takes 1-2 business days.
-                  </p>
-                </div>
-              </div>
 
-              {/* Step 3 */}
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-semibold text-sm">
-                    3
+                {/* Step 3 */}
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-semibold text-sm">
+                      3
+                    </div>
+                    <div className="w-0.5 h-12 bg-muted my-2"></div>
                   </div>
-                  <div className="w-0.5 h-12 bg-muted my-2"></div>
+                  <div className="pb-4">
+                    <p className="font-medium">Step 3: Under Review</p>
+                    <p className="text-sm text-muted-foreground">
+                      Our team will review your KYC application. This typically takes 1-2 business days.
+                    </p>
+                  </div>
                 </div>
-                <div className="pb-4">
-                  <p className="font-medium">Step 3: Policy Assignment</p>
-                  <p className="text-sm text-muted-foreground">
-                    Once approved, we'll assign your policy and provide you with full access to our services.
-                  </p>
-                </div>
-              </div>
 
-              {/* Step 4 */}
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-semibold text-sm">
-                    4
+                {/* Step 4 */}
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-semibold text-sm">
+                      4
+                    </div>
+                    <div className="w-0.5 h-12 bg-muted my-2"></div>
+                  </div>
+                  <div className="pb-4">
+                    <p className="font-medium">Step 4: Policy Assignment</p>
+                    <p className="text-sm text-muted-foreground">
+                      Once approved, we'll assign your policy and provide you with full access to our services.
+                    </p>
                   </div>
                 </div>
-                <div className="pb-4">
-                  <p className="font-medium">Step 4: Verified Customer</p>
-                  <p className="text-sm text-muted-foreground">
-                    Access your customer portal, manage policies, and enjoy all our services.
-                  </p>
+
+                {/* Step 5 */}
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-semibold text-sm">
+                      5
+                    </div>
+                  </div>
+                  <div className="pb-4">
+                    <p className="font-medium">Step 5: Verified Customer</p>
+                    <p className="text-sm text-muted-foreground">
+                      Access your customer portal, manage policies, and enjoy all our services.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Help Section */}
         <Card>

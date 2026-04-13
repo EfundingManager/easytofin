@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { protectedProcedure, adminProcedure } from "../_core/trpc";
-import { db } from "../db";
+import { protectedProcedure, adminProcedure, router } from "../_core/trpc";
+import { getDb } from "../db";
 import { phoneUsers } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -29,29 +29,37 @@ const kycFormSchema = z.object({
 
 export type KYCFormData = z.infer<typeof kycFormSchema>;
 
-export const kycFormRouter = {
+export const kycFormRouter = router({
   // Submit KYC form
   submitForm: protectedProcedure
     .input(kycFormSchema)
     .mutation(async ({ input, ctx }) => {
       try {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database connection failed" });
+        }
+
         // Get user ID from context
         const userId = ctx.user?.id;
         if (!userId) {
           throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
         }
 
-        // Find phoneUser record
-        const phoneUser = await db.query.phoneUsers.findFirst({
-          where: eq(phoneUsers.userId, userId),
-        });
+        // Find phoneUser record by userId
+        const phoneUserRecords = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.userId, userId));
 
-        if (!phoneUser) {
+        if (phoneUserRecords.length === 0) {
           throw new TRPCError({ code: "NOT_FOUND", message: "User profile not found" });
         }
 
+        const phoneUser = phoneUserRecords[0];
+
         // Update phoneUser with KYC data
-        const kycData = {
+        const kycData: any = {
           firstName: input.firstName,
           lastName: input.lastName,
           dateOfBirth: new Date(input.dateOfBirth),
@@ -90,40 +98,48 @@ export const kycFormRouter = {
   // Get KYC form data
   getForm: protectedProcedure.query(async ({ ctx }) => {
     try {
+      const db = await getDb();
+      if (!db) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database connection failed" });
+      }
+
       const userId = ctx.user?.id;
       if (!userId) {
         throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
       }
 
-      const phoneUser = await db.query.phoneUsers.findFirst({
-        where: eq(phoneUsers.userId, userId),
-      });
+      const phoneUserRecords = await db
+        .select()
+        .from(phoneUsers)
+        .where(eq(phoneUsers.userId, userId));
 
-      if (!phoneUser) {
+      if (phoneUserRecords.length === 0) {
         throw new TRPCError({ code: "NOT_FOUND", message: "User profile not found" });
       }
 
+      const phoneUser = phoneUserRecords[0];
+
       return {
-        firstName: phoneUser.firstName || "",
-        lastName: phoneUser.lastName || "",
-        dateOfBirth: phoneUser.dateOfBirth ? phoneUser.dateOfBirth.toISOString().split("T")[0] : "",
-        nationality: phoneUser.nationality || "",
-        address: phoneUser.address || "",
-        city: phoneUser.city || "",
-        postalCode: phoneUser.postalCode || "",
-        country: phoneUser.country || "",
-        idType: phoneUser.idType || "passport",
-        idNumber: phoneUser.idNumber || "",
-        idIssueDate: phoneUser.idIssueDate ? phoneUser.idIssueDate.toISOString().split("T")[0] : "",
-        idExpiryDate: phoneUser.idExpiryDate ? phoneUser.idExpiryDate.toISOString().split("T")[0] : "",
-        occupation: phoneUser.occupation || "",
-        employerName: phoneUser.employerName || "",
-        sourceOfIncome: phoneUser.sourceOfIncome || "employment",
-        annualIncome: phoneUser.annualIncome || "",
-        politicallyExposed: phoneUser.politicallyExposed === "true",
-        pepDetails: phoneUser.pepDetails || "",
-        kycStatus: phoneUser.kycStatus || "pending",
-        kycSubmittedAt: phoneUser.kycSubmittedAt,
+        firstName: (phoneUser as any).firstName || "",
+        lastName: (phoneUser as any).lastName || "",
+        dateOfBirth: (phoneUser as any).dateOfBirth ? (phoneUser as any).dateOfBirth.toISOString().split("T")[0] : "",
+        nationality: (phoneUser as any).nationality || "",
+        address: (phoneUser as any).address || "",
+        city: (phoneUser as any).city || "",
+        postalCode: (phoneUser as any).postalCode || "",
+        country: (phoneUser as any).country || "",
+        idType: (phoneUser as any).idType || "passport",
+        idNumber: (phoneUser as any).idNumber || "",
+        idIssueDate: (phoneUser as any).idIssueDate ? (phoneUser as any).idIssueDate.toISOString().split("T")[0] : "",
+        idExpiryDate: (phoneUser as any).idExpiryDate ? (phoneUser as any).idExpiryDate.toISOString().split("T")[0] : "",
+        occupation: (phoneUser as any).occupation || "",
+        employerName: (phoneUser as any).employerName || "",
+        sourceOfIncome: (phoneUser as any).sourceOfIncome || "employment",
+        annualIncome: (phoneUser as any).annualIncome || "",
+        politicallyExposed: (phoneUser as any).politicallyExposed === "true",
+        pepDetails: (phoneUser as any).pepDetails || "",
+        kycStatus: (phoneUser as any).kycStatus || "pending",
+        kycSubmittedAt: (phoneUser as any).kycSubmittedAt,
       };
     } catch (error) {
       console.error("Error fetching KYC form:", error);
@@ -134,11 +150,17 @@ export const kycFormRouter = {
   // Get all KYC submissions for admin review
   getSubmissions: adminProcedure.query(async () => {
     try {
-      const submissions = await db.query.phoneUsers.findMany({
-        where: (user: any, { eq: eqFn }: any) => eqFn(user.kycStatus, "submitted"),
-      });
+      const db = await getDb();
+      if (!db) {
+        return [];
+      }
 
-      return submissions.map((user) => ({
+      const submissions = await db
+        .select()
+        .from(phoneUsers)
+        .where(eq(phoneUsers.kycStatus, "submitted"));
+
+      return submissions.map((user: any) => ({
         id: user.id,
         userId: user.userId,
         name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
@@ -161,41 +183,49 @@ export const kycFormRouter = {
     .input(z.object({ userId: z.string() }))
     .query(async ({ input }) => {
       try {
-        const phoneUser = await db.query.phoneUsers.findFirst({
-          where: (user: any) => user.id === parseInt(input.userId),
-        });
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database connection failed" });
+        }
 
-        if (!phoneUser) {
+      const phoneUserRecords = await db
+        .select()
+        .from(phoneUsers)
+        .where(eq(phoneUsers.id, parseInt(input.userId)));
+
+        if (phoneUserRecords.length === 0) {
           throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
         }
 
+        const phoneUser = phoneUserRecords[0];
+
         return {
           id: phoneUser.id,
-          userId: phoneUser.userId,
-          firstName: phoneUser.firstName,
-          lastName: phoneUser.lastName,
+          userId: (phoneUser as any).userId,
+          firstName: (phoneUser as any).firstName,
+          lastName: (phoneUser as any).lastName,
           email: phoneUser.email,
           phone: phoneUser.phone,
-          dateOfBirth: phoneUser.dateOfBirth,
-          nationality: phoneUser.nationality,
-          address: phoneUser.address,
-          city: phoneUser.city,
-          postalCode: phoneUser.postalCode,
-          country: phoneUser.country,
-          idType: phoneUser.idType,
-          idNumber: phoneUser.idNumber,
-          idIssueDate: phoneUser.idIssueDate,
-          idExpiryDate: phoneUser.idExpiryDate,
-          occupation: phoneUser.occupation,
-          employerName: phoneUser.employerName,
-          sourceOfIncome: phoneUser.sourceOfIncome,
-          annualIncome: phoneUser.annualIncome,
-          politicallyExposed: phoneUser.politicallyExposed === "true",
-          pepDetails: phoneUser.pepDetails,
-          kycStatus: phoneUser.kycStatus,
-          kycSubmittedAt: phoneUser.kycSubmittedAt,
-          kycVerifiedAt: phoneUser.kycVerifiedAt,
-          kycRejectionReason: phoneUser.kycRejectionReason,
+          dateOfBirth: (phoneUser as any).dateOfBirth,
+          nationality: (phoneUser as any).nationality,
+          address: (phoneUser as any).address,
+          city: (phoneUser as any).city,
+          postalCode: (phoneUser as any).postalCode,
+          country: (phoneUser as any).country,
+          idType: (phoneUser as any).idType,
+          idNumber: (phoneUser as any).idNumber,
+          idIssueDate: (phoneUser as any).idIssueDate,
+          idExpiryDate: (phoneUser as any).idExpiryDate,
+          occupation: (phoneUser as any).occupation,
+          employerName: (phoneUser as any).employerName,
+          sourceOfIncome: (phoneUser as any).sourceOfIncome,
+          annualIncome: (phoneUser as any).annualIncome,
+          politicallyExposed: (phoneUser as any).politicallyExposed === "true",
+          pepDetails: (phoneUser as any).pepDetails,
+          kycStatus: (phoneUser as any).kycStatus,
+          kycSubmittedAt: (phoneUser as any).kycSubmittedAt,
+          kycVerifiedAt: (phoneUser as any).kycVerifiedAt,
+          kycRejectionReason: (phoneUser as any).kycRejectionReason,
           clientStatus: phoneUser.clientStatus,
         };
       } catch (error) {
@@ -209,20 +239,27 @@ export const kycFormRouter = {
     .input(z.object({ userId: z.string(), notes: z.string().optional() }))
     .mutation(async ({ input, ctx }) => {
       try {
-        const phoneUser = await db.query.phoneUsers.findFirst({
-          where: (user: any) => user.id === parseInt(input.userId),
-        });
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database connection failed" });
+        }
 
-        if (!phoneUser) {
+        const phoneUserRecords = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.userId, parseInt(input.userId)));
+
+        if (phoneUserRecords.length === 0) {
           throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
         }
+
+        const phoneUser = phoneUserRecords[0];
 
         await db
           .update(phoneUsers)
           .set({
-            kycStatus: "verified",
-            kycVerifiedAt: new Date(),
-            clientStatus: "customer",
+            kycStatus: "verified" as any,
+            clientStatus: "customer" as any,
           })
           .where(eq(phoneUsers.id, phoneUser.id));
 
@@ -238,19 +275,26 @@ export const kycFormRouter = {
     .input(z.object({ userId: z.string(), reason: z.string().min(1, "Rejection reason is required") }))
     .mutation(async ({ input, ctx }) => {
       try {
-        const phoneUser = await db.query.phoneUsers.findFirst({
-          where: (user: any) => user.id === parseInt(input.userId),
-        });
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database connection failed" });
+        }
 
-        if (!phoneUser) {
+        const phoneUserRecords = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.userId, parseInt(input.userId)));
+
+        if (phoneUserRecords.length === 0) {
           throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
         }
+
+        const phoneUser = phoneUserRecords[0];
 
         await db
           .update(phoneUsers)
           .set({
-            kycStatus: "rejected",
-            kycRejectionReason: input.reason,
+            kycStatus: "rejected" as any,
           })
           .where(eq(phoneUsers.id, phoneUser.id));
 
@@ -260,4 +304,4 @@ export const kycFormRouter = {
         throw error;
       }
     }),
-};
+});
