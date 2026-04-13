@@ -206,3 +206,72 @@ export const featureFlags = mysqlTable("featureFlags", {
 
 export type FeatureFlag = typeof featureFlags.$inferSelect;
 export type InsertFeatureFlag = typeof featureFlags.$inferInsert;
+
+
+/**
+ * Email templates for email blaster campaigns
+ */
+export const emailTemplates = mysqlTable("emailTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  htmlContent: text("htmlContent").notNull(),
+  plainTextContent: text("plainTextContent"),
+  description: text("description"),
+  category: mysqlEnum("category", ["kyc", "policy", "renewal", "welcome", "notification", "marketing", "other"]).default("other").notNull(),
+  isPredefined: mysqlEnum("isPredefined", ["true", "false"]).default("true").notNull(),
+  isActive: mysqlEnum("isActive", ["true", "false"]).default("true").notNull(),
+  variables: text("variables"), // JSON array of variable names used in template
+  createdBy: int("createdBy"),
+  updatedBy: int("updatedBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailTemplate = typeof emailTemplates.$inferSelect;
+export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
+
+/**
+ * Email blast campaigns
+ */
+export const emailBlasts = mysqlTable("emailBlasts", {
+  id: int("id").autoincrement().primaryKey(),
+  templateId: int("templateId").notNull(),
+  campaignName: varchar("campaignName", { length: 255 }).notNull(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  recipientFilter: text("recipientFilter"), // JSON object for filtering recipients
+  totalRecipients: int("totalRecipients").default(0),
+  sentCount: int("sentCount").default(0),
+  failedCount: int("failedCount").default(0),
+  status: mysqlEnum("status", ["draft", "scheduled", "sending", "sent", "failed", "paused"]).default("draft").notNull(),
+  scheduledAt: timestamp("scheduledAt"),
+  sentAt: timestamp("sentAt"),
+  createdBy: int("createdBy"),
+  updatedBy: int("updatedBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailBlast = typeof emailBlasts.$inferSelect;
+export type InsertEmailBlast = typeof emailBlasts.$inferInsert;
+
+/**
+ * Email blast delivery tracking
+ */
+export const emailBlastDeliveries = mysqlTable("emailBlastDeliveries", {
+  id: int("id").autoincrement().primaryKey(),
+  blastId: int("blastId").notNull(),
+  recipientId: int("recipientId").notNull(),
+  recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
+  status: mysqlEnum("status", ["pending", "sent", "failed", "bounced", "opened", "clicked"]).default("pending").notNull(),
+  sentAt: timestamp("sentAt"),
+  failureReason: text("failureReason"),
+  openedAt: timestamp("openedAt"),
+  clickedAt: timestamp("clickedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailBlastDelivery = typeof emailBlastDeliveries.$inferSelect;
+export type InsertEmailBlastDelivery = typeof emailBlastDeliveries.$inferInsert;

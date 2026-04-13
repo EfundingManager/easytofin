@@ -15,10 +15,10 @@ import { useLocation } from "wouter";
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState("overview");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [globalSearchQuery, setGlobalSearchQuery] = useState("");
-  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("overview");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [globalSearchQuery, setGlobalSearchQuery] = useState<string>("");
+  const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const [selectedClientForPolicy, setSelectedClientForPolicy] = useState<{ id: number; name: string } | null>(null);
 
   // Fetch admin data

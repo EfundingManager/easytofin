@@ -635,3 +635,33 @@
 - [ ] Write vitest tests for feature flag system
 - [ ] Test toggling Client Login visibility from admin panel
 - [ ] Verify feature flag changes take effect immediately on frontend
+
+
+## Phase 75: Email Blaster Feature
+- [ ] Design email templates database schema (emailTemplates table)
+- [ ] Create backend API endpoints for template management (CRUD operations)
+- [ ] Add Email Blaster option to navigation menu
+- [ ] Create Blast Templates management interface
+- [ ] Build email template editor with drag-and-drop builder
+- [ ] Add email preview functionality
+- [ ] Create predefined templates (KYC Status Update, Policy Renewal, Welcome Email, etc.)
+- [ ] Implement email blast sending interface
+- [ ] Add recipient selection (all customers, filtered by status, etc.)
+- [ ] Create email sending queue and scheduling
+- [ ] Add email delivery tracking and analytics
+- [ ] Write vitest tests for email blaster features
+- [ ] Test end-to-end email template creation and sending
+- [ ] Test email preview and rendering
+
+
+## Phase 76: Basic Compliant KYC Form
+- [ ] Design KYC form with required compliance fields (name, DOB, address, ID type, ID number)
+- [ ] Create backend API endpoint for KYC form submission
+- [ ] Build KYC form component with validation and error handling
+- [ ] Integrate KYC form into UserPortal component
+- [ ] Implement form data persistence to database
+- [ ] Add admin review interface for submitted KYC forms
+- [ ] Implement KYC status tracking (pending, submitted, verified, rejected)
+- [ ] Write vitest tests for KYC form validation
+- [ ] Test end-to-end KYC form submission workflow
+- [ ] Verify KYC form data is properly stored and retrievable
