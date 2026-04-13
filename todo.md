@@ -674,3 +674,13 @@
 - [x] Add document removal/deletion functionality
 - [ ] Write vitest tests for document upload procedures
 - [ ] Test end-to-end KYC document submission workflow
+
+## Phase 78: KYC Document Image Preview Feature
+- [x] Create image preview component with thumbnail display (ImagePreview.tsx)
+- [x] Add full-size image modal viewer with navigation controls (keyboard shortcuts, arrow buttons)
+- [x] Integrate preview into KycDocumentUpload component (ImagePreviewGrid)
+- [x] Add image preview to document list display (DocumentThumbnail component)
+- [x] Support zoom and rotate controls for image preview (50%-200% zoom, 90° rotation)
+- [x] Add download functionality for individual images
+- [ ] Write vitest tests for preview functionality
+- [ ] Test preview with various image formats and sizes

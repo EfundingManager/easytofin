@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { ImagePreviewGrid, PreviewableFile } from "./ImagePreview";
 
 interface KycDocumentUploadProps {
   phoneUserId?: number;
@@ -13,13 +14,14 @@ interface KycDocumentUploadProps {
   onDocumentsChange?: (documents: UploadedDocument[]) => void;
 }
 
-interface UploadedDocument {
+interface UploadedDocument extends PreviewableFile {
   id?: string;
   fileName: string;
   documentType: string;
   status: "pending" | "verified" | "rejected";
   uploadedAt?: Date;
   rejectionReason?: string;
+  file?: File;
 }
 
 const ALLOWED_DOCUMENT_TYPES = [
@@ -207,6 +209,11 @@ export function KycDocumentUpload({ phoneUserId, onUploadSuccess, onDocumentsCha
             </AlertDescription>
           </Alert>
 
+          {/* Image Preview Grid */}
+          {uploadedDocuments.length > 0 && (
+            <ImagePreviewGrid files={uploadedDocuments} />
+          )}
+
           {/* Uploaded Documents List */}
           {uploadedDocuments.length > 0 && (
             <div className="space-y-3">
@@ -218,7 +225,8 @@ export function KycDocumentUpload({ phoneUserId, onUploadSuccess, onDocumentsCha
                     className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <FileText className="w-4 h-4 text-gray-400" />
+                      {/* Thumbnail Preview */}
+                      <DocumentThumbnail doc={doc} />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">{doc.fileName}</p>
                         <p className="text-xs text-gray-500">
@@ -345,6 +353,40 @@ export function KycDocumentUpload({ phoneUserId, onUploadSuccess, onDocumentsCha
           </CardContent>
         </Card>
       )}
+    </div>
+  );
+}
+
+function DocumentThumbnail({ doc }: { doc: UploadedDocument }) {
+  const [imageUrl, setImageUrl] = React.useState<string>("");
+  const [error, setError] = React.useState(false);
+
+  React.useEffect(() => {
+    if (doc.url) {
+      setImageUrl(doc.url);
+    } else if (doc.file) {
+      const url = URL.createObjectURL(doc.file);
+      setImageUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [doc]);
+
+  if (error || !imageUrl) {
+    return (
+      <div className="w-10 h-10 rounded bg-gray-200 flex items-center justify-center flex-shrink-0">
+        <FileText className="w-5 h-5 text-gray-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-10 h-10 rounded border border-gray-300 overflow-hidden flex-shrink-0 bg-gray-100">
+      <img
+        src={imageUrl}
+        alt={doc.fileName}
+        className="w-full h-full object-cover"
+        onError={() => setError(true)}
+      />
     </div>
   );
 }
