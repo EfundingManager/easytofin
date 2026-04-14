@@ -12,6 +12,8 @@
 - [x] Implement 2FA verification flow
 - [x] Add "Client Login" button to Navbar
 - [x] Integrate Gmail OAuth login with Google Sign-in button
+- [x] Enable Client Login in the frontend (AuthSelection, PhoneAuth, EmailAuth pages)
+- [x] Fix phone OTP flow with proper database upsert handling
 - [ ] Add session management and authentication middleware
 
 ## Phase 3: Product Selection & Fact-Finding Forms
@@ -710,3 +712,24 @@
 - [x] Write vitest tests for OTP procedures (otp-auth.test.ts with 30+ test cases)
 - [x] Test end-to-end phone OTP authentication (134 tests passing)
 - [x] Test end-to-end email OTP authentication (134 tests passing)
+
+
+## Phase 81: Fix Google OAuth Configuration
+- [ ] Identify current OAuth configuration and authorized origins
+- [ ] Update Manus OAuth Portal settings with correct redirect URIs
+- [ ] Configure Google Cloud Console with authorized origins
+- [ ] Test Google Sign-in functionality
+- [ ] Verify OAuth flow works correctly
+
+
+## Phase 26: Client Login Frontend Implementation
+- [ ] Check current Navbar component for Client Login button
+- [ ] Create AuthSelection page for phone/email login choice
+- [ ] Implement phone authentication page (PhoneAuth.tsx)
+- [ ] Implement email authentication page (EmailAuth.tsx)
+- [ ] Add routing for /phone-auth and /email-auth
+- [ ] Test phone OTP flow end-to-end
+- [ ] Test email OTP flow end-to-end
+- [ ] Verify session creation and redirect logic
+- [ ] Test cross-browser compatibility
+- [ ] Test mobile responsiveness

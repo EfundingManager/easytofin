@@ -96,15 +96,31 @@ export async function createPhoneUser(data: InsertPhoneUser): Promise<PhoneUser>
     throw new Error("Database not available");
   }
 
-  const result = await db.insert(phoneUsers).values(data);
-  const insertedId = (result as any).insertId;
-  
-  const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, insertedId)).limit(1);
-  if (!user.length) {
-    throw new Error("Failed to create phone user");
+  try {
+    // Use upsert pattern: insert or update if phone already exists
+    await db.insert(phoneUsers).values(data).onDuplicateKeyUpdate({
+      set: {
+        email: data.email,
+        name: data.name,
+        address: data.address,
+        picture: data.picture,
+        loginMethod: data.loginMethod,
+      }
+    });
+    
+    // Retrieve the user by phone number
+    if (data.phone) {
+      const user = await getPhoneUserByPhone(data.phone);
+      if (user) {
+        return user;
+      }
+    }
+    
+    throw new Error("Failed to create or retrieve phone user");
+  } catch (error: any) {
+    console.error("[Phone Auth] Error creating phone user:", error);
+    throw error;
   }
-  
-  return user[0];
 }
 
 export async function getPhoneUserByPhone(phone: string): Promise<PhoneUser | undefined> {

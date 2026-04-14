@@ -35,7 +35,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/auth-selection" component={ClientLoginComingSoon} />
+      <Route path="/auth-selection" component={AuthSelection} />
       <Route path="/phone-auth" component={PhoneAuth} />
       <Route path="/email-auth" component={EmailAuth} />
       <Route path="/profile" component={UserProfile} />

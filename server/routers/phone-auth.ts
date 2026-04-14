@@ -33,7 +33,10 @@ export const phoneAuthRouter = router({
   requestOtp: publicProcedure
     .input(
       z.object({
-        phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number"),
+        phone: z.string()
+          .trim()
+          .transform(phone => phone.replace(/[\s\-()]/g, ''))
+          .refine(phone => /^\+?[1-9]\d{1,14}$/.test(phone), "Invalid phone number"),
       })
     )
     .mutation(async ({ input }) => {
