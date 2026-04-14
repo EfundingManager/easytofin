@@ -78,7 +78,10 @@ export const emailAuthRouter = router({
           console.log(`[OTP] Login OTP for ${input.email}: ${code}`);
 
           // Send OTP email for login
-          await sendOtpEmail(input.email, existingUser.name || "User", code, false);
+          const emailSent1 = await sendOtpEmail(input.email, existingUser.name || "User", code, false);
+          if (!emailSent1) {
+            console.warn(`[OTP] Failed to send email to ${input.email}, but OTP was created`);
+          }
 
           return {
             success: true,
@@ -109,7 +112,10 @@ export const emailAuthRouter = router({
           console.log(`[OTP] Registration OTP for ${input.email}: ${code}`);
 
           // Send OTP email
-          await sendOtpEmail(input.email, "New User", code, true);
+          const emailSent2 = await sendOtpEmail(input.email, "New User", code, true);
+          if (!emailSent2) {
+            console.warn(`[OTP] Failed to send email to ${input.email}, but OTP was created`);
+          }
 
           return {
             success: true,

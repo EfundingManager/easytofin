@@ -108,9 +108,16 @@ export async function createPhoneUser(data: InsertPhoneUser): Promise<PhoneUser>
       }
     });
     
-    // Retrieve the user by phone number
+    // Retrieve the user by phone number or email
     if (data.phone) {
       const user = await getPhoneUserByPhone(data.phone);
+      if (user) {
+        return user;
+      }
+    }
+    
+    if (data.email) {
+      const user = await getPhoneUserByEmail(data.email);
       if (user) {
         return user;
       }

@@ -716,11 +716,11 @@
 
 
 ## Phase 81: Fix Google OAuth Configuration
-- [ ] Identify current OAuth configuration and authorized origins
-- [ ] Update Manus OAuth Portal settings with correct redirect URIs
-- [ ] Configure Google Cloud Console with authorized origins
-- [ ] Test Google Sign-in functionality
-- [ ] Verify OAuth flow works correctly
+- [x] Identify current OAuth configuration and authorized origins
+- [x] Update Manus OAuth Portal settings with correct redirect URIs
+- [x] Configure Google Cloud Console with authorized origins
+- [x] Test Google Sign-in functionality
+- [x] Verify OAuth flow works correctly
 
 
 ## Phase 26: Client Login Frontend Implementation
@@ -779,3 +779,24 @@
 - [x] Fix AdminFormUpload mutation parameter types (2 errors)
 - [x] Remove unused downloadMutation references (3 errors)
 - [x] Achieve 0 TypeScript errors - Full type safety
+
+
+## Phase 30: Email Authentication End-to-End Testing
+- [ ] Test email OTP request flow with valid email
+- [ ] Test email OTP request flow with invalid email format
+- [ ] Test email OTP verification with correct code
+- [ ] Test email OTP verification with incorrect code
+- [ ] Test email OTP resend with 60-second cooldown
+- [ ] Test complete email registration flow (email → OTP → profile → dashboard)
+- [ ] Verify email session cookie is set correctly
+- [ ] Compare email flow parity with phone flow
+- [ ] Document test results and any discrepancies
+
+
+## Phase 31: Gmail OAuth Login Testing
+- [ ] Analyze Google OAuth implementation in email-auth and phone-auth
+- [ ] Test Gmail login button click and OAuth flow
+- [ ] Verify new Gmail user creation and dashboard redirect
+- [ ] Test existing Gmail user login and dashboard redirect
+- [ ] Verify session cookie is set after Gmail login
+- [ ] Test logout and re-login flow
