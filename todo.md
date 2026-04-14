@@ -684,3 +684,29 @@
 - [x] Add download functionality for individual images
 - [ ] Write vitest tests for preview functionality
 - [ ] Test preview with various image formats and sizes
+
+
+## Phase 79: Authentication Methods Testing
+- [ ] Test Gmail direct login and verify user data is correctly retrieved
+- [ ] Test non-Gmail email registration and login workflow
+- [ ] Test phone number registration and login workflow
+- [ ] Verify frontend error handling for failed logins
+- [ ] Check backend logs for authentication errors
+- [ ] Test session persistence across page refreshes
+- [ ] Verify OAuth callback handling for different auth methods
+- [ ] Test logout functionality for all authentication methods
+
+
+## Phase 80: OTP Authentication Enhancement for Phone and Email
+- [x] Create backend tRPC procedures for OTP (phoneAuth.requestOtp, phoneAuth.verifyOtp, emailAuth.requestOtp, emailAuth.verifyOtp)
+- [x] Implement OTP generation, storage, and validation logic (6-digit codes, 5-minute expiration)
+- [x] Integrate Twilio for SMS OTP delivery (sendSMSVerification, verifySMSCode)
+- [x] Integrate SendGrid for Email OTP delivery (sendOtpEmail, sendAccountConfirmationEmail)
+- [x] Create user registration flow after OTP verification (PhoneAuth.tsx, EmailAuth.tsx)
+- [x] Enhance PhoneAuth.tsx component with OTP input field (step: "otp")
+- [x] Enhance EmailAuth.tsx component with OTP input field (step: "otp")
+- [x] Add OTP timer and resend functionality (ResendCodeButton component)
+- [x] Add error handling and user feedback (toasts, loading states, rate limiting)
+- [x] Write vitest tests for OTP procedures (otp-auth.test.ts with 30+ test cases)
+- [x] Test end-to-end phone OTP authentication (134 tests passing)
+- [x] Test end-to-end email OTP authentication (134 tests passing)

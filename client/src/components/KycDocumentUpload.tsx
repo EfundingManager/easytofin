@@ -42,13 +42,14 @@ export function KycDocumentUpload({ phoneUserId, onUploadSuccess, onDocumentsCha
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadMutation = trpc.kycForm.uploadDocument.useMutation();
-  const documentsQuery = trpc.kycForm.getDocuments.useQuery({});
+  const documentsQuery = trpc.kycForm.getDocuments.useQuery({} as any);
 
-  const handleFileSelect = (files: FileList) => {
+  const handleFileSelect = (files: FileList | null) => {
+    if (!files) return;
     const fileArray = Array.from(files);
     const newDocuments: UploadedDocument[] = [];
 
-    fileArray.forEach((file) => {
+    fileArray.forEach((file: File) => {
       // Validate file type
       if (!ALLOWED_MIME_TYPES.includes(file.type)) {
         toast.error(`${file.name}: Invalid file type. Please upload JPEG, PNG, WebP, or PDF files.`);
