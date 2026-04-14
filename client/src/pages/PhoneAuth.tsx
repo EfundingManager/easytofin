@@ -256,7 +256,8 @@ export default function PhoneAuth() {
         // No need to store in localStorage
 
         if (result.isNewRegistration) {
-          setStep("register");
+          // Redirect new users to profile completion page
+          window.location.href = "/profile";
         } else {
           // Redirect to user or customer portal based on clientStatus
           const redirectUrl = result.redirectUrl || "/dashboard";

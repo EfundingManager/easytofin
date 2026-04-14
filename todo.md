@@ -78,7 +78,7 @@
 - [x] Add service selection multi-select with checkboxes
 - [x] Create success confirmation modal with contact info
 - [x] Update routing to add /profile route
-- [ ] Test complete registration and profile flow
+- [x] Test complete registration and profile flow
 
 ## Phase 7: Phone Auth Integration with Profile Redirect
 - [x] Review phone authentication flow
@@ -754,3 +754,20 @@
 - [x] Implement 60-second cooldown timer on frontend (EmailAuth)
 - [x] Add "Resend Code" button with countdown display
 - [x] Test resend flow with rate limiting
+
+
+## Phase 27: Complete OTP Verification Flow
+- [ ] Test OTP code validation with valid and invalid codes
+- [ ] Implement error handling for expired OTP codes
+- [ ] Implement error handling for incorrect OTP codes
+- [ ] Create user dashboard page for authenticated users
+- [ ] Implement automatic redirect to dashboard after successful OTP verification
+- [ ] Test complete end-to-end OTP flow from request to login
+
+
+## Phase 28: Complete User Registration Form
+- [ ] Create registration form component with profile fields (name, email, phone, address, etc.)
+- [ ] Implement form validation using Zod schemas
+- [ ] Add backend registration mutation to save user profile
+- [ ] Implement redirect to user dashboard after successful registration
+- [ ] Test registration flow end-to-end with phone and email OTP
