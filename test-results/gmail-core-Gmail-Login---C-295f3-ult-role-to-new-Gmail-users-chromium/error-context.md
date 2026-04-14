@@ -1,0 +1,225 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: gmail-core.spec.ts >> Gmail Login - Core Scenarios >> should assign default role to new Gmail users
+- Location: e2e/gmail-core.spec.ts:161:3
+
+# Error details
+
+```
+Error: expect(received).toBeTruthy()
+
+Received: false
+```
+
+# Test source
+
+```ts
+  74  |     });
+  75  | 
+  76  |     expect(loginResponse.ok()).toBeTruthy();
+  77  |     const loginResult = await loginResponse.json();
+  78  |     const loginData = loginResult.result.data;
+  79  | 
+  80  |     // Verify existing user login
+  81  |     expect(loginData.success).toBe(true);
+  82  |     expect(loginData.isNewRegistration).toBe(false);
+  83  |     expect(loginData.message).toContain('Login successful');
+  84  |     expect(loginData.userId).toBe(userId);
+  85  |   });
+  86  | 
+  87  |   test('should maintain user ID consistency across multiple logins', async ({ page }) => {
+  88  |     const email = `consistency-${Date.now()}@gmail.com`;
+  89  |     const googleId = `google-consistency-${Date.now()}`;
+  90  | 
+  91  |     const userIds = [];
+  92  | 
+  93  |     // Perform 3 logins
+  94  |     for (let i = 0; i < 3; i++) {
+  95  |       const response = await page.request.post('/api/trpc/gmailAuth.handleGoogleCallback', {
+  96  |         data: {
+  97  |           googleId: googleId,
+  98  |           email: email,
+  99  |           name: 'Consistency User',
+  100 |           picture: 'https://example.com/photo.jpg',
+  101 |         },
+  102 |       });
+  103 | 
+  104 |       expect(response.ok()).toBeTruthy();
+  105 |       const result = await response.json();
+  106 |       userIds.push(result.result.data.userId);
+  107 |     }
+  108 | 
+  109 |     // All user IDs should be identical
+  110 |     expect(userIds[0]).toBe(userIds[1]);
+  111 |     expect(userIds[1]).toBe(userIds[2]);
+  112 |   });
+  113 | 
+  114 |   test('should store user profile information correctly', async ({ page }) => {
+  115 |     const email = `profile-${Date.now()}@gmail.com`;
+  116 |     const googleId = `google-profile-${Date.now()}`;
+  117 |     const name = 'Profile Test User';
+  118 | 
+  119 |     const response = await page.request.post('/api/trpc/gmailAuth.handleGoogleCallback', {
+  120 |       data: {
+  121 |         googleId: googleId,
+  122 |         email: email,
+  123 |         name: name,
+  124 |         picture: 'https://example.com/profile.jpg',
+  125 |       },
+  126 |     });
+  127 | 
+  128 |     expect(response.ok()).toBeTruthy();
+  129 |     const result = await response.json();
+  130 |     const userData = result.result.data.user;
+  131 | 
+  132 |     // Verify user data
+  133 |     expect(userData.email).toBe(email);
+  134 |     expect(userData.name).toBe(name);
+  135 |     expect(userData.googleId).toBe(googleId);
+  136 |   });
+  137 | 
+  138 |   test('should set email as verified for Gmail users', async ({ page }) => {
+  139 |     const email = `verified-${Date.now()}@gmail.com`;
+  140 |     const googleId = `google-verified-${Date.now()}`;
+  141 | 
+  142 |     const response = await page.request.post('/api/trpc/gmailAuth.handleGoogleCallback', {
+  143 |       data: {
+  144 |         googleId: googleId,
+  145 |         email: email,
+  146 |         name: 'Verified User',
+  147 |         picture: 'https://example.com/photo.jpg',
+  148 |       },
+  149 |     });
+  150 | 
+  151 |     expect(response.ok()).toBeTruthy();
+  152 |     const result = await response.json();
+  153 |     const userData = result.result.data.user;
+  154 | 
+  155 |     // Email should be marked as verified
+  156 |     if (userData.emailVerified) {
+  157 |       expect(userData.emailVerified).toBe('true');
+  158 |     }
+  159 |   });
+  160 | 
+  161 |   test('should assign default role to new Gmail users', async ({ page }) => {
+  162 |     const email = `role-${Date.now()}@gmail.com`;
+  163 |     const googleId = `google-role-${Date.now()}`;
+  164 | 
+  165 |     const response = await page.request.post('/api/trpc/gmailAuth.handleGoogleCallback', {
+  166 |       data: {
+  167 |         googleId: googleId,
+  168 |         email: email,
+  169 |         name: 'Role Test User',
+  170 |         picture: 'https://example.com/photo.jpg',
+  171 |       },
+  172 |     });
+  173 | 
+> 174 |     expect(response.ok()).toBeTruthy();
+      |                           ^ Error: expect(received).toBeTruthy()
+  175 |     const result = await response.json();
+  176 |     const userData = result.result.data.user;
+  177 | 
+  178 |     // New users should have 'user' role
+  179 |     expect(userData.role).toBe('user');
+  180 |   });
+  181 | 
+  182 |   test('should reject Gmail login with invalid email', async ({ page }) => {
+  183 |     const response = await page.request.post('/api/trpc/gmailAuth.handleGoogleCallback', {
+  184 |       data: {
+  185 |         googleId: 'google-invalid',
+  186 |         email: 'invalid-email',
+  187 |         name: 'Invalid Email User',
+  188 |         picture: 'https://example.com/photo.jpg',
+  189 |       },
+  190 |     });
+  191 | 
+  192 |     // Should return error
+  193 |     expect(response.status()).not.toBe(200);
+  194 |   });
+  195 | 
+  196 |   test('should reject Gmail login with missing Google ID', async ({ page }) => {
+  197 |     const response = await page.request.post('/api/trpc/gmailAuth.handleGoogleCallback', {
+  198 |       data: {
+  199 |         googleId: '',
+  200 |         email: 'test@gmail.com',
+  201 |         name: 'Test User',
+  202 |         picture: 'https://example.com/photo.jpg',
+  203 |       },
+  204 |     });
+  205 | 
+  206 |     // Should return error
+  207 |     expect(response.status()).not.toBe(200);
+  208 |   });
+  209 | 
+  210 |   test('should reject Gmail login with missing name', async ({ page }) => {
+  211 |     const response = await page.request.post('/api/trpc/gmailAuth.handleGoogleCallback', {
+  212 |       data: {
+  213 |         googleId: 'google-no-name',
+  214 |         email: 'test@gmail.com',
+  215 |         name: '',
+  216 |         picture: 'https://example.com/photo.jpg',
+  217 |       },
+  218 |     });
+  219 | 
+  220 |     // Should return error
+  221 |     expect(response.status()).not.toBe(200);
+  222 |   });
+  223 | 
+  224 |   test('should handle Gmail login with optional picture', async ({ page }) => {
+  225 |     const email = `nopic-${Date.now()}@gmail.com`;
+  226 |     const googleId = `google-nopic-${Date.now()}`;
+  227 | 
+  228 |     const response = await page.request.post('/api/trpc/gmailAuth.handleGoogleCallback', {
+  229 |       data: {
+  230 |         googleId: googleId,
+  231 |         email: email,
+  232 |         name: 'No Picture User',
+  233 |         // picture is optional
+  234 |       },
+  235 |     });
+  236 | 
+  237 |     expect(response.ok()).toBeTruthy();
+  238 |     const result = await response.json();
+  239 |     expect(result.result.data.success).toBe(true);
+  240 |   });
+  241 | 
+  242 |   test('should redirect new user to correct profile page', async ({ page }) => {
+  243 |     const email = `redirect-${Date.now()}@gmail.com`;
+  244 |     const googleId = `google-redirect-${Date.now()}`;
+  245 | 
+  246 |     const response = await page.request.post('/api/trpc/gmailAuth.handleGoogleCallback', {
+  247 |       data: {
+  248 |         googleId: googleId,
+  249 |         email: email,
+  250 |         name: 'Redirect User',
+  251 |         picture: 'https://example.com/photo.jpg',
+  252 |       },
+  253 |     });
+  254 | 
+  255 |     expect(response.ok()).toBeTruthy();
+  256 |     const result = await response.json();
+  257 |     const redirectUrl = result.result.data.redirectUrl;
+  258 | 
+  259 |     // New user should redirect to /profile
+  260 |     expect(redirectUrl).toContain('/profile');
+  261 |   });
+  262 | 
+  263 |   test('should handle concurrent Gmail registrations', async ({ page }) => {
+  264 |     const registrations = [];
+  265 | 
+  266 |     // Create 3 concurrent registrations
+  267 |     for (let i = 0; i < 3; i++) {
+  268 |       const email = `concurrent-${Date.now()}-${i}@gmail.com`;
+  269 |       const googleId = `google-concurrent-${Date.now()}-${i}`;
+  270 | 
+  271 |       registrations.push(
+  272 |         page.request.post('/api/trpc/gmailAuth.handleGoogleCallback', {
+  273 |           data: {
+  274 |             googleId: googleId,
+```

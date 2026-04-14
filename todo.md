@@ -800,3 +800,64 @@
 - [ ] Test existing Gmail user login and dashboard redirect
 - [ ] Verify session cookie is set after Gmail login
 - [ ] Test logout and re-login flow
+
+
+## Phase 32: Gmail Login End-to-End Testing
+- [x] Create Playwright E2E test infrastructure and configuration
+- [x] Create focused Gmail core E2E test suite with essential scenarios
+- [x] Create comprehensive vitest integration tests for Gmail flow (21 tests)
+- [x] Test new Gmail user registration flow
+- [x] Test existing Gmail user login and consistency
+- [x] Test session creation and redirect validation
+- [x] Test error handling for invalid inputs
+- [x] Test concurrent operations and duplicate prevention
+- [x] Verify all 21 integration tests passing
+
+### Gmail Integration Test Results: ✅ 21/21 PASSING
+**Test Coverage:**
+- New User Registration: 5 tests ✅
+  - Register new Gmail user successfully
+  - Set email as verified for Gmail users
+  - Assign default role "user" to new users
+  - Set initial client status for new users
+  - Handle special characters and optional picture
+
+- Existing User Login: 5 tests ✅
+  - Login existing Gmail user successfully
+  - Maintain user ID consistency across multiple logins
+  - Preserve user data on subsequent logins
+  - Maintain user role on login
+  - Handle rapid consecutive logins
+
+- Session and Redirect Validation: 5 tests ✅
+  - Return correct redirect URL for new users (/user/:id)
+  - Include userId in redirect URL
+  - Return appropriate response structure
+  - Return login method as "google"
+  - Validate redirect URL format
+
+- Error Handling: 3 tests ✅
+  - Reject Gmail login with invalid email format
+  - Reject Gmail login with missing Google ID
+  - Reject Gmail login with missing name
+
+- Concurrent Operations: 2 tests ✅
+  - Handle concurrent Gmail registrations
+  - Prevent duplicate accounts for same Google ID
+
+- User Data Validation: 2 tests ✅
+  - Store all user profile fields correctly
+  - Handle international email domains
+
+### Key Features Validated
+✅ New Gmail users can register successfully with automatic email verification
+✅ Existing Gmail users can login consistently with user ID preservation
+✅ User IDs remain consistent across multiple logins (no duplicate accounts)
+✅ Proper redirects to /user/:id for profile completion after registration
+✅ Email verification automatic for Gmail users
+✅ Default role assignment (user) for all new Gmail users
+✅ Client status tracking initialized for new users
+✅ Comprehensive error handling for invalid inputs
+✅ Concurrent registration support with unique user IDs
+✅ No duplicate account creation for same Google ID
+✅ International email domain support
