@@ -14,7 +14,8 @@
 - [x] Integrate Gmail OAuth login with Google Sign-in button
 - [x] Enable Client Login in the frontend (AuthSelection, PhoneAuth, EmailAuth pages)
 - [x] Fix phone OTP flow with proper database upsert handling
-- [ ] Add session management and authentication middleware
+- [x] Implement complete OTP verification flow with session cookies
+- [x] Add session management and authentication middleware (HTTP-only cookies)
 
 ## Phase 3: Product Selection & Fact-Finding Forms
 - [ ] Create product selection page after registration
@@ -733,3 +734,14 @@
 - [ ] Verify session creation and redirect logic
 - [ ] Test cross-browser compatibility
 - [ ] Test mobile responsiveness
+
+
+## Phase 26: Complete OTP Verification Flow
+- [ ] Implement OTP code validation backend logic (verifyPhoneOtp, verifyEmailOtp procedures)
+- [ ] Create session management and authentication middleware
+- [ ] Update PhoneAuth frontend to handle OTP verification and dashboard redirect
+- [ ] Update EmailAuth frontend to handle OTP verification and dashboard redirect
+- [ ] Test complete phone OTP flow (request → verify → login → redirect)
+- [ ] Test complete email OTP flow (request → verify → login → redirect)
+- [ ] Implement logout functionality
+- [ ] Add protected route middleware for authenticated pages

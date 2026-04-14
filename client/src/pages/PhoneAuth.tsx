@@ -251,8 +251,8 @@ export default function PhoneAuth() {
 
       if (result.success) {
         toast.success(result.message);
-        localStorage.setItem("phoneUserId", result.userId.toString());
-        localStorage.setItem("phoneUserData", JSON.stringify(result.user));
+        // Session cookie is automatically set by the server
+        // No need to store in localStorage
 
         if (result.isNewRegistration) {
           setStep("register");

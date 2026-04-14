@@ -67,19 +67,8 @@ export default function EmailAuth() {
         }
 
         toast.success(result.message);
-
-        // Set session token as cookie for authentication
-        if (result.sessionToken) {
-          const oneYearSeconds = 365 * 24 * 60 * 60;
-
-          const isSecure = window.location.protocol === 'https:';
-          // Set cookie without domain restriction for better compatibility
-          const cookieString = `app_session_id=${result.sessionToken}; path=/; max-age=${oneYearSeconds}; SameSite=None${isSecure ? '; Secure' : ''}`;
-          document.cookie = cookieString;
-        }
-
-        if (result.userId) localStorage.setItem("emailUserId", result.userId.toString());
-        if (result.user) localStorage.setItem("emailUserData", JSON.stringify(result.user));
+        // Session cookie is automatically set by the server
+        // No need to store in localStorage
 
         // Redirect based on registration status and clientStatus
         let redirectUrl = "/dashboard";
@@ -280,8 +269,8 @@ export default function EmailAuth() {
 
       if (result.success) {
         toast.success(result.message);
-        localStorage.setItem("emailUserId", result.userId.toString());
-        localStorage.setItem("emailUserData", JSON.stringify(result.user));
+        // Session cookie is automatically set by the server
+        // No need to store in localStorage
 
         if (result.isNewRegistration) {
           window.location.href = "/profile";

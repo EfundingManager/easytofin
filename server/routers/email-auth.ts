@@ -3,6 +3,9 @@ import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../_core/trpc";
 import { sendOtpEmail, sendAccountConfirmationEmail, sendWelcomeEmail } from "../_core/emailService";
 import { rateLimiter, RATE_LIMIT_CONFIG } from "../rate-limiter";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { getSessionCookieOptions } from "../_core/cookies";
+import { sdk } from "../_core/sdk";
 import {
   createPhoneUser,
   getPhoneUserByEmail,
@@ -139,7 +142,7 @@ export const emailAuthRouter = router({
         isNewUser: z.boolean(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx: opts }) => {
       try {
         // Check rate limit for verification attempts
         const rateLimitCheck = rateLimiter.isVerificationAllowed(
@@ -230,6 +233,18 @@ export const emailAuthRouter = router({
             message: "User not found after verification",
           });
         }
+
+        // Create session token and set cookie
+        const sessionToken = await sdk.createSessionToken(
+          user.googleId || user.email || user.phone || `email-${user.id}`,
+          { expiresInMs: ONE_YEAR_MS }
+        );
+        
+        const cookieOptions = getSessionCookieOptions(opts.req);
+        opts.res.cookie(COOKIE_NAME, sessionToken, {
+          ...cookieOptions,
+          maxAge: ONE_YEAR_MS,
+        } as any);
 
         // Send confirmation email
         const dashboardUrl = `${process.env.VITE_FRONTEND_URL || "https://easytofin.com"}/dashboard`;

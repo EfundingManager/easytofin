@@ -13,6 +13,9 @@ import {
 } from "../db";
 import { sendSMSVerification, verifySMSCode } from "../verification";
 import { rateLimiter, RATE_LIMIT_CONFIG } from "../rate-limiter";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { getSessionCookieOptions } from "../_core/cookies";
+import { sdk } from "../_core/sdk";
 
 // Generate a random 6-digit OTP code
 function generateOtpCode(): string {
@@ -153,7 +156,7 @@ export const phoneAuthRouter = router({
         isNewUser: z.boolean().optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx: opts }) => {
       try {
         // Check rate limit for verification attempts
         const rateLimitCheck = rateLimiter.isVerificationAllowed(
@@ -210,6 +213,18 @@ export const phoneAuthRouter = router({
             verified: "true",
           });
 
+          // Create session token and set cookie
+          const sessionToken = await sdk.createSessionToken(
+            user.googleId || user.email || user.phone || `phone-${user.id}`,
+            { expiresInMs: ONE_YEAR_MS }
+          );
+          
+          const cookieOptions = getSessionCookieOptions(opts.req);
+          opts.res.cookie(COOKIE_NAME, sessionToken, {
+            ...cookieOptions,
+            maxAge: ONE_YEAR_MS,
+          } as any);
+
           // Determine redirect URL based on clientStatus
           const redirectUrl = user.clientStatus === 'customer' 
             ? `/customer/${user.id}`
@@ -245,6 +260,18 @@ export const phoneAuthRouter = router({
             verified: "true",
             role: "user",
           });
+
+          // Create session token and set cookie for new user
+          const sessionToken = await sdk.createSessionToken(
+            newUser.googleId || newUser.email || newUser.phone || `phone-${newUser.id}`,
+            { expiresInMs: ONE_YEAR_MS }
+          );
+          
+          const cookieOptions = getSessionCookieOptions(opts.req);
+          opts.res.cookie(COOKIE_NAME, sessionToken, {
+            ...cookieOptions,
+            maxAge: ONE_YEAR_MS,
+          } as any);
 
           // New users always start in queue status
           const redirectUrl = `/user/${newUser.id}`;
