@@ -163,9 +163,17 @@ export const RATE_LIMIT_CONFIG = {
     maxRequests: 3, // 3 SMS requests per phone
     windowMs: 60 * 60 * 1000, // per hour
   },
+  SMS_RESEND: {
+    maxRequests: 3, // 3 resend attempts per phone
+    windowMs: 60 * 1000, // per 60 seconds (cooldown period)
+  },
   EMAIL_REQUEST: {
     maxRequests: 3, // 3 email requests per email
     windowMs: 60 * 60 * 1000, // per hour
+  },
+  EMAIL_RESEND: {
+    maxRequests: 3, // 3 resend attempts per email
+    windowMs: 60 * 1000, // per 60 seconds (cooldown period)
   },
   VERIFICATION_ATTEMPT: {
     maxAttempts: 5, // 5 verification attempts

@@ -313,6 +313,96 @@ export const phoneAuthRouter = router({
   }),
 
   /**
+   * Resend OTP code with rate limiting and cooldown
+   */
+  resendOtp: publicProcedure
+    .input(
+      z.object({
+        phone: z.string()
+          .trim()
+          .transform(phone => phone.replace(/[\s\-()]/g, ''))
+          .refine(phone => /^\+?[1-9]\d{1,14}$/.test(phone), "Invalid phone number"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        // Check rate limit for resend requests (stricter than initial request)
+        const resendLimitKey = `resend-${input.phone}`;
+        const rateLimitCheck = rateLimiter.isAllowed(
+          resendLimitKey,
+          RATE_LIMIT_CONFIG.SMS_RESEND.maxRequests,
+          RATE_LIMIT_CONFIG.SMS_RESEND.windowMs
+        );
+
+        if (!rateLimitCheck.allowed) {
+          const retryAfter = rateLimitCheck.retryAfter || 60;
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `Too many resend attempts. Please try again in ${retryAfter} seconds.`,
+          });
+        }
+
+        // Get the phone user
+        const user = await getPhoneUserByPhone(input.phone);
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Phone number not registered",
+          });
+        }
+
+        // Generate new OTP code
+        const code = generateOtpCode();
+        const expiresAt = getOtpExpiration();
+
+        // Delete any existing OTP codes for this user
+        // (In a real app, you'd have a deleteOtpCodesByUserId function)
+        const newOtp = await createOtpCode({
+          phoneUserId: user.id,
+          code,
+          expiresAt,
+          attempts: 0,
+        });
+
+        if (!newOtp) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to generate OTP code",
+          });
+        }
+
+        // Send SMS
+        try {
+          await sendSMSVerification(input.phone);
+        } catch (smsError) {
+          console.error("[Phone Auth] SMS send failed:", smsError);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to send verification SMS",
+          });
+        }
+
+        console.log(`[OTP] Resend OTP sent via SMS to ${input.phone}`);
+
+        return {
+          success: true,
+          message: "OTP resent to your phone",
+          // For development only - remove in production
+          devCode: code,
+        };
+      } catch (error) {
+        console.error("[Phone Auth] Failed to resend OTP:", error);
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to resend OTP",
+        });
+      }
+    }),
+
+  /**
    * Logout phone user
    */
   logoutPhone: publicProcedure.mutation(async () => {

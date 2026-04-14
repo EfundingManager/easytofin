@@ -27,6 +27,7 @@ export default function PhoneAuth() {
   const rateLimit = useRateLimit();
 
   const requestOtpMutation = trpc.phoneAuth.requestOtp.useMutation();
+  const resendOtpMutation = trpc.phoneAuth.resendOtp.useMutation();
   const verifyOtpMutation = trpc.phoneAuth.verifyOtp.useMutation();
   const handleGoogleCallbackMutation = trpc.gmailAuth.handleGoogleCallback.useMutation();
 
@@ -407,13 +408,14 @@ export default function PhoneAuth() {
                     onResend={async () => {
                       setLoading(true);
                       try {
-                        const result = await requestOtpMutation.mutateAsync({ phone });
+                        const result = await resendOtpMutation.mutateAsync({ phone });
                         setDevCode(result.devCode || "");
                         toast.success("OTP resent to your phone!");
                       } catch (error: any) {
                         if (error.data?.code === "TOO_MANY_REQUESTS") {
-                          rateLimit.setRateLimit(3600, "Too many requests. Please try again later.");
-                          toast.error("Too many requests. Please try again later.");
+                          const retryAfter = parseInt(error.message.match(/\d+/)?.[0] || "60");
+                          rateLimit.setRateLimit(retryAfter, error.message);
+                          toast.error(error.message);
                         } else {
                           toast.error(error.message || "Failed to resend OTP");
                         }

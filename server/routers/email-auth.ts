@@ -299,6 +299,22 @@ export const emailAuthRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
+        // Check rate limit for resend requests
+        const resendLimitKey = `resend-${input.email}`;
+        const rateLimitCheck = rateLimiter.isAllowed(
+          resendLimitKey,
+          RATE_LIMIT_CONFIG.EMAIL_RESEND.maxRequests,
+          RATE_LIMIT_CONFIG.EMAIL_RESEND.windowMs
+        );
+
+        if (!rateLimitCheck.allowed) {
+          const retryAfter = rateLimitCheck.retryAfter || 60;
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `Too many resend attempts. Please try again in ${retryAfter} seconds.`,
+          });
+        }
+
         const user = await getPhoneUserByEmail(input.email);
 
         if (!user) {

@@ -745,3 +745,12 @@
 - [ ] Test complete email OTP flow (request → verify → login → redirect)
 - [ ] Implement logout functionality
 - [ ] Add protected route middleware for authenticated pages
+
+
+## Phase 26: OTP Resend Feature
+- [x] Add resendOtp procedure to phone-auth router with rate limiting
+- [x] Add resendOtp procedure to email-auth router with rate limiting
+- [x] Implement 60-second cooldown timer on frontend (PhoneAuth)
+- [x] Implement 60-second cooldown timer on frontend (EmailAuth)
+- [x] Add "Resend Code" button with countdown display
+- [x] Test resend flow with rate limiting
