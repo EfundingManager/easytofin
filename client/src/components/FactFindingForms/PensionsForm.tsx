@@ -83,8 +83,7 @@ export default function PensionsForm({ onSubmit, isLoading = false }: PensionsFo
     }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
+  const handleCheckboxChange = (name: string) => (checked: boolean) => {
     setFormData(prev => ({
       ...prev,
       [name]: checked,
@@ -192,9 +191,8 @@ export default function PensionsForm({ onSubmit, isLoading = false }: PensionsFo
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="employerPension"
-                  name="employerPension"
                   checked={formData.employerPension}
-                  onChange={handleCheckboxChange}
+                  onCheckedChange={handleCheckboxChange('employerPension')}
                 />
                 <Label htmlFor="employerPension" className="cursor-pointer">
                   I have an employer pension scheme
@@ -272,9 +270,8 @@ export default function PensionsForm({ onSubmit, isLoading = false }: PensionsFo
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="inheritanceExpected"
-                  name="inheritanceExpected"
                   checked={formData.inheritanceExpected}
-                  onChange={handleCheckboxChange}
+                  onCheckedChange={handleCheckboxChange('inheritanceExpected')}
                 />
                 <Label htmlFor="inheritanceExpected" className="cursor-pointer">
                   I expect to receive an inheritance
@@ -335,9 +332,8 @@ export default function PensionsForm({ onSubmit, isLoading = false }: PensionsFo
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="mortgage"
-                  name="mortgage"
                   checked={formData.mortgage}
-                  onChange={handleCheckboxChange}
+                  onCheckedChange={handleCheckboxChange('mortgage')}
                 />
                 <Label htmlFor="mortgage" className="cursor-pointer">
                   I have an outstanding mortgage

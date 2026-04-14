@@ -17,8 +17,7 @@ export function AdminDocumentUpload({ customerId, onUploadSuccess }: AdminDocume
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadMutation = trpc.documents.uploadDocument.useMutation();
-  const documentsQuery = trpc.documents.getDocuments.useQuery({ userId: customerId });
-  const downloadMutation = trpc.documents.getDownloadUrl.useMutation();
+  const documentsQuery = trpc.documents.getDocuments.useQuery();
   const deleteMutation = trpc.documents.deleteDocument.useMutation();
 
   const documentTypes = [
@@ -59,9 +58,11 @@ export function AdminDocumentUpload({ customerId, onUploadSuccess }: AdminDocume
 
     try {
       await uploadMutation.mutateAsync({
-        userId: customerId,
-        file: selectedFile,
         documentType,
+        fileName: selectedFile.name,
+        fileData: await selectedFile.text(),
+        mimeType: selectedFile.type,
+        fileSize: selectedFile.size,
       });
       setSelectedFile(null);
       setDocumentType("id");
@@ -75,16 +76,7 @@ export function AdminDocumentUpload({ customerId, onUploadSuccess }: AdminDocume
     }
   };
 
-  const handleDownload = async (documentId: number) => {
-    try {
-      const result = await downloadMutation.mutateAsync({ documentId });
-      if (result.url) {
-        window.open(result.url, "_blank");
-      }
-    } catch (error) {
-      console.error("Download failed:", error);
-    }
-  };
+
 
   const handleDelete = async (documentId: number) => {
     if (confirm("Are you sure you want to delete this document?")) {
@@ -192,9 +184,9 @@ export function AdminDocumentUpload({ customerId, onUploadSuccess }: AdminDocume
         <CardContent>
           {documentsQuery.isLoading ? (
             <p className="text-center py-4 text-gray-500">Loading documents...</p>
-          ) : documentsQuery.data && documentsQuery.data.length > 0 ? (
+          ) : documentsQuery.data?.data && documentsQuery.data.data.length > 0 ? (
             <div className="space-y-2">
-              {documentsQuery.data.map((doc: any) => (
+              {documentsQuery.data.data.map((doc: any) => (
                 <div
                   key={doc.id}
                   className="p-3 border rounded-lg flex items-center justify-between hover:bg-gray-50"
@@ -221,15 +213,7 @@ export function AdminDocumentUpload({ customerId, onUploadSuccess }: AdminDocume
                     >
                       {doc.status}
                     </Badge>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDownload(doc.id)}
-                      disabled={downloadMutation.isPending}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Download className="h-3 w-3" />
-                    </Button>
+
                     <Button
                       size="sm"
                       variant="ghost"

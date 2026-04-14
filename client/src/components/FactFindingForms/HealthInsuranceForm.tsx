@@ -93,8 +93,7 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
     }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
+  const handleCheckboxChange = (name: string) => (checked: boolean) => {
     setFormData(prev => ({
       ...prev,
       [name]: checked,
@@ -195,9 +194,8 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="needsFamilyCover"
-                  name="needsFamilyCover"
                   checked={formData.needsFamilyCover}
-                  onChange={handleCheckboxChange}
+                  onCheckedChange={handleCheckboxChange('needsFamilyCover')}
                 />
                 <Label htmlFor="needsFamilyCover" className="cursor-pointer">
                   I need family health insurance coverage
@@ -292,9 +290,8 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="recentHospitalization"
-                  name="recentHospitalization"
                   checked={formData.recentHospitalization}
-                  onChange={handleCheckboxChange}
+                  onCheckedChange={handleCheckboxChange('recentHospitalization')}
                 />
                 <Label htmlFor="recentHospitalization" className="cursor-pointer">
                   I have been hospitalized in the past 5 years
@@ -323,9 +320,8 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="smoker"
-                  name="smoker"
                   checked={formData.smoker}
-                  onChange={handleCheckboxChange}
+                  onCheckedChange={handleCheckboxChange('smoker')}
                 />
                 <Label htmlFor="smoker" className="cursor-pointer">
                   I am a smoker
@@ -390,9 +386,8 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="dentalCover"
-                      name="dentalCover"
                       checked={formData.dentalCover}
-                      onChange={handleCheckboxChange}
+                      onCheckedChange={handleCheckboxChange('dentalCover')}
                     />
                     <Label htmlFor="dentalCover" className="cursor-pointer">
                       Dental coverage
@@ -401,9 +396,8 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="visionCover"
-                      name="visionCover"
                       checked={formData.visionCover}
-                      onChange={handleCheckboxChange}
+                      onCheckedChange={handleCheckboxChange('visionCover')}
                     />
                     <Label htmlFor="visionCover" className="cursor-pointer">
                       Vision coverage
@@ -412,9 +406,8 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="prescriptionCover"
-                      name="prescriptionCover"
                       checked={formData.prescriptionCover}
-                      onChange={handleCheckboxChange}
+                      onCheckedChange={handleCheckboxChange('prescriptionCover')}
                     />
                     <Label htmlFor="prescriptionCover" className="cursor-pointer">
                       Prescription coverage
@@ -423,9 +416,8 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="mentalHealthCover"
-                      name="mentalHealthCover"
                       checked={formData.mentalHealthCover}
-                      onChange={handleCheckboxChange}
+                      onCheckedChange={handleCheckboxChange('mentalHealthCover')}
                     />
                     <Label htmlFor="mentalHealthCover" className="cursor-pointer">
                       Mental health coverage
@@ -443,9 +435,8 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
                 <div className="flex items-center gap-2">
                   <Checkbox
                     id="frequentDoctor"
-                    name="frequentDoctor"
                     checked={formData.frequentDoctor}
-                    onChange={handleCheckboxChange}
+                    onCheckedChange={handleCheckboxChange('frequentDoctor')}
                   />
                   <Label htmlFor="frequentDoctor" className="cursor-pointer">
                     I frequently visit my GP
@@ -454,9 +445,8 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
                 <div className="flex items-center gap-2">
                   <Checkbox
                     id="frequentSpecialist"
-                    name="frequentSpecialist"
                     checked={formData.frequentSpecialist}
-                    onChange={handleCheckboxChange}
+                    onCheckedChange={handleCheckboxChange('frequentSpecialist')}
                   />
                   <Label htmlFor="frequentSpecialist" className="cursor-pointer">
                     I regularly see specialists
@@ -465,9 +455,8 @@ export default function HealthInsuranceForm({ onSubmit, isLoading = false }: Hea
                 <div className="flex items-center gap-2">
                   <Checkbox
                     id="chronicConditionManagement"
-                    name="chronicConditionManagement"
                     checked={formData.chronicConditionManagement}
-                    onChange={handleCheckboxChange}
+                    onCheckedChange={handleCheckboxChange('chronicConditionManagement')}
                   />
                   <Label htmlFor="chronicConditionManagement" className="cursor-pointer">
                     I need ongoing chronic condition management

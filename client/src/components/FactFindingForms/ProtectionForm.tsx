@@ -71,8 +71,7 @@ export default function ProtectionForm({ onSubmit, isLoading = false }: Protecti
     }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
+  const handleCheckboxChange = (name: string) => (checked: boolean) => {
     setFormData(prev => ({
       ...prev,
       [name]: checked,
@@ -280,9 +279,8 @@ export default function ProtectionForm({ onSubmit, isLoading = false }: Protecti
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="smoker"
-                  name="smoker"
                   checked={formData.smoker}
-                  onChange={handleCheckboxChange}
+                  onCheckedChange={handleCheckboxChange('smoker')}
                 />
                 <Label htmlFor="smoker" className="cursor-pointer">
                   I am a smoker

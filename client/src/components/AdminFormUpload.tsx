@@ -18,7 +18,6 @@ export function AdminFormUpload({ customerId, onUploadSuccess }: AdminFormUpload
 
   const uploadMutation = trpc.documents.uploadDocument.useMutation();
   const formsQuery = trpc.admin.getCustomerDetail.useQuery({ customerId });
-  const downloadMutation = trpc.documents.getDownloadUrl.useMutation();
   const deleteMutation = trpc.documents.deleteDocument.useMutation();
 
   const formTypes = [
@@ -60,9 +59,11 @@ export function AdminFormUpload({ customerId, onUploadSuccess }: AdminFormUpload
 
     try {
       await uploadMutation.mutateAsync({
-        userId: customerId,
-        file: selectedFile,
         documentType: `form_${formType}`,
+        fileName: selectedFile.name,
+        fileData: await selectedFile.text(),
+        mimeType: selectedFile.type,
+        fileSize: selectedFile.size,
       });
       setSelectedFile(null);
       setFormType("protection");
@@ -76,16 +77,7 @@ export function AdminFormUpload({ customerId, onUploadSuccess }: AdminFormUpload
     }
   };
 
-  const handleDownload = async (documentId: number) => {
-    try {
-      const result = await downloadMutation.mutateAsync({ documentId });
-      if (result.url) {
-        window.open(result.url, "_blank");
-      }
-    } catch (error) {
-      console.error("Download failed:", error);
-    }
-  };
+
 
   const handleDelete = async (documentId: number) => {
     if (confirm("Are you sure you want to delete this form?")) {
@@ -229,15 +221,7 @@ export function AdminFormUpload({ customerId, onUploadSuccess }: AdminFormUpload
                     >
                       {doc.status}
                     </Badge>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDownload(doc.id)}
-                      disabled={downloadMutation.isPending}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Download className="h-3 w-3" />
-                    </Button>
+
                     <Button
                       size="sm"
                       variant="ghost"

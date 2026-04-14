@@ -89,8 +89,7 @@ export default function InvestmentsForm({ onSubmit, isLoading = false }: Investm
     }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
+  const handleCheckboxChange = (name: string) => (checked: boolean) => {
     setFormData(prev => ({
       ...prev,
       [name]: checked,
@@ -404,9 +403,8 @@ export default function InvestmentsForm({ onSubmit, isLoading = false }: Investm
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="emergencyFund"
-                  name="emergencyFund"
                   checked={formData.emergencyFund}
-                  onChange={handleCheckboxChange}
+                  onCheckedChange={handleCheckboxChange('emergencyFund')}
                 />
                 <Label htmlFor="emergencyFund" className="cursor-pointer">
                   I have an emergency fund
@@ -507,9 +505,8 @@ export default function InvestmentsForm({ onSubmit, isLoading = false }: Investm
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="taxEfficientInvesting"
-                  name="taxEfficientInvesting"
                   checked={formData.taxEfficientInvesting}
-                  onChange={handleCheckboxChange}
+                  onCheckedChange={handleCheckboxChange('taxEfficientInvesting')}
                 />
                 <Label htmlFor="taxEfficientInvesting" className="cursor-pointer">
                   I'm interested in tax-efficient investing strategies

@@ -85,8 +85,7 @@ export default function GeneralInsuranceForm({ onSubmit, isLoading = false }: Ge
     }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
+  const handleCheckboxChange = (name: string) => (checked: boolean) => {
     setFormData(prev => ({
       ...prev,
       [name]: checked,
@@ -212,9 +211,8 @@ export default function GeneralInsuranceForm({ onSubmit, isLoading = false }: Ge
                 <div className="flex items-center gap-2">
                   <Checkbox
                     id="lockedGates"
-                    name="lockedGates"
                     checked={formData.lockedGates}
-                    onChange={handleCheckboxChange}
+                    onCheckedChange={handleCheckboxChange('lockedGates')}
                   />
                   <Label htmlFor="lockedGates" className="cursor-pointer">
                     Locked gates/fencing
@@ -223,9 +221,8 @@ export default function GeneralInsuranceForm({ onSubmit, isLoading = false }: Ge
                 <div className="flex items-center gap-2">
                   <Checkbox
                     id="alarmSystem"
-                    name="alarmSystem"
                     checked={formData.alarmSystem}
-                    onChange={handleCheckboxChange}
+                    onCheckedChange={handleCheckboxChange('alarmSystem')}
                   />
                   <Label htmlFor="alarmSystem" className="cursor-pointer">
                     Alarm system installed
@@ -234,9 +231,8 @@ export default function GeneralInsuranceForm({ onSubmit, isLoading = false }: Ge
                 <div className="flex items-center gap-2">
                   <Checkbox
                     id="cctv"
-                    name="cctv"
                     checked={formData.cctv}
-                    onChange={handleCheckboxChange}
+                    onCheckedChange={handleCheckboxChange('cctv')}
                   />
                   <Label htmlFor="cctv" className="cursor-pointer">
                     CCTV cameras
@@ -245,9 +241,8 @@ export default function GeneralInsuranceForm({ onSubmit, isLoading = false }: Ge
                 <div className="flex items-center gap-2">
                   <Checkbox
                     id="secureLocks"
-                    name="secureLocks"
                     checked={formData.secureLocks}
-                    onChange={handleCheckboxChange}
+                    onCheckedChange={handleCheckboxChange('secureLocks')}
                   />
                   <Label htmlFor="secureLocks" className="cursor-pointer">
                     Secure locks on all doors/windows
@@ -261,12 +256,11 @@ export default function GeneralInsuranceForm({ onSubmit, isLoading = false }: Ge
               <h3 className="text-lg font-semibold">Motor Vehicle Information</h3>
 
               <div className="flex items-center gap-2">
-                <Checkbox
-                  id="hasMotorVehicle"
-                  name="hasMotorVehicle"
-                  checked={formData.hasMotorVehicle}
-                  onChange={handleCheckboxChange}
-                />
+                  <Checkbox
+                    id="hasMotorVehicle"
+                    checked={formData.hasMotorVehicle}
+                    onCheckedChange={handleCheckboxChange('hasMotorVehicle')}
+                  />
                 <Label htmlFor="hasMotorVehicle" className="cursor-pointer">
                   I need motor vehicle insurance
                 </Label>
@@ -353,12 +347,11 @@ export default function GeneralInsuranceForm({ onSubmit, isLoading = false }: Ge
               <h3 className="text-lg font-semibold">Claims History</h3>
 
               <div className="flex items-center gap-2">
-                <Checkbox
-                  id="previousClaims"
-                  name="previousClaims"
-                  checked={formData.previousClaims}
-                  onChange={handleCheckboxChange}
-                />
+                  <Checkbox
+                    id="previousClaims"
+                    checked={formData.previousClaims}
+                    onCheckedChange={handleCheckboxChange('previousClaims')}
+                  />
                 <Label htmlFor="previousClaims" className="cursor-pointer">
                   I have made previous insurance claims
                 </Label>
@@ -396,12 +389,11 @@ export default function GeneralInsuranceForm({ onSubmit, isLoading = false }: Ge
               <h3 className="text-lg font-semibold">Liability & Business</h3>
 
               <div className="flex items-center gap-2">
-                <Checkbox
-                  id="needsPersonalLiability"
-                  name="needsPersonalLiability"
-                  checked={formData.needsPersonalLiability}
-                  onChange={handleCheckboxChange}
-                />
+                  <Checkbox
+                    id="needsPersonalLiability"
+                    checked={formData.needsPersonalLiability}
+                    onCheckedChange={handleCheckboxChange('needsPersonalLiability')}
+                  />
                 <Label htmlFor="needsPersonalLiability" className="cursor-pointer">
                   I need personal liability coverage
                 </Label>
@@ -422,12 +414,11 @@ export default function GeneralInsuranceForm({ onSubmit, isLoading = false }: Ge
               )}
 
               <div className="flex items-center gap-2">
-                <Checkbox
-                  id="businessActivity"
-                  name="businessActivity"
-                  checked={formData.businessActivity}
-                  onChange={handleCheckboxChange}
-                />
+                  <Checkbox
+                    id="businessActivity"
+                    checked={formData.businessActivity}
+                    onCheckedChange={handleCheckboxChange('businessActivity')}
+                  />
                 <Label htmlFor="businessActivity" className="cursor-pointer">
                   I conduct business activities from home
                 </Label>
