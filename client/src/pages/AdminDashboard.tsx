@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { PolicyAssignmentModal } from "@/components/PolicyAssignmentModal";
-import { FeatureFlagsPanel } from "@/components/FeatureFlagsPanel";
+// Feature flags disabled - table not yet migrated
+// import { FeatureFlagsPanel } from "@/components/FeatureFlagsPanel";
 import { useLocation } from "wouter";
 
 export default function AdminDashboard() {
@@ -252,7 +253,8 @@ export default function AdminDashboard() {
             <TabsTrigger value="customers">Customers</TabsTrigger>
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
             <TabsTrigger value="forms">Forms</TabsTrigger>
-            <TabsTrigger value="featureFlags">Feature Flags</TabsTrigger>
+            {/* Feature Flags tab disabled - table not yet migrated */}
+            {/* <TabsTrigger value="featureFlags">Feature Flags</TabsTrigger> */}
             <TabsTrigger value="configuration">Configuration</TabsTrigger>
           </TabsList>
 
@@ -495,10 +497,10 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Feature Flags Tab */}
-          <TabsContent value="featureFlags" className="space-y-4">
+          {/* Feature Flags Tab - Disabled */}
+          {/* <TabsContent value="featureFlags" className="space-y-4">
             <FeatureFlagsPanel />
-          </TabsContent>
+          </TabsContent> */}
 
           {/* Configuration Tab */}
           <TabsContent value="configuration" className="space-y-4">
