@@ -911,3 +911,15 @@
 - ✅ Failed attempt tracking and lockout after 3 attempts
 - ✅ HTTPS-only session cookies
 - ✅ JWT token validation on every 2FA request
+
+
+## Phase 84: Email Campaign Composer
+- [ ] Design database schema for campaigns and recipient lists
+- [ ] Create backend API for campaign management
+- [ ] Build email campaign composer component with multi-step form
+- [ ] Implement recipient list selector with filtering
+- [ ] Create campaign preview modal with template rendering
+- [ ] Add scheduling UI with date/time picker
+- [ ] Integrate campaign composer into admin dashboard
+- [ ] Write comprehensive tests for campaign functionality
+- [ ] Test complete campaign workflow end-to-end
