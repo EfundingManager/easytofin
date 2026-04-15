@@ -9,15 +9,51 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useRateLimit } from "@/_core/hooks/useRateLimit";
 import { RateLimitAlert } from "@/components/RateLimitAlert";
-
+import { useAuth } from "@/_core/hooks/useAuth";
+import { useLocation } from "wouter";
 
 const EmailAuth = () => {
+  const [, setLocation] = useLocation();
+  const { user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"email" | "otp">("email");
   const [loading, setLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
+
+  // Redirect authenticated users away from login page
+  useEffect(() => {
+    if (authLoading) return; // Wait for auth check to complete
+    if (!user) return; // User not authenticated, stay on login page
+
+    // User is already authenticated, redirect to appropriate dashboard
+    if (user.role === "admin" || user.role === "manager" || user.role === "staff") {
+      setLocation("/admin");
+    } else {
+      setLocation(`/user/${user.id}`);
+    }
+  }, [user, authLoading, setLocation]);
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="ml-2">Loading...</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation();
   const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
@@ -73,6 +109,7 @@ const EmailAuth = () => {
       if (result.success && result.redirectUrl) {
         console.log("[Gmail] Login successful, redirecting to:", result.redirectUrl);
         toast.success("Login successful!");
+        // Redirect using window.location to ensure session cookie is recognized
         window.location.href = result.redirectUrl;
       } else {
         console.error("[Gmail] Backend returned unexpected response", result);
