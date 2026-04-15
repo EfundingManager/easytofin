@@ -3,12 +3,15 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Download, Trash2, RefreshCw, Mail } from "lucide-react";
+import { AlertCircle, Download, Trash2, RefreshCw, Mail, Eye } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { EmailTemplatePreviewModal } from "./EmailTemplatePreviewModal";
 
 export function EmailBlasterPanel() {
   const [isImporting, setIsImporting] = useState(false);
   const [importMessage, setImportMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Fetch all templates
   const { data: templates, isLoading, refetch } = trpc.emailBlaster.getAllTemplates.useQuery();
@@ -126,6 +129,17 @@ export function EmailBlasterPanel() {
                     <Button
                       variant="ghost"
                       size="sm"
+                      onClick={() => {
+                        setSelectedTemplate(template);
+                        setIsPreviewOpen(true);
+                      }}
+                      title="Preview template"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleDelete(template.id)}
                       disabled={deleteMutation.isPending}
                     >
@@ -173,6 +187,16 @@ export function EmailBlasterPanel() {
           </CardContent>
         </Card>
       )}
+
+      {/* Email Template Preview Modal */}
+      <EmailTemplatePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => {
+          setIsPreviewOpen(false);
+          setSelectedTemplate(null);
+        }}
+        template={selectedTemplate}
+      />
     </div>
   );
 }
