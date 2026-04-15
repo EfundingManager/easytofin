@@ -6,11 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus } from "lucide-react";
+import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus, Mail } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { PolicyAssignmentModal } from "@/components/PolicyAssignmentModal";
 // Feature flags disabled - table not yet migrated
 // import { FeatureFlagsPanel } from "@/components/FeatureFlagsPanel";
+import { EmailBlasterPanel } from "@/components/EmailBlasterPanel";
 import { useLocation } from "wouter";
 
 export default function AdminDashboard() {
@@ -253,6 +254,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="customers">Customers</TabsTrigger>
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
             <TabsTrigger value="forms">Forms</TabsTrigger>
+            <TabsTrigger value="emailBlaster">Email Blaster</TabsTrigger>
             {/* Feature Flags tab disabled - table not yet migrated */}
             {/* <TabsTrigger value="featureFlags">Feature Flags</TabsTrigger> */}
             <TabsTrigger value="configuration">Configuration</TabsTrigger>
@@ -501,6 +503,11 @@ export default function AdminDashboard() {
           {/* <TabsContent value="featureFlags" className="space-y-4">
             <FeatureFlagsPanel />
           </TabsContent> */}
+
+          {/* Email Blaster Tab */}
+          <TabsContent value="emailBlaster" className="space-y-4">
+            <EmailBlasterPanel />
+          </TabsContent>
 
           {/* Configuration Tab */}
           <TabsContent value="configuration" className="space-y-4">
