@@ -22,18 +22,35 @@ const EmailAuth = () => {
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
 
+  // Initialize mutations at the top level (before any conditional returns)
+  const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation();
+  const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
+
   // Redirect authenticated users away from login page
   useEffect(() => {
-    if (authLoading) return; // Wait for auth check to complete
-    if (!user) return; // User not authenticated, stay on login page
+    if (authLoading) return;
+    if (!user) return;
 
-    // User is already authenticated, redirect to appropriate dashboard
     if (user.role === "admin" || user.role === "manager" || user.role === "staff") {
       setLocation("/admin");
     } else {
       setLocation(`/user/${user.id}`);
     }
   }, [user, authLoading, setLocation]);
+
+  // Load Google Sign-In script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (window.google?.accounts?.id) {
+        setGoogleLoaded(true);
+      }
+    };
+    document.head.appendChild(script);
+  }, []);
 
   // Show loading state while checking authentication
   if (authLoading) {
@@ -55,9 +72,6 @@ const EmailAuth = () => {
     );
   }
 
-  const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation();
-  const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
-
   const handleGoogleSignIn = async (response: any) => {
     console.log("[Gmail] Google Sign-In callback triggered", response);
 
@@ -70,7 +84,6 @@ const EmailAuth = () => {
     setLoading(true);
     try {
       console.log("[Gmail] Decoding JWT credential...");
-      // Decode the JWT token to get user info
       const base64Url = response.credential.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const jsonPayload = decodeURIComponent(
@@ -82,7 +95,6 @@ const EmailAuth = () => {
       const data = JSON.parse(jsonPayload);
       console.log("[Gmail] Decoded user data:", { email: data.email, name: data.name, sub: data.sub });
 
-      // Call backend endpoint to handle Google callback and set session cookie
       console.log("[Gmail] Calling /api/gmail/callback endpoint...");
       const fetchResponse = await fetch("/api/gmail/callback", {
         method: "POST",
@@ -98,178 +110,51 @@ const EmailAuth = () => {
         }),
       });
 
-      if (!fetchResponse.ok) {
-        const error = await fetchResponse.json();
-        throw new Error(error.error || "Gmail login failed");
-      }
+      console.log("[Gmail] Response status:", fetchResponse.status);
 
-      const result = await fetchResponse.json();
-      console.log("[Gmail] Backend response:", result);
+      if (fetchResponse.ok) {
+        const result = await fetchResponse.json();
+        console.log("[Gmail] Callback successful, redirecting...", result);
 
-      if (result.success && result.redirectUrl) {
-        console.log("[Gmail] Login successful, redirecting to:", result.redirectUrl);
-        toast.success("Login successful!");
-        // Redirect using window.location to ensure session cookie is recognized
-        window.location.href = result.redirectUrl;
+        if (result.redirectUrl) {
+          setLocation(result.redirectUrl);
+        } else {
+          toast.success("Login successful!");
+          setLocation("/dashboard");
+        }
       } else {
-        console.error("[Gmail] Backend returned unexpected response", result);
-        toast.error("Gmail login failed");
+        const errorData = await fetchResponse.json();
+        console.error("[Gmail] Callback failed:", errorData);
+        toast.error(errorData.message || "Login failed");
       }
-    } catch (error: any) {
-      console.error("[Gmail] Error during Google Sign-in:", error);
-      toast.error(error.message || "Google Sign-in failed");
+    } catch (error) {
+      console.error("[Gmail] Error during Google Sign-In:", error);
+      toast.error("An error occurred during login");
     } finally {
       setLoading(false);
     }
   };
 
-  const initializeGoogleSignIn = () => {
-    const googleWindow = window as any;
-    if (googleWindow.google && googleWindow.google.accounts) {
-      try {
-        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-        if (!clientId) {
-          console.error("Google Client ID not configured");
-          return false;
-        }
-
-        googleWindow.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: handleGoogleSignIn,
-          ux_mode: "popup",
-          auto_select: false,
-          itp_support: true,
-        });
-        console.log("Google Sign-In API initialized successfully");
-        return true;
-      } catch (error) {
-        console.error("Error initializing Google Sign-In API:", error);
-        return false;
-      }
-    }
-    return false;
-  };
-
-  // Render Google button after it's mounted in DOM
-  useEffect(() => {
-    if (!googleLoaded) return;
-
-    const googleWindow = window as any;
-    if (!googleWindow.google || !googleWindow.google.accounts) {
-      console.warn("Google API not available for rendering button");
-      return;
-    }
-
-    const buttonElement = document.getElementById("google-signin-button");
-    if (buttonElement) {
-      try {
-        googleWindow.google.accounts.id.renderButton(buttonElement, {
-          type: "standard",
-          theme: "outline",
-          size: "large",
-          width: "100%",
-          text: "signin_with",
-        });
-        console.log("Google Sign-In button rendered successfully");
-      } catch (error) {
-        console.error("Error rendering Google button:", error);
-      }
-    } else {
-      console.warn("Google button element not found in DOM");
-    }
-  }, [googleLoaded]);
-
-  // Load Google Sign-In script on mount
-  useEffect(() => {
-    let retryCount = 0;
-    const maxRetries = 5;
-    let timeoutId: NodeJS.Timeout;
-
-    const loadGoogleSignIn = () => {
-      const googleWindow = window as any;
-
-      // Check if Google API is already loaded
-      if (googleWindow.google && googleWindow.google.accounts) {
-        console.log("Google API already available, initializing...");
-        if (initializeGoogleSignIn()) {
-          setGoogleLoaded(true);
-        }
-        return;
-      }
-
-      // Check if script already exists
-      const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
-      if (existingScript) {
-        if (retryCount < maxRetries) {
-          retryCount++;
-          console.log(`Retrying Google Sign-In initialization (${retryCount}/${maxRetries})`);
-          timeoutId = setTimeout(loadGoogleSignIn, 600);
-        } else {
-          console.error("Failed to load Google Sign-In after retries");
-        }
-        return;
-      }
-
-      // Create and load the script
-      console.log("Loading Google Sign-In script...");
-      const script = document.createElement("script");
-      script.src = "https://accounts.google.com/gsi/client";
-      script.async = true;
-      script.defer = false;
-      script.onload = () => {
-        console.log("Google Sign-In script loaded, initializing...");
-        timeoutId = setTimeout(() => {
-          if (initializeGoogleSignIn()) {
-            setGoogleLoaded(true);
-          }
-        }, 300);
-      };
-      script.onerror = () => {
-        console.error("Failed to load Google Sign-In script from CDN");
-      };
-      document.head.appendChild(script);
-    };
-
-    loadGoogleSignIn();
-
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, []);
-
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) {
-      toast.error("Please enter an email address");
-      return;
-    }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      toast.error("Please enter a valid email address");
+    if (!email) {
+      toast.error("Please enter your email");
       return;
     }
 
     if (isLimited) {
-      toast.error(`Too many requests. Please try again in ${formatTimeRemaining(timeRemaining)}`);
+      toast.error(`Too many attempts. Please wait ${timeRemaining}s`);
       return;
     }
 
     setLoading(true);
     try {
-      const result = await requestOtpMutation.mutateAsync({ email });
+      await requestOtpMutation.mutateAsync({ email });
       setStep("otp");
-      toast.success("OTP sent to your email!");
+      toast.success("OTP sent to your email");
     } catch (error: any) {
-      // Check if it's a rate limit error
-      if (error.data?.code === "TOO_MANY_REQUESTS") {
-        const retryAfter = parseInt(error.message.match(/\d+/)?.[0] || "3600");
-        setRateLimit(retryAfter);
-        toast.error(error.message);
-      } else {
-        toast.error(error.message || "Failed to send OTP");
-      }
+      toast.error(error.message || "Failed to send OTP");
     } finally {
       setLoading(false);
     }
@@ -277,27 +162,23 @@ const EmailAuth = () => {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code.trim() || code.length !== 6) {
-      toast.error("Please enter a valid 6-digit OTP");
+
+    if (!code || code.length !== 6) {
+      toast.error("Please enter a valid 6-digit code");
       return;
     }
 
     setLoading(true);
     try {
-      const result = await verifyOtpMutation.mutateAsync({ email, code, isNewUser: false, name: "", phone: "" });
-
-      if (result.success) {
-        toast.success("Email verified successfully!");
-
-        // Redirect based on clientStatus
-        if (result.clientStatus === "customer") {
-          window.location.href = `/customer/${result.userId}`;
-        } else {
-          window.location.href = `/user/${result.userId}`;
-        }
+      const result = await verifyOtpMutation.mutateAsync({ email, code, isNewUser: false });
+      toast.success("Login successful!");
+      if (result.redirectUrl) {
+        window.location.href = result.redirectUrl;
+      } else {
+        window.location.href = "/dashboard";
       }
     } catch (error: any) {
-      toast.error(error.message || "OTP verification failed");
+      toast.error(error.message || "Invalid OTP");
     } finally {
       setLoading(false);
     }
@@ -309,70 +190,76 @@ const EmailAuth = () => {
       <div className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  if (step === "otp") {
-                    setStep("email");
-                    setCode("");
-                  } else {
-                    window.history.back();
-                  }
-                }}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-              <div>
-                <CardTitle>Sign In or Register</CardTitle>
-                <CardDescription>Choose your preferred sign-in method</CardDescription>
-              </div>
-            </div>
+            <CardTitle>Client Login</CardTitle>
+            <CardDescription>Sign in to your EasyToFin account</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            {isLimited && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
+                Too many attempts. Please wait {timeRemaining}s before trying again.
+              </div>
+            )}
+
             {step === "email" ? (
-              <div className="space-y-4">
-                {/* Google Sign-In Button */}
+              <form onSubmit={handleRequestOtp} className="space-y-4">
                 <div>
-                  <div id="google-signin-button" className="w-full"></div>
-                  {!googleLoaded && (
-                    <p className="text-xs text-gray-500 mt-2 text-center">Loading Google Sign-In...</p>
-                  )}
+                  <label className="text-sm font-medium">Email Address</label>
+                  <Input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading || isLimited}
+                  />
                 </div>
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loading || isLimited || requestOtpMutation.isPending}
+                >
+                  {loading || requestOtpMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Send OTP"
+                  )}
+                </Button>
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-300"></span>
+                    <span className="w-full border-t"></span>
                   </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">or</span>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-muted-foreground">Or</span>
                   </div>
                 </div>
 
-                {/* Email OTP Form */}
-                <form onSubmit={handleRequestOtp} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                    <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                      required
-                    />
-                  </div>
-                  {isLimited && <RateLimitAlert timeRemaining={timeRemaining} message={`Too many requests. Try again in ${formatTimeRemaining(timeRemaining)}`} onFormatTime={formatTimeRemaining} />}
-                  <Button type="submit" className="w-full" disabled={loading || isLimited}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Send OTP
-                  </Button>
-                </form>
-              </div>
+                <div id="google-signin-button" className="flex justify-center">
+                  {googleLoaded && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.google?.accounts?.id) {
+                          window.google.accounts.id.renderButton(
+                            document.getElementById("google-signin-button"),
+                            { theme: "outline", size: "large", text: "signin_with" }
+                          );
+                        }
+                      }}
+                      className="text-sm text-muted-foreground"
+                    >
+                      Sign in with Google
+                    </button>
+                  )}
+                </div>
+              </form>
             ) : (
               <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Enter OTP</label>
+                  <label className="text-sm font-medium">Verification Code</label>
                   <Input
                     type="text"
                     placeholder="000000"
@@ -380,24 +267,39 @@ const EmailAuth = () => {
                     onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                     maxLength={6}
                     disabled={loading}
-                    required
                   />
-                  <p className="text-xs text-gray-500 mt-1">Check your email for the 6-digit code</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Enter the 6-digit code sent to {email}
+                  </p>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Verify OTP
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loading || code.length !== 6 || verifyOtpMutation.isPending}
+                >
+                  {loading || verifyOtpMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    "Verify Code"
+                  )}
                 </Button>
+
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="ghost"
                   className="w-full"
                   onClick={() => {
                     setStep("email");
                     setCode("");
                   }}
+                  disabled={loading}
                 >
-                  Back
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Email
                 </Button>
               </form>
             )}
