@@ -79,7 +79,7 @@ export const gmailAuthRouter = router({
 
         // ── Regular user: issue session immediately ──
         const sessionToken = await sdk.createSessionToken(input.googleId, {
-          name: input.name || "",
+          name: input.name || input.email || "User",
           expiresInMs: ONE_YEAR_MS,
         });
 

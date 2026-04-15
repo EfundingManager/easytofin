@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
-import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,35 +9,31 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useRateLimit } from "@/_core/hooks/useRateLimit";
 import { RateLimitAlert } from "@/components/RateLimitAlert";
-import { ResendCodeButton } from "@/components/ResendCodeButton";
 
-type AuthStep = "email" | "otp" | "register";
 
-export default function EmailAuth() {
-  const [step, setStep] = useState<AuthStep>("email");
+const EmailAuth = () => {
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [isNewUser, setIsNewUser] = useState(false);
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState<"email" | "otp">("email");
   const [loading, setLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
-  const [, setLocation] = useLocation();
-  const rateLimit = useRateLimit();
+  const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
 
   const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation();
-  const resendOtpMutation = trpc.emailAuth.resendOtp.useMutation();
   const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
-  const handleGoogleCallbackMutation = trpc.gmailAuth.handleGoogleCallback.useMutation();
 
   const handleGoogleSignIn = async (response: any) => {
+    console.log("[Gmail] Google Sign-In callback triggered", response);
+
     if (!response.credential) {
+      console.error("[Gmail] No credential in response", response);
       toast.error("Google Sign-in failed");
       return;
     }
 
     setLoading(true);
     try {
+      console.log("[Gmail] Decoding JWT credential...");
       // Decode the JWT token to get user info
       const base64Url = response.credential.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -50,44 +44,48 @@ export default function EmailAuth() {
           .join("")
       );
       const data = JSON.parse(jsonPayload);
+      console.log("[Gmail] Decoded user data:", { email: data.email, name: data.name, sub: data.sub });
 
-      // Call backend to handle Google callback
-      const result = await handleGoogleCallbackMutation.mutateAsync({
-        googleId: data.sub,
-        email: data.email,
-        name: data.name,
-        picture: data.picture,
+      // Call backend endpoint to handle Google callback and set session cookie
+      console.log("[Gmail] Calling /api/gmail/callback endpoint...");
+      const fetchResponse = await fetch("/api/gmail/callback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          googleId: data.sub,
+          email: data.email,
+          name: data.name,
+          picture: data.picture,
+        }),
       });
 
-      if (result.success) {
-        // Privileged role: redirect to phone 2FA challenge
-        if (result.requires2FA && result.pendingToken) {
-          toast.info("Phone verification required for your account.");
-          window.location.href = `/2fa?token=${encodeURIComponent(result.pendingToken)}`;
-          return;
-        }
+      if (!fetchResponse.ok) {
+        const error = await fetchResponse.json();
+        throw new Error(error.error || "Gmail login failed");
+      }
 
-        toast.success(result.message);
-        // Session cookie is automatically set by the server
-        // No need to store in localStorage
+      const result = await fetchResponse.json();
+      console.log("[Gmail] Backend response:", result);
 
-        // Redirect based on registration status and clientStatus
-        let redirectUrl = "/dashboard";
-        if (result.isNewRegistration) {
-          redirectUrl = "/profile";
-        } else if (result.redirectUrl) {
-          redirectUrl = result.redirectUrl;
-        }
-        window.location.href = redirectUrl;
+      if (result.success && result.redirectUrl) {
+        console.log("[Gmail] Login successful, redirecting to:", result.redirectUrl);
+        toast.success("Login successful!");
+        window.location.href = result.redirectUrl;
+      } else {
+        console.error("[Gmail] Backend returned unexpected response", result);
+        toast.error("Gmail login failed");
       }
     } catch (error: any) {
+      console.error("[Gmail] Error during Google Sign-in:", error);
       toast.error(error.message || "Google Sign-in failed");
     } finally {
       setLoading(false);
     }
   };
 
-  // Initialize Google Sign-In API
   const initializeGoogleSignIn = () => {
     const googleWindow = window as any;
     if (googleWindow.google && googleWindow.google.accounts) {
@@ -216,22 +214,21 @@ export default function EmailAuth() {
       return;
     }
 
-    if (rateLimit.isLimited) {
-      toast.error(`Too many requests. Please try again in ${rateLimit.formatTimeRemaining(rateLimit.timeRemaining)}`);
+    if (isLimited) {
+      toast.error(`Too many requests. Please try again in ${formatTimeRemaining(timeRemaining)}`);
       return;
     }
 
     setLoading(true);
     try {
       const result = await requestOtpMutation.mutateAsync({ email });
-      setIsNewUser(result.isNewUser || false);
       setStep("otp");
       toast.success("OTP sent to your email!");
     } catch (error: any) {
       // Check if it's a rate limit error
       if (error.data?.code === "TOO_MANY_REQUESTS") {
         const retryAfter = parseInt(error.message.match(/\d+/)?.[0] || "3600");
-        rateLimit.setRateLimit(retryAfter, error.message);
+        setRateLimit(retryAfter);
         toast.error(error.message);
       } else {
         toast.error(error.message || "Failed to send OTP");
@@ -243,240 +240,136 @@ export default function EmailAuth() {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otp.trim() || otp.length !== 6) {
+    if (!code.trim() || code.length !== 6) {
       toast.error("Please enter a valid 6-digit OTP");
-      return;
-    }
-
-    if (isNewUser && (!name.trim() || !phone.trim())) {
-      toast.error("Please enter your name and phone number");
-      return;
-    }
-
-    if (rateLimit.isLimited) {
-      toast.error(`Too many verification attempts. Please try again in ${rateLimit.formatTimeRemaining(rateLimit.timeRemaining)}`);
       return;
     }
 
     setLoading(true);
     try {
-      const result = await verifyOtpMutation.mutateAsync({
-        email,
-        code: otp,
-        name: isNewUser ? name : undefined,
-        phone: isNewUser ? phone : undefined,
-        isNewUser,
-      });
+      const result = await verifyOtpMutation.mutateAsync({ email, code, isNewUser: false, name: "", phone: "" });
 
       if (result.success) {
-        toast.success(result.message);
-        // Session cookie is automatically set by the server
-        // No need to store in localStorage
+        toast.success("Email verified successfully!");
 
-        if (result.isNewRegistration) {
-          window.location.href = "/profile";
+        // Redirect based on clientStatus
+        if (result.clientStatus === "customer") {
+          window.location.href = `/customer/${result.userId}`;
         } else {
-          // Redirect to user or customer portal based on clientStatus
-          const redirectUrl = result.redirectUrl || "/dashboard";
-          window.location.href = redirectUrl;
+          window.location.href = `/user/${result.userId}`;
         }
       }
     } catch (error: any) {
-      // Check if it's a rate limit error
-      if (error.data?.code === "TOO_MANY_REQUESTS") {
-        const retryAfter = parseInt(error.message.match(/\d+/)?.[0] || "3600");
-        rateLimit.setRateLimit(retryAfter, error.message);
-        toast.error(error.message);
-      } else {
-        toast.error(error.message || "Failed to verify OTP");
-      }
+      toast.error(error.message || "OTP verification failed");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <Navbar />
-      <div className="flex-grow bg-gradient-to-br from-[oklch(0.97_0.003_240)] to-[oklch(0.92_0.02_155)] flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <Link href="/auth-selection" className="inline-flex items-center text-[oklch(0.40_0.11_195)] hover:text-[oklch(0.35_0.10_195)] mb-6">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Selection
-          </Link>
-
-          <Card className="border-[oklch(0.88_0.008_240)]">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-[Outfit] font-800 text-[oklch(0.18_0.015_240)]">
-                {step === "email" && "Sign In or Register"}
-                {step === "otp" && "Verify Your Email"}
-                {step === "register" && "Complete Registration"}
-              </CardTitle>
-              <CardDescription className="text-[oklch(0.52_0.015_240)]">
-                {step === "email" && "Choose your preferred sign-in method"}
-                {step === "otp" && "Enter the 6-digit code sent to your email"}
-                {step === "register" && "Complete your profile"}
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent>
-              {step === "email" && (
-                <div className="space-y-4">
-                  {/* Google Sign-In Button */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  if (step === "otp") {
+                    setStep("email");
+                    setCode("");
+                  } else {
+                    window.history.back();
+                  }
+                }}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <div>
+                <CardTitle>Sign In or Register</CardTitle>
+                <CardDescription>Choose your preferred sign-in method</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {step === "email" ? (
+              <div className="space-y-4">
+                {/* Google Sign-In Button */}
+                <div>
+                  <div id="google-signin-button" className="w-full"></div>
                   {!googleLoaded && (
-                    <div className="text-center text-sm text-[oklch(0.52_0.015_240)] flex items-center justify-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Loading Google Sign-In...
-                    </div>
+                    <p className="text-xs text-gray-500 mt-2 text-center">Loading Google Sign-In...</p>
                   )}
-                  {googleLoaded && (
-                    <div id="google-signin-button" className="flex justify-center" />
-                  )}
-
-                  {/* Divider */}
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-[oklch(0.88_0.008_240)]" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-[oklch(0.52_0.015_240)]">or</span>
-                    </div>
-                  </div>
-
-                  {/* Email Sign-In Form */}
-                  <form onSubmit={handleRequestOtp} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
-                        Email Address
-                      </label>
-                      <Input
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={loading}
-                        className="border-[oklch(0.88_0.008_240)]"
-                      />
-                    </div>
-
-                    <Button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Sending OTP...
-                        </>
-                      ) : (
-                        "Send OTP"
-                      )}
-                    </Button>
-                  </form>
                 </div>
-              )}
 
-              {step === "otp" && (
-                <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-gray-300"></span>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-gray-500">or</span>
+                  </div>
+                </div>
+
+                {/* Email OTP Form */}
+                <form onSubmit={handleRequestOtp} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
-                      Enter 6-Digit OTP
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                     <Input
-                      type="text"
-                      placeholder="000000"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                      maxLength={6}
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       disabled={loading}
-                      className="border-[oklch(0.88_0.008_240)] text-center text-2xl tracking-widest"
+                      required
                     />
                   </div>
-
-                  {isNewUser && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
-                          Full Name
-                        </label>
-                        <Input
-                          type="text"
-                          placeholder="John Doe"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          disabled={loading}
-                          className="border-[oklch(0.88_0.008_240)]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-[oklch(0.18_0.015_240)] mb-2">
-                          Phone Number
-                        </label>
-                        <Input
-                          type="tel"
-                          placeholder="+353 1 234 5678"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          disabled={loading}
-                          className="border-[oklch(0.88_0.008_240)]"
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Verifying...
-                      </>
-                    ) : (
-                      "Verify OTP"
-                    )}
-                  </Button>
-
-                  <ResendCodeButton
-                    onResend={async () => {
-                      setLoading(true);
-                      try {
-                        await resendOtpMutation.mutateAsync({ email });
-                        toast.success("OTP resent to your email!");
-                      } catch (error: any) {
-                        if (error.data?.code === "TOO_MANY_REQUESTS") {
-                          const retryAfter = parseInt(error.message.match(/\d+/)?.[0] || "60");
-                          rateLimit.setRateLimit(retryAfter, error.message);
-                          toast.error(error.message);
-                        } else {
-                          toast.error(error.message || "Failed to resend OTP");
-                        }
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                    disabled={rateLimit.isLimited}
-                    isLoading={loading}
-                    cooldownSeconds={60}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setStep("email")}
-                    className="w-full"
-                  >
-                    Back
+                  {isLimited && <RateLimitAlert timeRemaining={timeRemaining} message={`Too many requests. Try again in ${formatTimeRemaining(timeRemaining)}`} onFormatTime={formatTimeRemaining} />}
+                  <Button type="submit" className="w-full" disabled={loading || isLimited}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Send OTP
                   </Button>
                 </form>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+              </div>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Enter OTP</label>
+                  <Input
+                    type="text"
+                    placeholder="000000"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    maxLength={6}
+                    disabled={loading}
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Check your email for the 6-digit code</p>
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Verify OTP
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    setStep("email");
+                    setCode("");
+                  }}
+                >
+                  Back
+                </Button>
+              </form>
+            )}
+          </CardContent>
+        </Card>
       </div>
       <Footer />
     </div>
   );
-}
+};
+
+export default EmailAuth;
