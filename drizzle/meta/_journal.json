@@ -43,6 +43,13 @@
       "when": 1776082112110,
       "tag": "0005_natural_venus",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1776236310764,
+      "tag": "0006_calm_the_phantom",
+      "breakpoints": true
     }
   ]
 }
