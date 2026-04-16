@@ -14,18 +14,20 @@ import { useLocation } from "wouter";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 
+type AuthStep = "email" | "authMethod" | "otp" | "password";
+
 const EmailAuth = () => {
   const [, setLocation] = useLocation();
   const { user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
-  const [step, setStep] = useState<"email" | "otp" | "password">("email");
+  const [step, setStep] = useState<AuthStep>("email");
+  const [selectedAuthMethod, setSelectedAuthMethod] = useState<"otp" | "password" | null>(null);
   const [loading, setLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [usePasswordLogin, setUsePasswordLogin] = useState(false);
   const [password, setPassword] = useState("");
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
 
@@ -213,13 +215,19 @@ const EmailAuth = () => {
     setLoading(true);
     try {
       await requestOtpMutation.mutateAsync({ email });
-      setStep("otp");
+      setStep("authMethod");
+      setSelectedAuthMethod(null);
       toast.success("OTP sent to your email");
     } catch (error: any) {
       toast.error(error.message || "Failed to send OTP");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSelectAuthMethod = (method: "otp" | "password") => {
+    setSelectedAuthMethod(method);
+    setStep(method);
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -261,8 +269,35 @@ const EmailAuth = () => {
       <div className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Client Login</CardTitle>
-            <CardDescription>Sign in to your EasyToFin account</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>
+                  {step === "email" && "Client Login"}
+                  {step === "authMethod" && "Choose Sign-In Method"}
+                  {step === "otp" && "Verify Email"}
+                  {step === "password" && "Enter Password"}
+                </CardTitle>
+                <CardDescription>
+                  {step === "email" && "Sign in to your EasyToFin account"}
+                  {step === "authMethod" && `Signing in with ${email}`}
+                  {step === "otp" && "Enter the 6-digit code sent to your email"}
+                  {step === "password" && "Enter your password"}
+                </CardDescription>
+              </div>
+              {step !== "email" && (
+                <button
+                  onClick={() => {
+                    setStep("email");
+                    setSelectedAuthMethod(null);
+                    setCode("");
+                    setPassword("");
+                  }}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5 text-slate-600" />
+                </button>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {isLimited && (
@@ -271,73 +306,17 @@ const EmailAuth = () => {
               </div>
             )}
 
-            {step === "email" ? (
-              <>
-                {/* Login Method Toggle */}
-                <div className="flex gap-2 mb-4">
-                  <Button
-                    type="button"
-                    variant={!usePasswordLogin ? "default" : "outline"}
-                    className="flex-1"
-                    onClick={() => {
-                      setUsePasswordLogin(false);
-                      setPassword("");
-                    }}
-                  >
-                    OTP Login
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={usePasswordLogin ? "default" : "outline"}
-                    className="flex-1"
-                    onClick={() => {
-                      setUsePasswordLogin(true);
-                      setCode("");
-                    }}
-                  >
-                    Password Login
-                  </Button>
-                </div>
-
-                <form onSubmit={usePasswordLogin ? handlePasswordLogin : handleRequestOtp} className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Email Address</label>
-                  <Input
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading || isLimited}
-                  />
-                </div>
-
-                {usePasswordLogin && (
-                  <div>
-                    <label className="text-sm font-medium">Password</label>
-                    <Input
-                      type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                    />
+            {step === "email" && (
+              <div className="space-y-4">
+                {!googleLoaded && (
+                  <div className="text-center text-sm text-slate-500 flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading Google Sign-In...
                   </div>
                 )}
-
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={loading || isLimited || requestOtpMutation.isPending}
-                >
-                  {loading || requestOtpMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    "Send OTP"
-                  )}
-                </Button>
+                {googleLoaded && (
+                  <div id="google-signin-button" className="flex justify-center" />
+                )}
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
@@ -348,10 +327,71 @@ const EmailAuth = () => {
                   </div>
                 </div>
 
-                <div id="google-signin-button" className="flex justify-center w-full" />
-              </form>
-              </>
-            ) : step === "otp" ? (
+                <form onSubmit={handleRequestOtp} className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Email Address</label>
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={loading || isLimited}
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={loading || isLimited || requestOtpMutation.isPending}
+                  >
+                    {loading || requestOtpMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Continue"
+                    )}
+                  </Button>
+                </form>
+              </div>
+            )}
+
+            {step === "authMethod" && (
+              <div className="space-y-4">
+                <div className="bg-slate-50 p-4 rounded-lg mb-6">
+                  <p className="text-sm text-slate-600">
+                    Choose how you'd like to sign in
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleSelectAuthMethod("otp")}
+                  className="w-full h-auto py-4 flex flex-col items-start gap-2 hover:bg-slate-50"
+                >
+                  <span className="font-semibold text-slate-900">OTP Verification</span>
+                  <span className="text-xs text-slate-600">
+                    Use the 6-digit code sent to your email
+                  </span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleSelectAuthMethod("password")}
+                  className="w-full h-auto py-4 flex flex-col items-start gap-2 hover:bg-slate-50"
+                >
+                  <span className="font-semibold text-slate-900">Password Login</span>
+                  <span className="text-xs text-slate-600">
+                    Sign in with your password
+                  </span>
+                </Button>
+              </div>
+            )}
+
+            {step === "otp" && (
               <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium">Verification Code</label>
@@ -389,19 +429,6 @@ const EmailAuth = () => {
                   )}
                 </Button>
 
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full"
-                  onClick={() => {
-                    setStep("email");
-                    setCode("");
-                  }}
-                  disabled={loading}
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Email
-                </Button>
                 <button
                   type="button"
                   onClick={() => setShowForgotPassword(true)}
@@ -410,7 +437,51 @@ const EmailAuth = () => {
                   Forgot Password?
                 </button>
               </form>
-            ) : null}
+            )}
+
+            {step === "password" && (
+              <form onSubmit={handlePasswordLogin} className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Password</label>
+                  <Input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+
+                <RememberDeviceCheckbox
+                  checked={rememberDevice}
+                  onChange={setRememberDevice}
+                  showTooltip={true}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loading || isLimited || loginWithPasswordMutation.isPending}
+                >
+                  {loading || loginWithPasswordMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Logging in...
+                    </>
+                  ) : (
+                    "Login"
+                  )}
+                </Button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-2 w-full text-center"
+                >
+                  Forgot Password?
+                </button>
+              </form>
+            )}
           </CardContent>
         </Card>
       </div>
