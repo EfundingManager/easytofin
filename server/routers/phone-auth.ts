@@ -220,21 +220,22 @@ export const phoneAuthRouter = router({
 
           // Create session token and set cookie
           const sessionDuration = input.rememberMe ? THIRTY_DAYS_MS : ONE_YEAR_MS;
+          const openId = user.googleId || user.email || user.phone || `phone-${user.id}`;
           const sessionToken = await sdk.createSessionToken(
-            user.googleId || user.email || user.phone || `phone-${user.id}`,
-            { expiresInMs: sessionDuration }
+            openId,
+            { expiresInMs: sessionDuration, name: user.name || "User" }
           );
           
           const cookieOptions = getSessionCookieOptions(opts.req);
           console.log("[Phone Auth] Setting session cookie:", { COOKIE_NAME, sessionDuration });
+          console.log("[Phone Auth] Cookie options:", cookieOptions);
           opts.res.cookie(COOKIE_NAME, sessionToken, {
             ...cookieOptions,
-          console.log("[Phone Auth] Cookie options:", cookieOptions);
             maxAge: sessionDuration,
           } as any);
+          console.log("[Phone Auth] Session cookie set successfully");
 
           // Determine redirect URL based on clientStatus
-          console.log("[Phone Auth] Session cookie set successfully");
           const redirectUrl = user.clientStatus === 'customer' 
             ? `/customer/${user.id}`
             : `/user/${user.id}`;

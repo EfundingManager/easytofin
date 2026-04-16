@@ -244,9 +244,10 @@ export const emailAuthRouter = router({
 
         // Create session token and set cookie
         const sessionDuration = input.rememberMe ? THIRTY_DAYS_MS : ONE_YEAR_MS;
+        const openId = user.googleId || user.email || user.phone || `email-${user.id}`;
         const sessionToken = await sdk.createSessionToken(
-          user.googleId || user.email || user.phone || `email-${user.id}`,
-          { expiresInMs: sessionDuration }
+          openId,
+          { expiresInMs: sessionDuration, name: user.name || "User" }
         );
         
         const cookieOptions = getSessionCookieOptions(opts.req);
