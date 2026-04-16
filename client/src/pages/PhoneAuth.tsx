@@ -14,7 +14,7 @@ import { ResendCodeButton } from "@/components/ResendCodeButton";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 
-type AuthStep = "phone" | "otp" | "register";
+type AuthStep = "phone" | "otp" | "register" | "password";
 
 export default function PhoneAuth() {
   const [step, setStep] = useState<AuthStep>("phone");
@@ -29,11 +29,14 @@ export default function PhoneAuth() {
   const [rememberMe, setRememberMe] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [usePasswordLogin, setUsePasswordLogin] = useState(false);
+  const [password, setPassword] = useState("");
   const rateLimit = useRateLimit();
 
   const requestOtpMutation = trpc.phoneAuth.requestOtp.useMutation();
   const resendOtpMutation = trpc.phoneAuth.resendOtp.useMutation();
   const verifyOtpMutation = trpc.phoneAuth.verifyOtp.useMutation();
+  const loginWithPasswordMutation = trpc.passwordLogin.loginWithPassword.useMutation();
   const handleGoogleCallbackMutation = trpc.gmailAuth.handleGoogleCallback.useMutation();
 
   const handleGoogleSignIn = async (response: any) => {
@@ -237,6 +240,33 @@ export default function PhoneAuth() {
     }
   };
 
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone.trim() || !password.trim()) {
+      toast.error("Please enter phone and password");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await loginWithPasswordMutation.mutateAsync({
+        phoneOrEmail: phone,
+        password,
+        rememberMe,
+        rememberDevice,
+      });
+
+      if (result.success) {
+        toast.success("Login successful!");
+        window.location.href = result.redirectUrl;
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Password login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otp.trim()) {
@@ -341,11 +371,37 @@ export default function PhoneAuth() {
                     </div>
                   </div>
 
+                  {/* Login Method Toggle */}
+                  <div className="flex gap-2 mb-4">
+                    <Button
+                      type="button"
+                      variant={!usePasswordLogin ? "default" : "outline"}
+                      className="flex-1"
+                      onClick={() => {
+                        setUsePasswordLogin(false);
+                        setPassword("");
+                      }}
+                    >
+                      OTP Login
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={usePasswordLogin ? "default" : "outline"}
+                      className="flex-1"
+                      onClick={() => {
+                        setUsePasswordLogin(true);
+                        setOtp("");
+                      }}
+                    >
+                      Password Login
+                    </Button>
+                  </div>
+
                   {/* Phone Sign-In Form */}
-                  <form onSubmit={handleRequestOtp} className="space-y-4">
+                  <form onSubmit={usePasswordLogin ? handlePasswordLogin : handleRequestOtp} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-[oklch(0.25_0.06_155)] mb-2">
-                        Phone Number
+                        {usePasswordLogin ? "Phone or Email" : "Phone Number"}
                       </label>
                       <Input
                         type="tel"
@@ -356,6 +412,21 @@ export default function PhoneAuth() {
                         className="border-[oklch(0.88_0.008_240)]"
                       />
                     </div>
+                    {usePasswordLogin && (
+                      <div>
+                        <label className="block text-sm font-medium text-[oklch(0.25_0.06_155)] mb-2">
+                          Password
+                        </label>
+                        <Input
+                          type="password"
+                          placeholder="Enter your password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          disabled={loading}
+                          className="border-[oklch(0.88_0.008_240)]"
+                        />
+                      </div>
+                    )}
                     <Button
                       type="submit"
                       disabled={loading || rateLimit.isLimited}
@@ -364,12 +435,12 @@ export default function PhoneAuth() {
                       {loading ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Sending OTP...
+                          {usePasswordLogin ? "Logging in..." : "Sending OTP..."}
                         </>
                       ) : rateLimit.isLimited ? (
                         `Retry in ${rateLimit.formatTimeRemaining(rateLimit.timeRemaining)}`
                       ) : (
-                        "Send OTP"
+                        usePasswordLogin ? "Login" : "Send OTP"
                       )}
                     </Button>
                     {rateLimit.isLimited && (

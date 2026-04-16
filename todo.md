@@ -1127,3 +1127,18 @@
 - [x] All TypeScript checks passing
 - [ ] Test complete password reset workflow
 - [ ] Test on production domain
+
+
+## Phase 97: Add Password Login Option to Email and Phone Pages
+- [x] Create password login tRPC procedure (loginWithPassword)
+- [x] Add password validation using SHA-256 hashing
+- [x] Create password login router with 2 procedures
+- [x] Add password login form to PhoneAuth page
+- [x] Add toggle between OTP and password login
+- [x] Implement dynamic button text based on login method
+- [x] Add password input field with conditional rendering
+- [x] Support phone or email for password login
+- [x] All TypeScript checks passing
+- [ ] Add password login form to EmailAuth page
+- [ ] Test password login flow
+- [ ] Test on production domain
