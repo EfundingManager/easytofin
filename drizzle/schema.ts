@@ -334,3 +334,46 @@ export const recipients = mysqlTable("recipients", {
 
 export type Recipient = typeof recipients.$inferSelect;
 export type InsertRecipient = typeof recipients.$inferInsert;
+
+
+/**
+ * Trusted devices for streamlined login
+ * Stores device fingerprints and allows users to skip OTP on trusted devices
+ */
+export const trustedDevices = mysqlTable("trustedDevices", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull(),
+  deviceFingerprint: varchar("deviceFingerprint", { length: 255 }).notNull(),
+  deviceName: varchar("deviceName", { length: 255 }).notNull(), // e.g., "Chrome on MacOS", "Safari on iPhone"
+  deviceToken: varchar("deviceToken", { length: 255 }).notNull().unique(), // Unique token for device verification
+  userAgent: text("userAgent"),
+  ipAddress: varchar("ipAddress", { length: 45 }), // IPv4 or IPv6
+  lastUsedAt: timestamp("lastUsedAt").defaultNow().notNull(),
+  isActive: mysqlEnum("isActive", ["true", "false"]).default("true").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TrustedDevice = typeof trustedDevices.$inferSelect;
+export type InsertTrustedDevice = typeof trustedDevices.$inferInsert;
+
+/**
+ * Device verification tokens for secure device registration
+ * Used to verify new devices before adding them to trusted devices
+ */
+export const deviceVerificationTokens = mysqlTable("deviceVerificationTokens", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  deviceFingerprint: varchar("deviceFingerprint", { length: 255 }).notNull(),
+  deviceName: varchar("deviceName", { length: 255 }).notNull(),
+  userAgent: text("userAgent"),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  expiresAt: timestamp("expiresAt").notNull(),
+  verified: mysqlEnum("verified", ["true", "false"]).default("false").notNull(),
+  verifiedAt: timestamp("verifiedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type DeviceVerificationToken = typeof deviceVerificationTokens.$inferSelect;
+export type InsertDeviceVerificationToken = typeof deviceVerificationTokens.$inferInsert;

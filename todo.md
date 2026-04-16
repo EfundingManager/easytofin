@@ -977,3 +977,22 @@
 - [ ] Test session persistence across browser restarts
 - [ ] Test session expiration after 30 days
 - [ ] Test logout clears Remember Me token
+
+
+## Phase 88: "Remember This Device" Feature for Streamlined Login
+- [x] Create device fingerprinting utility (browser, OS, user agent) - deviceFingerprint.ts
+- [x] Add trustedDevices table to database schema
+- [x] Add deviceVerificationTokens table to database schema
+- [x] Create device management database helpers - db-device.ts
+- [x] Create comprehensive device fingerprinting tests (34 tests passing)
+- [ ] Add device registration tRPC procedure
+- [ ] Add device verification tRPC procedure
+- [ ] Add device list/management tRPC procedures
+- [ ] Create "Remember this device" checkbox component
+- [ ] Integrate checkbox into phone auth flow
+- [ ] Integrate checkbox into email auth flow
+- [ ] Integrate checkbox into Gmail auth flow
+- [ ] Implement device fingerprint validation on login
+- [ ] Add device management dashboard
+- [ ] Test automatic login detection
+- [ ] Test device revocation
