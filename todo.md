@@ -1113,3 +1113,17 @@
 - [ ] Add password reset SMS template
 - [ ] Create comprehensive tests for password reset
 - [ ] Test complete password reset flow end-to-end
+
+
+## Phase 96: Integrate Forgot Password into Login Pages
+- [x] Create ForgotPasswordModal component with email/phone selection
+- [x] Create OTP verification modal component
+- [x] Create new password form component
+- [x] Add "Forgot Password?" link to PhoneAuth page
+- [x] Add "Forgot Password?" link to EmailAuth page
+- [x] Implement forgot password flow in PhoneAuth
+- [x] Implement forgot password flow in EmailAuth
+- [x] Add success message and redirect after password reset
+- [x] All TypeScript checks passing
+- [ ] Test complete password reset workflow
+- [ ] Test on production domain

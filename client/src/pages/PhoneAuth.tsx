@@ -12,6 +12,7 @@ import { useRateLimit } from "@/_core/hooks/useRateLimit";
 import { RateLimitAlert } from "@/components/RateLimitAlert";
 import { ResendCodeButton } from "@/components/ResendCodeButton";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
+import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 
 type AuthStep = "phone" | "otp" | "register";
 
@@ -27,6 +28,7 @@ export default function PhoneAuth() {
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const rateLimit = useRateLimit();
 
   const requestOtpMutation = trpc.phoneAuth.requestOtp.useMutation();
@@ -289,6 +291,11 @@ export default function PhoneAuth() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <ForgotPasswordModal
+        open={showForgotPassword}
+        onOpenChange={setShowForgotPassword}
+        onSuccess={() => setStep("phone")}
+      />
       <div className="flex-grow bg-gradient-to-br from-[oklch(0.97_0.003_240)] to-[oklch(0.92_0.02_155)] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <Link href="/" className="inline-flex items-center text-[oklch(0.40_0.11_195)] hover:text-[oklch(0.35_0.10_195)] mb-6">
@@ -451,6 +458,13 @@ export default function PhoneAuth() {
                   >
                     Back
                   </Button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-2 w-full text-center"
+                  >
+                    Forgot Password?
+                  </button>
                 </form>
               )}
             </CardContent>

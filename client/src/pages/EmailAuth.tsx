@@ -12,6 +12,7 @@ import { RateLimitAlert } from "@/components/RateLimitAlert";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
+import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 
 const EmailAuth = () => {
   const [, setLocation] = useLocation();
@@ -23,6 +24,7 @@ const EmailAuth = () => {
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
 
 
@@ -221,6 +223,11 @@ const EmailAuth = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <Navbar />
+      <ForgotPasswordModal
+        open={showForgotPassword}
+        onOpenChange={setShowForgotPassword}
+        onSuccess={() => setStep("email")}
+      />
       <div className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
@@ -324,6 +331,13 @@ const EmailAuth = () => {
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Email
                 </Button>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-2 w-full text-center"
+                >
+                  Forgot Password?
+                </button>
               </form>
             )}
           </CardContent>
