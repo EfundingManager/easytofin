@@ -1065,3 +1065,28 @@
 - [ ] User to verify redirect URI in Google Cloud Console
 - [ ] Test Gmail login after redirect URI verification
 - [ ] If still failing, use Google OAuth 2.0 Playground to test
+
+
+## Phase 93: Deploy Auth-Selection Page to Production
+- [ ] Verify all code is committed and checkpoint saved
+- [ ] Check environment variables are set for production
+- [ ] Verify database migrations are applied
+- [ ] Test auth-selection page on dev server
+- [ ] Click Publish button in Management UI
+- [ ] Verify deployment to www.easytofin.com
+- [ ] Test Gmail login on production domain
+- [ ] Verify callback endpoint works (https://www.easytofin.com/api/gmail/callback)
+- [ ] Test email OTP login on production
+- [ ] Test phone OTP login on production
+
+
+## Phase 94: Fix Phone and Email Login Redirect Issues
+- [ ] Debug OTP verification response to confirm redirectUrl is being returned
+- [ ] Check if session cookie is being set properly after OTP verification
+- [ ] Verify UserPortal and CustomerPortal components are receiving auth state
+- [ ] Add logging to track redirect flow
+- [ ] Test with browser network tab to see OTP verification response
+- [ ] Check if window.location.href is working properly
+- [ ] Verify user session is persisted across page navigation
+- [ ] Test email login flow end-to-end
+- [ ] Test phone login flow end-to-end

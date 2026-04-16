@@ -200,11 +200,15 @@ const EmailAuth = () => {
 
     setLoading(true);
     try {
+      console.log("[EmailAuth] Verifying OTP...", { email, code });
       const result = await verifyOtpMutation.mutateAsync({ email, code, isNewUser: false, rememberMe: rememberDevice });
+      console.log("[EmailAuth] OTP verification result:", result);
       toast.success("Login successful!");
       if (result.redirectUrl) {
+        console.log("[EmailAuth] Redirecting to:", result.redirectUrl);
         window.location.href = result.redirectUrl;
       } else {
+        console.log("[EmailAuth] No redirectUrl, redirecting to /dashboard");
         window.location.href = "/dashboard";
       }
     } catch (error: any) {

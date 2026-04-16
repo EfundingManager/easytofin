@@ -226,12 +226,15 @@ export const phoneAuthRouter = router({
           );
           
           const cookieOptions = getSessionCookieOptions(opts.req);
+          console.log("[Phone Auth] Setting session cookie:", { COOKIE_NAME, sessionDuration });
           opts.res.cookie(COOKIE_NAME, sessionToken, {
             ...cookieOptions,
+          console.log("[Phone Auth] Cookie options:", cookieOptions);
             maxAge: sessionDuration,
           } as any);
 
           // Determine redirect URL based on clientStatus
+          console.log("[Phone Auth] Session cookie set successfully");
           const redirectUrl = user.clientStatus === 'customer' 
             ? `/customer/${user.id}`
             : `/user/${user.id}`;

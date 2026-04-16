@@ -256,18 +256,23 @@ export default function PhoneAuth() {
       });
 
       if (result.success) {
+        console.log("[PhoneAuth] OTP verification successful:", result);
         toast.success(result.message);
         // Session cookie is automatically set by the server
         // No need to store in localStorage
 
         if (result.isNewRegistration) {
           // Redirect new users to profile completion page
+          console.log("[PhoneAuth] Redirecting new user to /profile");
           window.location.href = "/profile";
         } else {
           // Redirect to user or customer portal based on clientStatus
           const redirectUrl = result.redirectUrl || "/dashboard";
+          console.log("[PhoneAuth] Redirecting to:", redirectUrl);
           window.location.href = redirectUrl;
         }
+      } else {
+        console.error("[PhoneAuth] OTP verification returned success=false:", result);
       }
     } catch (error: any) {
       if (error.data?.code === "TOO_MANY_REQUESTS") {
