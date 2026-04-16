@@ -936,3 +936,24 @@
 - [ ] Integrate into campaign composer
 - [ ] Add recipient preview and management
 - [ ] Test complete workflow end-to-end
+
+
+## Phase 86: Gmail Sign-In Test Plan & Edge Case Testing
+- [x] Create comprehensive Gmail sign-in test plan document (GMAIL_SIGNIN_TEST_PLAN.md)
+- [x] Document 12 test categories (happy paths, edge cases, errors, security, integration, performance, browser compatibility, localization, regression)
+- [x] Create automated test suite for edge cases (75 tests)
+- [x] Test special characters in user names (8 different languages)
+- [x] Test very long user names (>100 characters)
+- [x] Test missing optional fields (name, picture)
+- [x] Test rapid successive login attempts
+- [x] Test cross-device sessions
+- [x] Test error scenarios (missing credentials, invalid JWT, database failures)
+- [x] Test security (SQL injection, XSS, privilege escalation, CSRF)
+- [x] Test integration flows (profile completion, admin dashboard, email verification)
+- [x] Test performance (response time, concurrent sign-ins, query performance)
+- [x] Test regression (email OTP still works, phone OTP still works)
+- [x] All 75 edge case tests passing
+- [ ] Manual testing with real Gmail accounts
+- [ ] Browser compatibility testing (Chrome, Firefox, Safari, Mobile)
+- [ ] Performance load testing with 100+ concurrent users
+- [ ] Security penetration testing
