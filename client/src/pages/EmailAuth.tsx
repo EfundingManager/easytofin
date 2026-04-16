@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
@@ -14,7 +14,7 @@ import { useLocation } from "wouter";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 
-type AuthStep = "email" | "authMethod" | "otp" | "password";
+type AuthStep = "email" | "authMethod" | "otp" | "password" | "confirmation";
 
 const EmailAuth = () => {
   const [, setLocation] = useLocation();
@@ -29,6 +29,7 @@ const EmailAuth = () => {
   const [rememberDevice, setRememberDevice] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [password, setPassword] = useState("");
+  const [isNewUser, setIsNewUser] = useState(false);
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
 
 
@@ -214,7 +215,8 @@ const EmailAuth = () => {
 
     setLoading(true);
     try {
-      await requestOtpMutation.mutateAsync({ email });
+      const result = await requestOtpMutation.mutateAsync({ email });
+      setIsNewUser(result.isNewUser || false);
       setStep("authMethod");
       setSelectedAuthMethod(null);
       toast.success("OTP sent to your email");
@@ -240,19 +242,40 @@ const EmailAuth = () => {
 
     setLoading(true);
     try {
-      console.log("[EmailAuth] Verifying OTP...", { email, code });
-      const result = await verifyOtpMutation.mutateAsync({ email, code, isNewUser: false, rememberMe: rememberDevice });
+      console.log("[EmailAuth] Verifying OTP...", { email, code, isNewUser });
+      const result = await verifyOtpMutation.mutateAsync({ email, code, isNewUser, rememberMe: rememberDevice });
       console.log("[EmailAuth] OTP verification result:", result);
-      toast.success("Login successful!");
-      if (result.redirectUrl) {
-        console.log("[EmailAuth] Redirecting to:", result.redirectUrl);
-        window.location.href = result.redirectUrl;
+      
+      // For new users, show confirmation screen
+      if (isNewUser) {
+        setStep("confirmation");
+        toast.success("Email verified successfully!");
       } else {
-        console.log("[EmailAuth] No redirectUrl, redirecting to /dashboard");
-        window.location.href = "/dashboard";
+        // For existing users, proceed directly to login
+        toast.success("Login successful!");
+        if (result.redirectUrl) {
+          console.log("[EmailAuth] Redirecting to:", result.redirectUrl);
+          window.location.href = result.redirectUrl;
+        } else {
+          console.log("[EmailAuth] No redirectUrl, redirecting to /dashboard");
+          window.location.href = "/dashboard";
+        }
       }
     } catch (error: any) {
       toast.error(error.message || "Invalid OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfirmRegistration = async () => {
+    setLoading(true);
+    try {
+      // Complete the registration by redirecting to profile completion
+      toast.success("Registration confirmed! Please complete your profile.");
+      window.location.href = "/profile";
+    } catch (error: any) {
+      toast.error(error.message || "Failed to confirm registration");
     } finally {
       setLoading(false);
     }
@@ -276,15 +299,17 @@ const EmailAuth = () => {
                   {step === "authMethod" && "Choose Sign-In Method"}
                   {step === "otp" && "Verify Email"}
                   {step === "password" && "Enter Password"}
+                  {step === "confirmation" && "Registration Confirmed"}
                 </CardTitle>
                 <CardDescription>
                   {step === "email" && "Sign in to your EasyToFin account"}
                   {step === "authMethod" && `Signing in with ${email}`}
                   {step === "otp" && "Enter the 6-digit code sent to your email"}
                   {step === "password" && "Enter your password"}
+                  {step === "confirmation" && "Your email has been verified"}
                 </CardDescription>
               </div>
-              {step !== "email" && (
+              {step !== "email" && step !== "confirmation" && (
                 <button
                   onClick={() => {
                     setStep("email");
@@ -481,6 +506,65 @@ const EmailAuth = () => {
                   Forgot Password?
                 </button>
               </form>
+            )}
+
+            {step === "confirmation" && (
+              <div className="space-y-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                  <div className="mb-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle2 className="w-6 h-6 text-green-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-green-900 mb-2">
+                      Email Verified!
+                    </h3>
+                    <p className="text-sm text-green-700 mb-4">
+                      Your email <span className="font-semibold">{email}</span> has been verified successfully.
+                    </p>
+                  </div>
+
+                  <div className="bg-white rounded p-4 mb-4 text-left">
+                    <p className="text-sm text-slate-600 mb-2">
+                      <strong>Next step:</strong> Complete your profile to finish registration
+                    </p>
+                    <ul className="text-xs text-slate-500 space-y-1 ml-4">
+                      <li>✓ Personal information</li>
+                      <li>✓ Contact details</li>
+                      <li>✓ Account preferences</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  onClick={handleConfirmRegistration}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Proceeding...
+                    </>
+                  ) : (
+                    "Complete Registration"
+                  )}
+                </Button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep("email");
+                    setCode("");
+                    setEmail("");
+                    setSelectedAuthMethod(null);
+                    setIsNewUser(false);
+                  }}
+                  className="w-full text-sm text-slate-600 hover:text-slate-900 font-medium py-2"
+                >
+                  Use a different email
+                </button>
+              </div>
             )}
           </CardContent>
         </Card>
