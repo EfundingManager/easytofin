@@ -1,10 +1,10 @@
-import { publicProcedure, router } from "../_core/trpc";
 import { z } from "zod";
 import * as db from "../db";
 import { createPhoneUser, getPhoneUserByEmail } from "../db";
 import { TRPCError } from "@trpc/server";
 import { sdk } from "../_core/sdk";
-import { ONE_YEAR_MS } from "@shared/const";
+import { router, publicProcedure } from "../_core/trpc";
+import { THIRTY_DAYS_MS, DEFAULT_SESSION_MS } from "@shared/const";
 import { roleRequires2FA, createPending2FAToken } from "../_core/twoFactor";
 
 /**
@@ -15,6 +15,7 @@ import { roleRequires2FA, createPending2FAToken } from "../_core/twoFactor";
  * Instead a short-lived pendingToken is returned and the frontend must redirect
  * the user to /2fa for phone OTP verification before a real session is issued.
  */
+
 export const gmailAuthRouter = router({
   /**
    * Handle Google OAuth callback.
@@ -27,6 +28,7 @@ export const gmailAuthRouter = router({
         email: z.string().email("Invalid email"),
         name: z.string().min(1, "Name is required"),
         picture: z.string().url().optional(),
+        rememberMe: z.boolean().optional().default(false),
       })
     )
     .mutation(async ({ input }) => {
@@ -78,9 +80,10 @@ export const gmailAuthRouter = router({
         }
 
         // ── Regular user: issue session immediately ──
+        const sessionDuration = input.rememberMe ? THIRTY_DAYS_MS : DEFAULT_SESSION_MS;
         const sessionToken = await sdk.createSessionToken(input.googleId, {
           name: input.name || input.email || "User",
-          expiresInMs: ONE_YEAR_MS,
+          expiresInMs: sessionDuration,
         });
 
         // Determine redirect URL based on clientStatus

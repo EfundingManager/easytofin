@@ -1007,9 +1007,11 @@
 - [x] Install testing dependencies (@testing-library/react, jsdom, etc.)
 - [x] Create comprehensive component unit tests (30+ tests)
 - [x] Update vitest config for client component testing
-- [ ] Integrate checkbox into PhoneAuth flow
-- [ ] Integrate checkbox into EmailAuth flow
-- [ ] Integrate checkbox into Gmail auth flow
+- [x] Integrate checkbox into PhoneAuth flow
+- [x] Integrate checkbox into EmailAuth flow
+- [x] Update gmailAuth router to support rememberMe parameter
+- [x] Update session duration logic based on rememberDevice flag
+- [x] All TypeScript errors resolved
 - [ ] Add device management to user dashboard
 - [ ] Create device activity timeline
 - [ ] Add device security alerts
