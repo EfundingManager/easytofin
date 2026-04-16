@@ -11,6 +11,7 @@ import { useRateLimit } from "@/_core/hooks/useRateLimit";
 import { RateLimitAlert } from "@/components/RateLimitAlert";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
+import { RememberMeCheckbox } from "@/components/RememberMeCheckbox";
 
 const EmailAuth = () => {
   const [, setLocation] = useLocation();
@@ -20,6 +21,7 @@ const EmailAuth = () => {
   const [step, setStep] = useState<"email" | "otp">("email");
   const [loading, setLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
 
   // Initialize mutations at the top level (before any conditional returns)
@@ -107,6 +109,7 @@ const EmailAuth = () => {
           email: data.email,
           name: data.name,
           picture: data.picture,
+          rememberMe,
         }),
       });
 
@@ -170,7 +173,7 @@ const EmailAuth = () => {
 
     setLoading(true);
     try {
-      const result = await verifyOtpMutation.mutateAsync({ email, code, isNewUser: false });
+      const result = await verifyOtpMutation.mutateAsync({ email, code, isNewUser: false, rememberMe });
       toast.success("Login successful!");
       if (result.redirectUrl) {
         window.location.href = result.redirectUrl;
@@ -272,6 +275,11 @@ const EmailAuth = () => {
                     Enter the 6-digit code sent to {email}
                   </p>
                 </div>
+
+                <RememberMeCheckbox
+                  checked={rememberMe}
+                  onChange={setRememberMe}
+                />
 
                 <Button
                   type="submit"

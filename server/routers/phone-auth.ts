@@ -13,7 +13,7 @@ import {
 } from "../db";
 import { sendSMSVerification, verifySMSCode } from "../verification";
 import { rateLimiter, RATE_LIMIT_CONFIG } from "../rate-limiter";
-import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS, THIRTY_DAYS_MS } from "@shared/const";
 import { getSessionCookieOptions } from "../_core/cookies";
 import { sdk } from "../_core/sdk";
 
@@ -40,6 +40,7 @@ export const phoneAuthRouter = router({
           .trim()
           .transform(phone => phone.replace(/[\s\-()]/g, ''))
           .refine(phone => /^\+?[1-9]\d{1,14}$/.test(phone), "Invalid phone number"),
+        rememberMe: z.boolean().optional().default(false),
       })
     )
     .mutation(async ({ input }) => {
@@ -157,6 +158,7 @@ export const phoneAuthRouter = router({
         email: z.string().email().optional(),
         name: z.string().min(2).optional(),
         isNewUser: z.boolean().optional(),
+        rememberMe: z.boolean().optional().default(false),
       })
     )
     .mutation(async ({ input, ctx: opts }) => {
@@ -217,15 +219,16 @@ export const phoneAuthRouter = router({
           });
 
           // Create session token and set cookie
+          const sessionDuration = input.rememberMe ? THIRTY_DAYS_MS : ONE_YEAR_MS;
           const sessionToken = await sdk.createSessionToken(
             user.googleId || user.email || user.phone || `phone-${user.id}`,
-            { expiresInMs: ONE_YEAR_MS }
+            { expiresInMs: sessionDuration }
           );
           
           const cookieOptions = getSessionCookieOptions(opts.req);
           opts.res.cookie(COOKIE_NAME, sessionToken, {
             ...cookieOptions,
-            maxAge: ONE_YEAR_MS,
+            maxAge: sessionDuration,
           } as any);
 
           // Determine redirect URL based on clientStatus
@@ -265,15 +268,16 @@ export const phoneAuthRouter = router({
           });
 
           // Create session token and set cookie for new user
+          const sessionDuration = input.rememberMe ? THIRTY_DAYS_MS : ONE_YEAR_MS;
           const sessionToken = await sdk.createSessionToken(
             newUser.googleId || newUser.email || newUser.phone || `phone-${newUser.id}`,
-            { expiresInMs: ONE_YEAR_MS }
+            { expiresInMs: sessionDuration }
           );
           
           const cookieOptions = getSessionCookieOptions(opts.req);
           opts.res.cookie(COOKIE_NAME, sessionToken, {
             ...cookieOptions,
-            maxAge: ONE_YEAR_MS,
+            maxAge: sessionDuration,
           } as any);
 
           // New users always start in queue status

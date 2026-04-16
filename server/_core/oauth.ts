@@ -1,8 +1,8 @@
-import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
 import { sdk } from "./sdk";
+import { COOKIE_NAME, ONE_YEAR_MS, THIRTY_DAYS_MS } from "@shared/const";
 
 function getQueryParam(req: Request, key: string): string | undefined {
   const value = req.query[key];
@@ -13,7 +13,7 @@ export function registerOAuthRoutes(app: Express) {
   // Gmail authentication callback endpoint
   app.post("/api/gmail/callback", async (req: Request, res: Response) => {
     try {
-      const { googleId, email, name } = req.body;
+      const { googleId, email, name, rememberMe } = req.body;
 
       if (!googleId || !email) {
         res.status(400).json({ error: "googleId and email are required" });
@@ -36,13 +36,14 @@ export function registerOAuthRoutes(app: Express) {
       }
 
       // Create session token with non-empty name
+      const sessionDuration = rememberMe ? THIRTY_DAYS_MS : ONE_YEAR_MS;
       const sessionToken = await sdk.createSessionToken(googleId, {
         name: name || email || "User",
-        expiresInMs: ONE_YEAR_MS,
+        expiresInMs: sessionDuration,
       });
 
       const cookieOptions = getSessionCookieOptions(req);
-      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: sessionDuration });
 
       // Determine redirect URL based on clientStatus and 2FA requirement
       let redirectUrl = "/dashboard";

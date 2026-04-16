@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import { useRateLimit } from "@/_core/hooks/useRateLimit";
 import { RateLimitAlert } from "@/components/RateLimitAlert";
 import { ResendCodeButton } from "@/components/ResendCodeButton";
+import { RememberMeCheckbox } from "@/components/RememberMeCheckbox";
 
 type AuthStep = "phone" | "otp" | "register";
 
@@ -24,6 +25,7 @@ export default function PhoneAuth() {
   const [loading, setLoading] = useState(false);
   const [devCode, setDevCode] = useState("");
   const [googleLoaded, setGoogleLoaded] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const rateLimit = useRateLimit();
 
   const requestOtpMutation = trpc.phoneAuth.requestOtp.useMutation();
@@ -248,6 +250,7 @@ export default function PhoneAuth() {
       const result = await verifyOtpMutation.mutateAsync({
         phone,
         code: otp,
+        rememberMe,
       });
 
       if (result.success) {
@@ -382,6 +385,10 @@ export default function PhoneAuth() {
                       className="border-[oklch(0.88_0.008_240)] text-center text-2xl tracking-widest"
                     />
                   </div>
+                  <RememberMeCheckbox
+                    checked={rememberMe}
+                    onChange={setRememberMe}
+                  />
                   <Button
                     type="submit"
                     disabled={loading || rateLimit.isLimited}

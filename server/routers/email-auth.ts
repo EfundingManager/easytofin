@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../_core/trpc";
 import { sendOtpEmail, sendAccountConfirmationEmail, sendWelcomeEmail } from "../_core/emailService";
 import { rateLimiter, RATE_LIMIT_CONFIG } from "../rate-limiter";
-import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS, THIRTY_DAYS_MS } from "@shared/const";
 import { getSessionCookieOptions } from "../_core/cookies";
 import { sdk } from "../_core/sdk";
 import {
@@ -37,6 +37,7 @@ export const emailAuthRouter = router({
     .input(
       z.object({
         email: z.string().email("Invalid email address"),
+        rememberMe: z.boolean().optional().default(false),
       })
     )
     .mutation(async ({ input }) => {
@@ -146,6 +147,7 @@ export const emailAuthRouter = router({
         name: z.string().optional(),
         phone: z.string().optional(),
         isNewUser: z.boolean(),
+        rememberMe: z.boolean().optional().default(false),
       })
     )
     .mutation(async ({ input, ctx: opts }) => {
@@ -241,15 +243,16 @@ export const emailAuthRouter = router({
         }
 
         // Create session token and set cookie
+        const sessionDuration = input.rememberMe ? THIRTY_DAYS_MS : ONE_YEAR_MS;
         const sessionToken = await sdk.createSessionToken(
           user.googleId || user.email || user.phone || `email-${user.id}`,
-          { expiresInMs: ONE_YEAR_MS }
+          { expiresInMs: sessionDuration }
         );
         
         const cookieOptions = getSessionCookieOptions(opts.req);
         opts.res.cookie(COOKIE_NAME, sessionToken, {
           ...cookieOptions,
-          maxAge: ONE_YEAR_MS,
+          maxAge: sessionDuration,
         } as any);
 
         // Send confirmation email

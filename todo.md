@@ -957,3 +957,23 @@
 - [ ] Browser compatibility testing (Chrome, Firefox, Safari, Mobile)
 - [ ] Performance load testing with 100+ concurrent users
 - [ ] Security penetration testing
+
+
+## Phase 87: Implement "Remember Me" Checkbox for Extended Sessions
+- [x] Add rememberMe parameter to phone-auth router (requestOtp, verifyOtp)
+- [x] Add rememberMe parameter to email-auth router (requestOtp, verifyOtp)
+- [x] Add rememberMe parameter to Gmail callback endpoint
+- [x] Update session token generation to support extended expiration (30 days)
+- [x] Create RememberMe checkbox component (RememberMeCheckbox.tsx)
+- [x] Integrate checkbox into PhoneAuth component
+- [x] Integrate checkbox into EmailAuth component
+- [x] Add "Remember Me" UI to Gmail sign-in flow
+- [x] Update session cookie maxAge based on rememberMe flag
+- [x] Create comprehensive tests for Remember Me functionality (36 tests passing)
+- [x] Add THIRTY_DAYS_MS and DEFAULT_SESSION_MS constants
+- [x] Update all auth routers to use rememberMe flag
+- [x] All TypeScript checks passing, zero errors
+- [ ] Manual testing with real user accounts
+- [ ] Test session persistence across browser restarts
+- [ ] Test session expiration after 30 days
+- [ ] Test logout clears Remember Me token
