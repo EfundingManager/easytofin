@@ -923,3 +923,16 @@
 - [ ] Integrate campaign composer into admin dashboard
 - [ ] Write comprehensive tests for campaign functionality
 - [ ] Test complete campaign workflow end-to-end
+
+
+## Phase 85: Bulk Recipient Upload from CSV
+- [x] Create CSV parsing and validation backend API
+- [x] Build recipient list storage and management (recipientLists and recipients tables in schema)
+- [x] Install papaparse library for CSV parsing
+- [x] Create recipient upload router with 7 procedures (create, list, get, update, delete, deleteList, validateCSV)
+- [x] Register recipient upload router in main routers file
+- [x] Write comprehensive unit tests (33 tests passing)
+- [ ] Create CSV upload UI component
+- [ ] Integrate into campaign composer
+- [ ] Add recipient preview and management
+- [ ] Test complete workflow end-to-end

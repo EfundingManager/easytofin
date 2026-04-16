@@ -296,3 +296,41 @@ export const emailBlastDeliveries = mysqlTable("emailBlastDeliveries", {
 
 export type EmailBlastDelivery = typeof emailBlastDeliveries.$inferSelect;
 export type InsertEmailBlastDelivery = typeof emailBlastDeliveries.$inferInsert;
+
+
+/**
+ * Recipient lists for email campaigns
+ */
+export const recipientLists = mysqlTable("recipientLists", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  recipientCount: int("recipientCount").default(0),
+  createdBy: int("createdBy").notNull(),
+  updatedBy: int("updatedBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RecipientList = typeof recipientLists.$inferSelect;
+export type InsertRecipientList = typeof recipientLists.$inferInsert;
+
+/**
+ * Individual recipients in recipient lists
+ */
+export const recipients = mysqlTable("recipients", {
+  id: int("id").autoincrement().primaryKey(),
+  listId: int("listId").notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  name: varchar("name", { length: 255 }),
+  firstName: varchar("firstName", { length: 255 }),
+  lastName: varchar("lastName", { length: 255 }),
+  phone: varchar("phone", { length: 20 }),
+  company: varchar("company", { length: 255 }),
+  status: mysqlEnum("status", ["active", "inactive", "bounced", "unsubscribed"]).default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Recipient = typeof recipients.$inferSelect;
+export type InsertRecipient = typeof recipients.$inferInsert;
