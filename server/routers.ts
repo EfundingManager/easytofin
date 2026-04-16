@@ -21,6 +21,7 @@ import { emailBlasterRouter } from "./routers/email-blaster";
 import { emailCampaignRouter } from "./routers/email-campaign";
 import { recipientUploadRouter } from "./routers/recipient-upload";
 import { deviceRegistrationRouter } from "./routers/device-registration";
+import { passwordResetRouter } from "./routers/password-reset";
 import * as db from "./db";
 
 export const appRouter = router({
@@ -56,6 +57,7 @@ export const appRouter = router({
   phoneAuth: phoneAuthRouter,
   gmailAuth: gmailAuthRouter,
   emailAuth: emailAuthRouter,
+  passwordReset: passwordResetRouter,
   admin: adminRouter,
   workflow: workflowRouter,
   profile: profileRouter,

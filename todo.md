@@ -1090,3 +1090,26 @@
 - [ ] Verify user session is persisted across page navigation
 - [ ] Test email login flow end-to-end
 - [ ] Test phone login flow end-to-end
+
+
+## Phase 95: Forgot Password Feature
+- [x] Add passwordResetTokens table to database schema (15 columns)
+- [x] Create password reset database helpers (8 functions)
+- [x] Create password reset tRPC router (4 procedures)
+- [x] Register password reset router in main routers
+- [x] Implement requestReset procedure (email/phone OTP)
+- [x] Implement verifyOtp procedure (OTP validation)
+- [x] Implement resetPassword procedure (password update)
+- [x] Implement validateToken procedure (token validation)
+- [x] Add security features (1-hour expiration, max 5 attempts)
+- [x] All TypeScript checks passing
+- [ ] Create ForgotPasswordForm component
+- [ ] Create ResetPasswordForm component
+- [ ] Create PasswordResetSuccess component
+- [ ] Add Forgot Password link to login pages
+- [ ] Integrate password reset into PhoneAuth flow
+- [ ] Integrate password reset into EmailAuth flow
+- [ ] Add password reset email template
+- [ ] Add password reset SMS template
+- [ ] Create comprehensive tests for password reset
+- [ ] Test complete password reset flow end-to-end
