@@ -1036,3 +1036,18 @@
 - [ ] Test OTP bypass for remembered devices
 - [ ] Test device revocation and re-verification
 - [ ] Database migration for trustedDevices and deviceVerificationTokens tables
+
+
+## Phase 91: Fix Google OAuth 2.0 Policy Compliance
+- [x] Verify OAuth redirect URIs are properly configured (https://easyfinserv-dmr4obss.manus.space/api/gmail/callback)
+- [x] Check Google Cloud Console OAuth consent screen settings (External, verified branding)
+- [x] Ensure app verification status is correct (Branding verified)
+- [x] Verify HTTPS is enforced on all redirect URLs
+- [x] Fix Google Sign-In button initialization in EmailAuth component
+- [x] Update button rendering to use window.google.accounts.id.initialize() callback
+- [x] Remove incorrect button rendering logic from click handler
+- [x] Add proper useEffect hook for button rendering
+- [x] Verify OAuth scopes are minimal and necessary
+- [x] Check user consent screen branding
+- [ ] Test Gmail login with a fresh incognito session
+- [ ] Verify error message no longer appears

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +25,8 @@ const EmailAuth = () => {
   const [rememberDevice, setRememberDevice] = useState(false);
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
 
+
+
   // Initialize mutations at the top level (before any conditional returns)
   const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation();
   const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
@@ -41,7 +43,7 @@ const EmailAuth = () => {
     }
   }, [user, authLoading, setLocation]);
 
-  // Load Google Sign-In script
+  // Load Google Sign-In script and initialize button
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
@@ -49,11 +51,35 @@ const EmailAuth = () => {
     script.defer = true;
     script.onload = () => {
       if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          callback: handleGoogleSignIn,
+          ux_mode: "popup",
+          auto_select: false,
+        });
         setGoogleLoaded(true);
       }
     };
     document.head.appendChild(script);
   }, []);
+
+  // Render Google button when it's loaded
+  useEffect(() => {
+    if (googleLoaded && window.google?.accounts?.id) {
+      const buttonElement = document.getElementById("google-signin-button");
+      if (buttonElement && buttonElement.children.length === 0) {
+        try {
+          window.google.accounts.id.renderButton(buttonElement, {
+            theme: "outline",
+            size: "large",
+            text: "signin_with",
+          });
+        } catch (error) {
+          console.error("[Gmail] Error rendering button:", error);
+        }
+      }
+    }
+  }, [googleLoaded]);
 
   // Show loading state while checking authentication
   if (authLoading) {
@@ -241,24 +267,7 @@ const EmailAuth = () => {
                   </div>
                 </div>
 
-                <div id="google-signin-button" className="flex justify-center">
-                  {googleLoaded && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (window.google?.accounts?.id) {
-                          window.google.accounts.id.renderButton(
-                            document.getElementById("google-signin-button"),
-                            { theme: "outline", size: "large", text: "signin_with" }
-                          );
-                        }
-                      }}
-                      className="text-sm text-muted-foreground"
-                    >
-                      Sign in with Google
-                    </button>
-                  )}
-                </div>
+                <div id="google-signin-button" className="flex justify-center w-full" />
               </form>
             ) : (
               <form onSubmit={handleVerifyOtp} className="space-y-4">
