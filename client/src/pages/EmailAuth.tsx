@@ -19,12 +19,14 @@ const EmailAuth = () => {
   const { user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
-  const [step, setStep] = useState<"email" | "otp">("email");
+  const [step, setStep] = useState<"email" | "otp" | "password">("email");
   const [loading, setLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [usePasswordLogin, setUsePasswordLogin] = useState(false);
+  const [password, setPassword] = useState("");
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
 
 
@@ -32,6 +34,7 @@ const EmailAuth = () => {
   // Initialize mutations at the top level (before any conditional returns)
   const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation();
   const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
+  const loginWithPasswordMutation = trpc.passwordLogin.loginWithPassword.useMutation();
 
   // Redirect authenticated users away from login page
   useEffect(() => {
@@ -167,6 +170,33 @@ const EmailAuth = () => {
     }
   };
 
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      toast.error("Please enter email and password");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await loginWithPasswordMutation.mutateAsync({
+        phoneOrEmail: email,
+        password,
+        rememberMe,
+        rememberDevice,
+      });
+
+      if (result.success) {
+        toast.success("Login successful!");
+        window.location.href = result.redirectUrl;
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Password login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -242,7 +272,34 @@ const EmailAuth = () => {
             )}
 
             {step === "email" ? (
-              <form onSubmit={handleRequestOtp} className="space-y-4">
+              <>
+                {/* Login Method Toggle */}
+                <div className="flex gap-2 mb-4">
+                  <Button
+                    type="button"
+                    variant={!usePasswordLogin ? "default" : "outline"}
+                    className="flex-1"
+                    onClick={() => {
+                      setUsePasswordLogin(false);
+                      setPassword("");
+                    }}
+                  >
+                    OTP Login
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={usePasswordLogin ? "default" : "outline"}
+                    className="flex-1"
+                    onClick={() => {
+                      setUsePasswordLogin(true);
+                      setCode("");
+                    }}
+                  >
+                    Password Login
+                  </Button>
+                </div>
+
+                <form onSubmit={usePasswordLogin ? handlePasswordLogin : handleRequestOtp} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium">Email Address</label>
                   <Input
@@ -253,6 +310,19 @@ const EmailAuth = () => {
                     disabled={loading || isLimited}
                   />
                 </div>
+
+                {usePasswordLogin && (
+                  <div>
+                    <label className="text-sm font-medium">Password</label>
+                    <Input
+                      type="password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
+                )}
 
                 <Button
                   type="submit"
@@ -280,7 +350,8 @@ const EmailAuth = () => {
 
                 <div id="google-signin-button" className="flex justify-center w-full" />
               </form>
-            ) : (
+              </>
+            ) : step === "otp" ? (
               <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium">Verification Code</label>
@@ -339,7 +410,7 @@ const EmailAuth = () => {
                   Forgot Password?
                 </button>
               </form>
-            )}
+            ) : null}
           </CardContent>
         </Card>
       </div>

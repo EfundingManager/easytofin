@@ -1138,7 +1138,9 @@
 - [x] Implement dynamic button text based on login method
 - [x] Add password input field with conditional rendering
 - [x] Support phone or email for password login
+- [x] Add password login form to EmailAuth page
+- [x] Add toggle between OTP and password login on EmailAuth
+- [x] Implement password handler in EmailAuth
 - [x] All TypeScript checks passing
-- [ ] Add password login form to EmailAuth page
-- [ ] Test password login flow
+- [ ] Test password login flow on both pages
 - [ ] Test on production domain
