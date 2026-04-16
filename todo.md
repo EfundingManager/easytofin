@@ -1051,3 +1051,17 @@
 - [x] Check user consent screen branding
 - [ ] Test Gmail login with a fresh incognito session
 - [ ] Verify error message no longer appears
+
+
+## Phase 92: Debug "Access blocked: Authorization Error" for Gmail OAuth
+- [x] Verify VITE_GOOGLE_CLIENT_ID is correctly set
+- [x] Check OAuth Consent Screen status (In production - VERIFIED)
+- [x] Verify branding is verified (CONFIRMED)
+- [x] Check OAuth scopes configuration (email, profile)
+- [x] Verify all JavaScript origins are registered (CONFIRMED)
+- [x] Create comprehensive troubleshooting guide (GMAIL_OAUTH_TROUBLESHOOTING.md)
+- [x] Identify most likely cause: Redirect URI mismatch (90% probability)
+- [x] Document step-by-step resolution process
+- [ ] User to verify redirect URI in Google Cloud Console
+- [ ] Test Gmail login after redirect URI verification
+- [ ] If still failing, use Google OAuth 2.0 Playground to test
