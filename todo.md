@@ -1016,3 +1016,23 @@
 - [ ] Create device activity timeline
 - [ ] Add device security alerts
 - [ ] Fix existing server test failures
+
+
+## Phase 90: Automatic Device Recognition to Bypass OTP
+- [x] Create device registration tRPC procedure (registerDevice)
+- [x] Create device verification tRPC procedure (verifyDevice)
+- [x] Create device lookup procedure (verifyDevice with fingerprint matching)
+- [x] Create device revocation procedure (deactivateDevice)
+- [x] Add device verification token generation and validation
+- [x] Create device registration router with 6 procedures
+- [x] Register device registration router in main routers
+- [x] Create comprehensive unit tests for device registration (9 tests)
+- [x] Implement device fingerprint comparison logic
+- [x] Add automatic login bypass for recognized devices
+- [ ] Update phone-auth router to check for remembered devices before OTP
+- [ ] Update email-auth router to check for remembered devices before OTP
+- [ ] Update Gmail auth flow to check for remembered devices
+- [ ] Integrate device recognition into login flow
+- [ ] Test OTP bypass for remembered devices
+- [ ] Test device revocation and re-verification
+- [ ] Database migration for trustedDevices and deviceVerificationTokens tables

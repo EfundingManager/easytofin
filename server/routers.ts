@@ -20,6 +20,7 @@ import { kycFormRouter } from "./routers/kyc-form";
 import { emailBlasterRouter } from "./routers/email-blaster";
 import { emailCampaignRouter } from "./routers/email-campaign";
 import { recipientUploadRouter } from "./routers/recipient-upload";
+import { deviceRegistrationRouter } from "./routers/device-registration";
 import * as db from "./db";
 
 export const appRouter = router({
@@ -68,8 +69,9 @@ export const appRouter = router({
   featureFlags: featureFlagsRouter,
   kycForm: kycFormRouter,
   emailBlaster: emailBlasterRouter,
-  emailCampaign: router(emailCampaignRouter),
-  recipientUpload: router(recipientUploadRouter),
+  emailCampaign: emailCampaignRouter,
+  recipientUpload: recipientUploadRouter,
+  deviceRegistration: deviceRegistrationRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({
