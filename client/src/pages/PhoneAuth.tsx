@@ -361,7 +361,7 @@ export default function PhoneAuth() {
               </div>
             </CardHeader>
 
-            <CardContent className="max-h-[60vh] overflow-y-auto">
+            <CardContent className="max-h-[calc(100vh-300px)] overflow-y-auto">
               {step === "phone" && (
                 <div className="space-y-4">
                   {/* Google Sign-In Button */}
