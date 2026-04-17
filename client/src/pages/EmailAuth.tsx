@@ -39,17 +39,7 @@ const EmailAuth = () => {
   const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
   const loginWithPasswordMutation = trpc.passwordLogin.loginWithPassword.useMutation();
 
-  // Redirect authenticated users away from login page
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) return;
-
-    if (user.role === "admin" || user.role === "manager" || user.role === "staff") {
-      setLocation("/admin");
-    } else {
-      setLocation(`/user/${user.id}`);
-    }
-  }, [user, authLoading, setLocation]);
+  // Note: We allow authenticated users to access this page so they can switch accounts if needed
 
   // Load Google Sign-In script and initialize button
   useEffect(() => {
