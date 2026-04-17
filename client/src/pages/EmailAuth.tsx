@@ -314,7 +314,7 @@ const EmailAuth = () => {
               )}
             </div>
           </CardHeader>
-          <CardContent className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
+          <CardContent className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
             {isLimited && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
                 Too many attempts. Please wait {timeRemaining}s before trying again.
@@ -373,8 +373,8 @@ const EmailAuth = () => {
             )}
 
             {step === "authMethod" && (
-              <div className="space-y-4">
-                <div className="bg-slate-50 p-4 rounded-lg mb-6">
+              <div className="space-y-3">
+                <div className="bg-slate-50 p-3 rounded-lg">
                   <p className="text-sm text-slate-600">
                     Choose how you'd like to sign in
                   </p>
@@ -384,7 +384,7 @@ const EmailAuth = () => {
                   type="button"
                   variant="outline"
                   onClick={() => handleSelectAuthMethod("otp")}
-                  className="w-full h-auto py-4 flex flex-col items-start gap-2 hover:bg-slate-50"
+                  className="w-full h-auto py-3 flex flex-col items-start gap-1 hover:bg-slate-50"
                 >
                   <span className="font-semibold text-slate-900">OTP Verification</span>
                   <span className="text-xs text-slate-600">
@@ -396,7 +396,7 @@ const EmailAuth = () => {
                   type="button"
                   variant="outline"
                   onClick={() => handleSelectAuthMethod("password")}
-                  className="w-full h-auto py-4 flex flex-col items-start gap-2 hover:bg-slate-50"
+                  className="w-full h-auto py-3 flex flex-col items-start gap-1 hover:bg-slate-50"
                 >
                   <span className="font-semibold text-slate-900">Password Login</span>
                   <span className="text-xs text-slate-600">
