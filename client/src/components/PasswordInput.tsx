@@ -19,6 +19,8 @@ export const PasswordInput = ({
   error,
   helperText,
   className,
+  autoComplete,
+  name,
   ...props
 }: PasswordInputProps) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,6 +36,8 @@ export const PasswordInput = ({
         <Input
           type={showPassword ? "text" : "password"}
           className={`pr-10 border-[oklch(0.88_0.008_240)] ${className || ""}`}
+          autoComplete={autoComplete || "current-password"}
+          name={name || "password"}
           {...props}
         />
         <button

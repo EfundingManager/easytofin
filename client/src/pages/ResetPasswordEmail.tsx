@@ -267,6 +267,8 @@ export default function ResetPasswordEmail() {
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={loading}
                       className="border-[oklch(0.88_0.008_240)] pr-10"
+                      autoComplete="new-password"
+                      name="new-password"
                     />
                     <button
                       type="button"
@@ -290,6 +292,8 @@ export default function ResetPasswordEmail() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       disabled={loading}
                       className="border-[oklch(0.88_0.008_240)] pr-10"
+                      autoComplete="new-password"
+                      name="confirm-password"
                     />
                     <button
                       type="button"

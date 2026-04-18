@@ -290,6 +290,8 @@ export default function ResetPassword() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   disabled={loading}
+                  autoComplete="new-password"
+                  name="new-password"
                 />
 
                 <PasswordInput
@@ -298,6 +300,8 @@ export default function ResetPassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={loading}
+                  autoComplete="new-password"
+                  name="confirm-password"
                 />
 
                 <Button

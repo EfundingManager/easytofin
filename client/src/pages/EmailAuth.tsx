@@ -222,6 +222,8 @@ const EmailAuth = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={loading || isLimited}
+                      autoComplete="email"
+                      name="email"
                     />
                   </div>
 
@@ -231,6 +233,8 @@ const EmailAuth = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
+                    autoComplete="current-password"
+                    name="password"
                   />
                   <RememberDeviceCheckbox
                     checked={rememberDevice}

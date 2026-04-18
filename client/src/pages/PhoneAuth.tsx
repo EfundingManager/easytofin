@@ -403,6 +403,8 @@ export default function PhoneAuth() {
                         onChange={(e) => setPhone(e.target.value)}
                         disabled={loading}
                         className="border-[oklch(0.88_0.008_240)]"
+                        autoComplete="tel"
+                        name="phone"
                       />
                     </div>
                     <PasswordInput
@@ -411,6 +413,8 @@ export default function PhoneAuth() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={loading}
+                      autoComplete="current-password"
+                      name="password"
                     />
                     <RememberDeviceCheckbox
                       checked={rememberDevice}
