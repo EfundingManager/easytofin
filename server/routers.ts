@@ -24,6 +24,7 @@ import { deviceRegistrationRouter } from "./routers/device-registration";
 import { passwordResetRouter } from "./routers/password-reset";
 import { passwordLoginRouter } from "./routers/password-login";
 import { signupRouter } from "./routers/signup";
+import { smsVerificationRouter } from "./routers/sms-verification";
 import * as db from "./db";
 
 export const appRouter = router({
@@ -67,6 +68,7 @@ export const appRouter = router({
   profile: profileRouter,
   profileProgress: profileProgressRouter,
   emailVerification: emailVerificationRouter,
+  smsVerification: smsVerificationRouter,
   documents: documentsRouter,
   documentReview: documentReviewRouter,
   policies: policiesRouter,

@@ -402,3 +402,21 @@ export const passwordResetTokens = mysqlTable("passwordResetTokens", {
 });
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
+
+
+/**
+ * SMS verification tokens for phone verification
+ * Used for SMS-based verification during signup and account recovery
+ */
+export const smsVerificationTokens = mysqlTable("smsVerificationTokens", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull(),
+  phone: varchar("phone", { length: 20 }).notNull(),
+  otp: varchar("otp", { length: 6 }).notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  verifiedAt: timestamp("verifiedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SmsVerificationToken = typeof smsVerificationTokens.$inferSelect;
+export type InsertSmsVerificationToken = typeof smsVerificationTokens.$inferInsert;
