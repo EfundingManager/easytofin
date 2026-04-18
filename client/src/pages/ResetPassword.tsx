@@ -8,6 +8,7 @@ import { Loader2, CheckCircle2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export default function ResetPassword() {
   const [, setLocation] = useLocation();
@@ -283,61 +284,21 @@ export default function ResetPassword() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="password" className="text-[oklch(0.25_0.06_155)] font-medium">
-                    New Password
-                  </Label>
-                  <div className="relative mt-2">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter new password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="border-[oklch(0.92_0.02_155)] focus:border-[oklch(0.40_0.11_195)] pr-10"
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[oklch(0.52_0.015_240)]"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
+                <PasswordInput
+                  label="New Password"
+                  placeholder="Enter new password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  disabled={loading}
+                />
 
-                <div>
-                  <Label htmlFor="confirm-password" className="text-[oklch(0.25_0.06_155)] font-medium">
-                    Confirm Password
-                  </Label>
-                  <div className="relative mt-2">
-                    <Input
-                      id="confirm-password"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm new password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="border-[oklch(0.92_0.02_155)] focus:border-[oklch(0.40_0.11_195)] pr-10"
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[oklch(0.52_0.015_240)]"
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
+                <PasswordInput
+                  label="Confirm Password"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={loading}
+                />
 
                 <Button
                   type="submit"

@@ -13,6 +13,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
+import { PasswordInput } from "@/components/PasswordInput";
 
 type AuthStep = "email" | "authMethod" | "otp" | "password" | "confirmation";
 
@@ -224,19 +225,13 @@ const EmailAuth = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-2">
-                      Password
-                    </label>
-                    <Input
-                      type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                      className="border-slate-200"
-                    />
-                  </div>
+                  <PasswordInput
+                    label="Password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                  />
                   <RememberDeviceCheckbox
                     checked={rememberDevice}
                     onChange={setRememberDevice}

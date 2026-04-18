@@ -13,6 +13,7 @@ import { RateLimitAlert } from "@/components/RateLimitAlert";
 import { ResendCodeButton } from "@/components/ResendCodeButton";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
+import { PasswordInput } from "@/components/PasswordInput";
 
 type AuthStep = "phone" | "authMethod" | "otp" | "register" | "password";
 
@@ -404,19 +405,13 @@ export default function PhoneAuth() {
                         className="border-[oklch(0.88_0.008_240)]"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[oklch(0.25_0.06_155)] mb-2">
-                        Password
-                      </label>
-                      <Input
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={loading}
-                        className="border-[oklch(0.88_0.008_240)]"
-                      />
-                    </div>
+                    <PasswordInput
+                      label="Password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                    />
                     <RememberDeviceCheckbox
                       checked={rememberDevice}
                       onChange={setRememberDevice}
