@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import crypto from "crypto";
 import { publicProcedure, router } from "../_core/trpc";
 import { sendWelcomeEmail } from "../_core/emailService";
 import { rateLimiter, RATE_LIMIT_CONFIG } from "../rate-limiter";
@@ -12,6 +13,14 @@ import {
   updatePhoneUser,
 } from "../db";
 
+function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto
+    .pbkdf2Sync(password, salt, 100000, 64, "sha512")
+    .toString("hex");
+  return `${salt}:${hash}`;
+}
+
 export const signupRouter = router({
   /**
    * Register a new user with email, phone, and full name
@@ -23,6 +32,7 @@ export const signupRouter = router({
         email: z.string().email("Invalid email address"),
         phone: z.string().min(10, "Invalid phone number"),
         fullName: z.string().min(2, "Full name must be at least 2 characters"),
+        password: z.string().min(8, "Password must be at least 8 characters"),
         rememberMe: z.boolean().optional().default(false),
       })
     )
@@ -69,11 +79,15 @@ export const signupRouter = router({
           });
         }
 
+        // Hash the password
+        const hashedPassword = hashPassword(input.password);
+
         // Create new user
         const newUser = await createPhoneUser({
           email: input.email.toLowerCase(),
           phone: input.phone,
           name: input.fullName,
+          passwordHash: hashedPassword,
           loginMethod: "password",
           role: "user",
         });
