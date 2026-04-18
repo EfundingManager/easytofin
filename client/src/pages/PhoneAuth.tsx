@@ -386,7 +386,7 @@ export default function PhoneAuth() {
                   </div>
 
                   {/* Phone Sign-In Form */}
-                  <form onSubmit={handleRequestOtp} className="space-y-4">
+                  <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-[oklch(0.25_0.06_155)] mb-2">
                         Phone Number
@@ -405,22 +405,32 @@ export default function PhoneAuth() {
                       onChange={setRememberDevice}
                       showTooltip={true}
                     />
-                    <Button
-                      type="submit"
-                      disabled={loading || rateLimit.isLimited}
-                      className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white disabled:opacity-50"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Sending OTP...
-                        </>
-                      ) : rateLimit.isLimited ? (
-                        `Retry in ${rateLimit.formatTimeRemaining(rateLimit.timeRemaining)}`
-                      ) : (
-                        "Continue"
-                      )}
-                    </Button>
+                    <div className="space-y-3 pt-2">
+                      <Button
+                        type="button"
+                        onClick={() => handleRequestOtp({ preventDefault: () => {} } as any)}
+                        disabled={loading || rateLimit.isLimited}
+                        className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 border-2 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
+                        variant="outline"
+                      >
+                        <span className="font-semibold text-[oklch(0.25_0.06_155)]">Continue with OTP</span>
+                        <span className="text-xs text-[oklch(0.52_0.015_240)]">
+                          Use the 6-digit code sent to your phone
+                        </span>
+                      </Button>
+
+                      <Button
+                        type="button"
+                        onClick={() => setStep("password")}
+                        className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 border-2 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
+                        variant="outline"
+                      >
+                        <span className="font-semibold text-[oklch(0.25_0.06_155)]">Continue with Password</span>
+                        <span className="text-xs text-[oklch(0.52_0.015_240)]">
+                          Sign in with your password
+                        </span>
+                      </Button>
+                    </div>
                     {rateLimit.isLimited && (
                       <RateLimitAlert
                         message={rateLimit.message}
@@ -428,7 +438,7 @@ export default function PhoneAuth() {
                         onFormatTime={rateLimit.formatTimeRemaining}
                       />
                     )}
-                  </form>
+                  </div>
                 </div>
               )}
 

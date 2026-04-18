@@ -343,7 +343,7 @@ const EmailAuth = () => {
                   </div>
                 </div>
 
-                <form onSubmit={handleRequestOtp} className="space-y-4">
+                <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium">Email Address</label>
                     <Input
@@ -361,21 +361,33 @@ const EmailAuth = () => {
                     showTooltip={true}
                   />
 
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={loading || isLimited || requestOtpMutation.isPending}
-                  >
-                    {loading || requestOtpMutation.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Sending...
-                      </>
-                    ) : (
-                      "Continue"
-                    )}
-                  </Button>
-                </form>
+                  <div className="space-y-3 pt-2">
+                    <Button
+                      type="button"
+                      onClick={() => handleRequestOtp({ preventDefault: () => {} } as any)}
+                      className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 hover:bg-slate-50 border-2 border-slate-200"
+                      variant="outline"
+                      disabled={loading || isLimited || requestOtpMutation.isPending}
+                    >
+                      <span className="font-semibold text-slate-900">Continue with OTP</span>
+                      <span className="text-xs text-slate-600">
+                        Use the 6-digit code sent to your email
+                      </span>
+                    </Button>
+
+                    <Button
+                      type="button"
+                      onClick={() => setStep("password")}
+                      className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 hover:bg-slate-50 border-2 border-slate-200"
+                      variant="outline"
+                    >
+                      <span className="font-semibold text-slate-900">Continue with Password</span>
+                      <span className="text-xs text-slate-600">
+                        Sign in with your password
+                      </span>
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
 
