@@ -342,7 +342,7 @@ export default function PhoneAuth() {
                     {step === "register" && "Complete Registration"}
                   </CardTitle>
                   <CardDescription className="text-[oklch(0.52_0.015_240)]">
-                    {step === "phone" && "Enter your phone number"}
+                    {step === "phone" && "Enter your phone number to Sign In with your phone number"}
                     {step === "authMethod" && `Signing in with ${phone}`}
                     {step === "otp" && "Enter the 6-digit code sent to your phone"}
                     {step === "password" && "Enter your password"}
