@@ -490,3 +490,29 @@ export const accountLinkTokens = mysqlTable("accountLinkTokens", {
 
 export type AccountLinkToken = typeof accountLinkTokens.$inferSelect;
 export type InsertAccountLinkToken = typeof accountLinkTokens.$inferInsert;
+
+
+/**
+ * Account lockout tracking for brute force protection
+ * Locks accounts after 5 failed login attempts for 30 minutes
+ */
+export const accountLockouts = mysqlTable("accountLockouts", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId"),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  failedAttempts: int("failedAttempts").default(0).notNull(),
+  maxFailedAttempts: int("maxFailedAttempts").default(5).notNull(),
+  isLocked: mysqlEnum("isLocked", ["true", "false"]).default("false").notNull(),
+  lockedUntil: timestamp("lockedUntil"),
+  lastFailedAttempt: timestamp("lastFailedAttempt"),
+  lastFailureReason: varchar("lastFailureReason", { length: 255 }),
+  unlockMethod: mysqlEnum("unlockMethod", ["time_based", "email_verification", "sms_verification"]).default("time_based"),
+  unlockToken: varchar("unlockToken", { length: 255 }).unique(),
+  unlockTokenExpiresAt: timestamp("unlockTokenExpiresAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AccountLockout = typeof accountLockouts.$inferSelect;
+export type InsertAccountLockout = typeof accountLockouts.$inferInsert;

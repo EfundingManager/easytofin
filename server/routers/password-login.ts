@@ -7,6 +7,7 @@ import { TRPCError } from "@trpc/server";
 import { THIRTY_DAYS_MS, DEFAULT_SESSION_MS } from "../../shared/const";
 import crypto from "crypto";
 import { trackLoginAttempt } from "../services/loginAttemptService";
+import { AccountLockoutService } from "../services/accountLockoutService";
 
 export const passwordLoginRouter = router({
   /**
@@ -27,6 +28,20 @@ export const passwordLoginRouter = router({
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database connection failed" });
 
       try {
+        // Check if account is locked
+        const lockStatus = await AccountLockoutService.isAccountLocked(
+          null,
+          input.phoneOrEmail.includes("@") ? input.phoneOrEmail : null,
+          !input.phoneOrEmail.includes("@") ? input.phoneOrEmail : null
+        );
+
+        if (lockStatus.isLocked) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `Account is temporarily locked. Please try again in ${lockStatus.remainingMinutes} minutes or use the unlock option.`,
+          });
+        }
+
         // Find user by phone or email in phoneUsers table
         let phoneUser = null;
         const phoneUserResult = await db
@@ -78,6 +93,15 @@ export const passwordLoginRouter = router({
         const passwordHash = crypto.createHash("sha256").update(input.password).digest("hex");
         const passwordMatch = passwordHash === phoneUser.passwordHash;
         if (!passwordMatch) {
+          // Record failed attempt and check lockout
+          const lockoutResult = await AccountLockoutService.recordFailedAttempt(
+            phoneUser.id,
+            phoneUser.email || null,
+            phoneUser.phone || null,
+            'invalid_password',
+            ctx.req?.ip
+          );
+
           // Track failed login attempt
           await trackLoginAttempt({
             phoneUserId: phoneUser.id,
@@ -90,11 +114,26 @@ export const passwordLoginRouter = router({
             userAgent: ctx.req?.headers?.['user-agent'],
           });
 
+          // If account is now locked, return specific message
+          if (lockoutResult.isLocked) {
+            throw new TRPCError({
+              code: "TOO_MANY_REQUESTS",
+              message: `Too many failed attempts. Account locked for 30 minutes. Remaining attempts: ${lockoutResult.remainingAttempts}`,
+            });
+          }
+
           throw new TRPCError({
             code: "UNAUTHORIZED",
-            message: "Invalid phone/email or password",
+            message: `Invalid phone/email or password. Remaining attempts: ${lockoutResult.remainingAttempts}`,
           });
         }
+
+        // Record successful login
+        await AccountLockoutService.recordSuccessfulLogin(
+          phoneUser.id,
+          phoneUser.email || null,
+          phoneUser.phone || null
+        );
 
         // Create session token
         const sessionDuration = input.rememberMe ? THIRTY_DAYS_MS : DEFAULT_SESSION_MS;
