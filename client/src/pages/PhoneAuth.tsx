@@ -33,6 +33,7 @@ export default function PhoneAuth() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [showSmsOtpFallback, setShowSmsOtpFallback] = useState(false);
   const rateLimit = useRateLimit();
 
   const requestOtpMutation = trpc.phoneAuth.requestOtp.useMutation();
@@ -272,7 +273,25 @@ export default function PhoneAuth() {
     } catch (error: any) {
       const errorMsg = error.message || "Password login failed";
       setLoginError(errorMsg);
+      setShowSmsOtpFallback(true);
       toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUseSmsOtp = async () => {
+    setLoading(true);
+    try {
+      const result = await requestOtpMutation.mutateAsync({ phone });
+      setDevCode(result.devCode || "");
+      setIsNewUser(result.isNewUser || false);
+      setStep("otp");
+      setLoginError("");
+      setShowSmsOtpFallback(false);
+      toast.success("OTP sent to your phone!");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send OTP");
     } finally {
       setLoading(false);
     }
@@ -442,6 +461,27 @@ export default function PhoneAuth() {
                         timeRemaining={rateLimit.timeRemaining}
                         onFormatTime={rateLimit.formatTimeRemaining}
                       />
+                    )}
+                    {loginError && showSmsOtpFallback && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p className="text-sm text-red-800 mb-3">{loginError}</p>
+                        <Button
+                          type="button"
+                          onClick={handleUseSmsOtp}
+                          disabled={loading}
+                          variant="outline"
+                          className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                        >
+                          {loading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Sending OTP...
+                            </>
+                          ) : (
+                            "Receive OTP via SMS"
+                          )}
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </div>

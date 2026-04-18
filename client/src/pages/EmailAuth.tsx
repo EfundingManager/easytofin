@@ -31,6 +31,8 @@ const EmailAuth = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [showSmsOtpFallback, setShowSmsOtpFallback] = useState(false);
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
 
 
@@ -158,7 +160,26 @@ const EmailAuth = () => {
       }
     } catch (error: any) {
       console.error("[Email Auth] Failed to login:", error);
-      toast.error(error.message || "Invalid email or password");
+      const errorMsg = error.message || "Invalid email or password";
+      setLoginError(errorMsg);
+      setShowSmsOtpFallback(true);
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUseSmsOtp = async () => {
+    setLoading(true);
+    try {
+      const result = await requestOtpMutation.mutateAsync({ email });
+      setIsNewUser(result.isNewUser || false);
+      setStep("otp");
+      setLoginError("");
+      setShowSmsOtpFallback(false);
+      toast.success("OTP sent to your email!");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send OTP");
     } finally {
       setLoading(false);
     }
@@ -256,6 +277,27 @@ const EmailAuth = () => {
                       "Login"
                     )}
                   </Button>
+                  {loginError && showSmsOtpFallback && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <p className="text-sm text-red-800 mb-3">{loginError}</p>
+                      <Button
+                        type="button"
+                        onClick={handleUseSmsOtp}
+                        disabled={loading}
+                        variant="outline"
+                        className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Sending OTP...
+                          </>
+                        ) : (
+                          "Receive OTP via SMS"
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
