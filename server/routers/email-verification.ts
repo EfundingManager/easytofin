@@ -5,6 +5,52 @@ import { phoneUsers, emailVerificationTokens } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
 import crypto from 'crypto';
 
+// Rate limiting: Store last resend time per user (in-memory, can be replaced with Redis)
+const resendAttempts = new Map<number, { timestamp: number; count: number }>();
+const COOLDOWN_SECONDS = 60;
+const MAX_ATTEMPTS_PER_HOUR = 5;
+
+function checkRateLimit(userId: number): { allowed: boolean; remainingSeconds?: number; error?: string } {
+  const now = Date.now();
+  const userAttempts = resendAttempts.get(userId);
+
+  if (!userAttempts) {
+    // First attempt
+    resendAttempts.set(userId, { timestamp: now, count: 1 });
+    return { allowed: true };
+  }
+
+  const timeSinceLastAttempt = (now - userAttempts.timestamp) / 1000;
+
+  // Check cooldown
+  if (timeSinceLastAttempt < COOLDOWN_SECONDS) {
+    const remainingSeconds = Math.ceil(COOLDOWN_SECONDS - timeSinceLastAttempt);
+    return {
+      allowed: false,
+      remainingSeconds,
+      error: `Please wait ${remainingSeconds} seconds before resending`,
+    };
+  }
+
+  // Reset count if more than 1 hour has passed
+  if (timeSinceLastAttempt > 3600) {
+    resendAttempts.set(userId, { timestamp: now, count: 1 });
+    return { allowed: true };
+  }
+
+  // Check max attempts per hour
+  if (userAttempts.count >= MAX_ATTEMPTS_PER_HOUR) {
+    return {
+      allowed: false,
+      error: `Too many resend attempts. Please try again later.`,
+    };
+  }
+
+  // Allow and increment count
+  resendAttempts.set(userId, { timestamp: now, count: userAttempts.count + 1 });
+  return { allowed: true };
+}
+
 // Generate a random token
 function generateToken(): string {
   return crypto.randomBytes(32).toString('hex');
@@ -175,6 +221,16 @@ export const emailVerificationRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       try {
+        // Check rate limiting
+        const rateLimitCheck = checkRateLimit(ctx.user.id);
+        if (!rateLimitCheck.allowed) {
+          return {
+            success: false,
+            error: rateLimitCheck.error || 'Too many requests. Please try again later.',
+            remainingSeconds: rateLimitCheck.remainingSeconds,
+          };
+        }
+
         const db = await getDb();
         if (!db) {
           return { success: false, error: 'Database not available' };
@@ -231,6 +287,7 @@ export const emailVerificationRouter = router({
           success: true,
           message: 'Verification email resent successfully',
           expiresAt: expiresAt.toISOString(),
+          cooldownSeconds: COOLDOWN_SECONDS,
         };
       } catch (error) {
         console.log('[EmailVerification] Failed to resend verification email:', error);

@@ -13,9 +13,28 @@ export default function VerifyEmail() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'resend'>('loading');
   const [email, setEmail] = useState('');
   const [resendLoading, setResendLoading] = useState(false);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const [lastResendTime, setLastResendTime] = useState<number | null>(null);
 
   const verifyEmailMutation = trpc.emailVerification.verifyEmail.useMutation();
   const resendEmailMutation = trpc.emailVerification.resendVerificationEmail.useMutation();
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (cooldownSeconds <= 0) return;
+
+    const timer = setInterval(() => {
+      setCooldownSeconds(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [cooldownSeconds]);
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -59,6 +78,12 @@ export default function VerifyEmail() {
       return;
     }
 
+    // Check if cooldown is still active
+    if (cooldownSeconds > 0) {
+      toast.error(`Please wait ${cooldownSeconds} seconds before resending`);
+      return;
+    }
+
     setResendLoading(true);
     try {
       const result = await resendEmailMutation.mutateAsync({ email });
@@ -66,6 +91,9 @@ export default function VerifyEmail() {
       if (result.success) {
         toast.success('Verification email resent successfully');
         setStatus('resend');
+        // Start 60-second cooldown
+        setCooldownSeconds(60);
+        setLastResendTime(Date.now());
       } else {
         toast.error(result.error || 'Failed to resend email');
       }
@@ -148,18 +176,39 @@ export default function VerifyEmail() {
                 <div className="space-y-4">
                   <Button
                     onClick={handleResendEmail}
-                    disabled={resendLoading}
-                    className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white"
+                    disabled={resendLoading || cooldownSeconds > 0}
+                    className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {resendLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Sending...
                       </>
+                    ) : cooldownSeconds > 0 ? (
+                      `Resend in ${cooldownSeconds}s`
                     ) : (
                       'Resend Verification Email'
                     )}
                   </Button>
+
+                  {cooldownSeconds > 0 && (
+                    <div className="w-full bg-[oklch(0.92_0.02_155)] rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-[oklch(0.52_0.015_240)]">Cooldown active:</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 h-2 bg-[oklch(0.88_0.008_240)] rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-[oklch(0.40_0.11_195)] transition-all duration-1000"
+                              style={{ width: `${((60 - cooldownSeconds) / 60) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-semibold text-[oklch(0.40_0.11_195)] w-8 text-right">
+                            {cooldownSeconds}s
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <Button
                     onClick={() => setLocation('/')}
@@ -185,6 +234,26 @@ export default function VerifyEmail() {
                   <p className="text-sm text-[oklch(0.52_0.015_240)] text-center">
                     Didn't receive the email? Check your spam folder or try again in a few minutes.
                   </p>
+
+                  {cooldownSeconds > 0 && (
+                    <div className="w-full bg-[oklch(0.92_0.02_155)] rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-[oklch(0.52_0.015_240)]">Cooldown active:</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 h-2 bg-[oklch(0.88_0.008_240)] rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-[oklch(0.40_0.11_195)] transition-all duration-1000"
+                              style={{ width: `${((60 - cooldownSeconds) / 60) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-semibold text-[oklch(0.40_0.11_195)] w-8 text-right">
+                            {cooldownSeconds}s
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <Button
                     onClick={() => setLocation('/')}
                     className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white"
