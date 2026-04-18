@@ -420,3 +420,28 @@ export const smsVerificationTokens = mysqlTable("smsVerificationTokens", {
 
 export type SmsVerificationToken = typeof smsVerificationTokens.$inferSelect;
 export type InsertSmsVerificationToken = typeof smsVerificationTokens.$inferInsert;
+
+
+/**
+ * Login attempt tracking for security monitoring
+ * Tracks failed login attempts to detect suspicious activity
+ */
+export const loginAttempts = mysqlTable("loginAttempts", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId"),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  attemptType: mysqlEnum("attemptType", ["password", "otp", "email_link"]).notNull(),
+  status: mysqlEnum("status", ["success", "failed"]).notNull(),
+  failureReason: varchar("failureReason", { length: 255 }), // e.g., "invalid_password", "expired_otp", "rate_limited"
+  ipAddress: varchar("ipAddress", { length: 45 }), // IPv4 or IPv6
+  userAgent: text("userAgent"),
+  deviceFingerprint: varchar("deviceFingerprint", { length: 255 }),
+  location: varchar("location", { length: 255 }), // Approximate location from IP
+  alertSent: mysqlEnum("alertSent", ["true", "false"]).default("false").notNull(),
+  alertSentAt: timestamp("alertSentAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type LoginAttempt = typeof loginAttempts.$inferSelect;
+export type InsertLoginAttempt = typeof loginAttempts.$inferInsert;

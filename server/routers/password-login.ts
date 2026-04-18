@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { THIRTY_DAYS_MS, DEFAULT_SESSION_MS } from "../../shared/const";
 import crypto from "crypto";
+import { trackLoginAttempt } from "../services/loginAttemptService";
 
 export const passwordLoginRouter = router({
   /**
@@ -58,6 +59,18 @@ export const passwordLoginRouter = router({
         const passwordHash = crypto.createHash("sha256").update(input.password).digest("hex");
         const passwordMatch = passwordHash === phoneUser.passwordHash;
         if (!passwordMatch) {
+          // Track failed login attempt
+          await trackLoginAttempt({
+            phoneUserId: phoneUser.id,
+            email: phoneUser.email || undefined,
+            phone: phoneUser.phone || undefined,
+            attemptType: 'password',
+            status: 'failed',
+            failureReason: 'invalid_password',
+            ipAddress: ctx.req?.ip,
+            userAgent: ctx.req?.headers?.['user-agent'],
+          });
+
           throw new TRPCError({
             code: "UNAUTHORIZED",
             message: "Invalid phone/email or password",
@@ -92,6 +105,17 @@ export const passwordLoginRouter = router({
         } else {
           redirectUrl = `/user/${phoneUser.id}`;
         }
+
+        // Track successful login attempt
+        await trackLoginAttempt({
+          phoneUserId: phoneUser.id,
+          email: phoneUser.email || undefined,
+          phone: phoneUser.phone || undefined,
+          attemptType: 'password',
+          status: 'success',
+          ipAddress: ctx.req?.ip,
+          userAgent: ctx.req?.headers?.['user-agent'],
+        });
 
         return {
           success: true,
