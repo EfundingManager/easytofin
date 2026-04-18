@@ -29,6 +29,7 @@ import TwoFactorAuth from "./pages/TwoFactorAuth";
 import UserPortal from "./pages/UserPortal";
 import CustomerPortal from "./pages/CustomerPortal";
 import ClientLoginComingSoon from "./pages/ClientLoginComingSoon";
+import SignUp from "./pages/SignUp";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/auth-selection" component={AuthSelection} />
       <Route path="/phone-auth" component={PhoneAuth} />
       <Route path="/email-auth" component={EmailAuth} />
+      <Route path="/signup" component={SignUp} />
       <Route path="/profile" component={UserProfile} />
       <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/fact-finding" component={FactFindingForm} />
