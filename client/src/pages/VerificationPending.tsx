@@ -6,6 +6,8 @@ import SMSVerificationModal from "@/components/SMSVerificationModal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useEffect, useState } from "react";
+import { ResendCodeButton } from "@/components/ResendCodeButton";
+import { trpc } from "@/lib/trpc";
 
 export default function VerificationPending() {
   const [, setLocation] = useLocation();
@@ -125,6 +127,20 @@ export default function VerificationPending() {
                   <li>• Wait a few minutes and refresh this page</li>
                 </ul>
               </div>
+
+              {/* Resend Code Button */}
+              <ResendCodeButton
+                onResend={async () => {
+                  if (verificationMethod === "email" && email) {
+                    // Resend email verification
+                    // This would call a backend endpoint to resend verification email
+                  } else if (verificationMethod === "sms" && phone) {
+                    // Resend SMS code
+                    // This would call a backend endpoint to resend SMS code
+                  }
+                }}
+                cooldownSeconds={60}
+              />
 
               {/* Action Buttons */}
               <div className="space-y-3 pt-4">

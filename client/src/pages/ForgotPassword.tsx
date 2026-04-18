@@ -9,6 +9,7 @@ import { Loader2, Mail, Phone, ArrowLeft, CheckCircle2, AlertCircle } from "luci
 import { trpc } from "@/lib/trpc";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { ResendCodeButton } from "@/components/ResendCodeButton";
 
 export default function ForgotPassword() {
   const [, setLocation] = useLocation();
@@ -97,6 +98,20 @@ export default function ForgotPassword() {
                 </div>
 
                 <div className="space-y-3">
+                  <ResendCodeButton
+                    onResend={async () => {
+                      const result = await requestRecoveryMutation.mutateAsync({
+                        email: recoveryMethod === "email" ? identifier : undefined,
+                        phone: recoveryMethod === "sms" ? identifier : undefined,
+                        method: recoveryMethod,
+                      });
+                      if (!result.success) {
+                        throw new Error(result.error || "Failed to resend");
+                      }
+                    }}
+                    cooldownSeconds={60}
+                  />
+
                   <Button
                     className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white"
                     onClick={() => {
