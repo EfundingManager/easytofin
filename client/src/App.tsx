@@ -30,6 +30,7 @@ import UserPortal from "./pages/UserPortal";
 import CustomerPortal from "./pages/CustomerPortal";
 import ClientLoginComingSoon from "./pages/ClientLoginComingSoon";
 import SignUp from "./pages/SignUp";
+import VerifyEmailToken from "./pages/VerifyEmailToken";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/signup" component={SignUp} />
       <Route path="/profile" component={UserProfile} />
       <Route path="/verify-email" component={VerifyEmail} />
+      <Route path="/verify-email/:token" component={VerifyEmailToken} />
       <Route path="/fact-finding" component={FactFindingForm} />
       <Route path="/fact-finding/:product" component={FactFindingForm} />
       <Route path="/dashboard" component={UserDashboard} />
