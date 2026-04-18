@@ -404,22 +404,39 @@ export default function PhoneAuth() {
                         className="border-[oklch(0.88_0.008_240)]"
                       />
                     </div>
-                    <div className="space-y-3 pt-2">
-                      <Button
-                        type="button"
-                        onClick={() => setStep("password")}
-                        className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 border-2 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
-                        variant="outline"
-                      >
-                        <span className="font-semibold text-[oklch(0.25_0.06_155)]">Continue with Password</span>
-                        <span className="text-xs text-[oklch(0.52_0.015_240)]">with your password</span>
-                      </Button>
-                      <RememberDeviceCheckbox
-                        checked={rememberDevice}
-                        onChange={setRememberDevice}
-                        showTooltip={true}
+                    <div>
+                      <label className="block text-sm font-medium text-[oklch(0.25_0.06_155)] mb-2">
+                        Password
+                      </label>
+                      <Input
+                        type="password"
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={loading}
+                        className="border-[oklch(0.88_0.008_240)]"
                       />
                     </div>
+                    <RememberDeviceCheckbox
+                      checked={rememberDevice}
+                      onChange={setRememberDevice}
+                      showTooltip={true}
+                    />
+                    <Button
+                      type="button"
+                      onClick={(e: any) => handlePasswordLogin(e)}
+                      disabled={loading || !phone || !password}
+                      className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white disabled:opacity-50"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Logging in...
+                        </>
+                      ) : (
+                        "Login"
+                      )}
+                    </Button>
                     {rateLimit.isLimited && (
                       <RateLimitAlert
                         message={rateLimit.message}

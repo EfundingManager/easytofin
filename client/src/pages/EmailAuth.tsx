@@ -224,22 +224,39 @@ const EmailAuth = () => {
                     />
                   </div>
 
-                  <div className="space-y-3 pt-2">
-                    <Button
-                      type="button"
-                      onClick={() => setStep("password")}
-                      className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 hover:bg-slate-50 border-2 border-slate-200"
-                      variant="outline"
-                    >
-                      <span className="font-semibold text-slate-900">Continue with Password</span>
-                      <span className="text-xs text-slate-500">with your password</span>
-                    </Button>
-                    <RememberDeviceCheckbox
-                      checked={rememberDevice}
-                      onChange={setRememberDevice}
-                      showTooltip={true}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-900 mb-2">
+                      Password
+                    </label>
+                    <Input
+                      type="password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                      className="border-slate-200"
                     />
                   </div>
+                  <RememberDeviceCheckbox
+                    checked={rememberDevice}
+                    onChange={setRememberDevice}
+                    showTooltip={true}
+                  />
+                  <Button
+                    type="button"
+                    onClick={(e: any) => handlePasswordLogin(e)}
+                    disabled={loading || !email || !password}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Logging in...
+                      </>
+                    ) : (
+                      "Login"
+                    )}
+                  </Button>
                 </div>
               </div>
             )}
