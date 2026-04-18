@@ -224,12 +224,6 @@ const EmailAuth = () => {
                     />
                   </div>
 
-                  <RememberDeviceCheckbox
-                    checked={rememberDevice}
-                    onChange={setRememberDevice}
-                    showTooltip={true}
-                  />
-
                   <div className="space-y-3 pt-2">
                     <Button
                       type="button"
@@ -238,10 +232,13 @@ const EmailAuth = () => {
                       variant="outline"
                     >
                       <span className="font-semibold text-slate-900">Continue with Password</span>
-                      <span className="text-xs text-slate-600">
-                        Sign in with your password
-                      </span>
+                      <span className="text-xs text-slate-500">with your password</span>
                     </Button>
+                    <RememberDeviceCheckbox
+                      checked={rememberDevice}
+                      onChange={setRememberDevice}
+                      showTooltip={true}
+                    />
                   </div>
                 </div>
               </div>
