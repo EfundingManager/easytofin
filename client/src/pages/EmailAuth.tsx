@@ -315,7 +315,7 @@ const EmailAuth = () => {
               )}
             </div>
           </CardHeader>
-          <CardContent className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+          <CardContent className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto scroll-smooth pr-2">
             {isLimited && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
                 Too many attempts. Please wait {timeRemaining}s before trying again.
