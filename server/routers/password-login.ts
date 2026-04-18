@@ -1,7 +1,7 @@
 import { router, publicProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
-import { phoneUsers } from "../../drizzle/schema";
+import { phoneUsers, users } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { THIRTY_DAYS_MS, DEFAULT_SESSION_MS } from "../../shared/const";
@@ -27,8 +27,9 @@ export const passwordLoginRouter = router({
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database connection failed" });
 
       try {
-        // Find user by phone or email
-        const user = await db
+        // Find user by phone or email in phoneUsers table
+        let phoneUser = null;
+        const phoneUserResult = await db
           .select()
           .from(phoneUsers)
           .where(
@@ -38,14 +39,32 @@ export const passwordLoginRouter = router({
           )
           .limit(1);
 
-        if (!user || user.length === 0) {
+        if (phoneUserResult && phoneUserResult.length > 0) {
+          phoneUser = phoneUserResult[0];
+        }
+
+        // If not found in phoneUsers and it's an email, check main users table
+        if (!phoneUser && input.phoneOrEmail.includes("@")) {
+          const mainUserResult = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, input.phoneOrEmail))
+            .limit(1);
+
+          if (mainUserResult && mainUserResult.length > 0) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: "Please use your OAuth login method to sign in.",
+            });
+          }
+        }
+
+        if (!phoneUser) {
           throw new TRPCError({
             code: "UNAUTHORIZED",
             message: "Invalid phone/email or password",
           });
         }
-
-        const phoneUser = user[0];
 
         // Verify password
         if (!phoneUser.passwordHash) {
