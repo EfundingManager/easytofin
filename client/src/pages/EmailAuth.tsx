@@ -355,6 +355,12 @@ const EmailAuth = () => {
                     />
                   </div>
 
+                  <RememberDeviceCheckbox
+                    checked={rememberDevice}
+                    onChange={setRememberDevice}
+                    showTooltip={true}
+                  />
+
                   <Button
                     type="submit"
                     className="w-full"
@@ -374,36 +380,38 @@ const EmailAuth = () => {
             )}
 
             {step === "authMethod" && (
-              <div className="space-y-3">
+              <div className="space-y-4 pb-4">
                 <div className="bg-slate-50 p-3 rounded-lg">
                   <p className="text-sm text-slate-600">
                     Choose how you'd like to sign in
                   </p>
                 </div>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handleSelectAuthMethod("otp")}
-                  className="w-full h-auto py-3 flex flex-col items-start gap-1 hover:bg-slate-50"
-                >
-                  <span className="font-semibold text-slate-900">OTP Verification</span>
-                  <span className="text-xs text-slate-600">
-                    Use the 6-digit code sent to your email
-                  </span>
-                </Button>
+                <div className="space-y-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleSelectAuthMethod("otp")}
+                    className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 hover:bg-slate-50 border-2 border-slate-200"
+                  >
+                    <span className="font-semibold text-slate-900">OTP Verification</span>
+                    <span className="text-xs text-slate-600">
+                      Use the 6-digit code sent to your email
+                    </span>
+                  </Button>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handleSelectAuthMethod("password")}
-                  className="w-full h-auto py-3 flex flex-col items-start gap-1 hover:bg-slate-50"
-                >
-                  <span className="font-semibold text-slate-900">Password Login</span>
-                  <span className="text-xs text-slate-600">
-                    Sign in with your password
-                  </span>
-                </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleSelectAuthMethod("password")}
+                    className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 hover:bg-slate-50 border-2 border-slate-200"
+                  >
+                    <span className="font-semibold text-slate-900">Password Login</span>
+                    <span className="text-xs text-slate-600">
+                      Sign in with your password
+                    </span>
+                  </Button>
+                </div>
               </div>
             )}
 

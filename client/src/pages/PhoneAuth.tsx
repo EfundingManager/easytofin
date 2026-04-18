@@ -400,6 +400,11 @@ export default function PhoneAuth() {
                         className="border-[oklch(0.88_0.008_240)]"
                       />
                     </div>
+                    <RememberDeviceCheckbox
+                      checked={rememberDevice}
+                      onChange={setRememberDevice}
+                      showTooltip={true}
+                    />
                     <Button
                       type="submit"
                       disabled={loading || rateLimit.isLimited}
@@ -428,36 +433,38 @@ export default function PhoneAuth() {
               )}
 
               {step === "authMethod" && (
-                <div className="space-y-3">
+                <div className="space-y-4 pb-4">
                   <div className="bg-[oklch(0.95_0.008_240)] p-3 rounded-lg">
                     <p className="text-sm text-[oklch(0.52_0.015_240)]">
                       Choose how you'd like to sign in
                     </p>
                   </div>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => handleSelectAuthMethod("otp")}
-                    className="w-full h-auto py-3 flex flex-col items-start gap-1 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
-                  >
-                    <span className="font-semibold text-[oklch(0.25_0.06_155)]">OTP Verification</span>
-                    <span className="text-xs text-[oklch(0.52_0.015_240)]">
-                      Use the 6-digit code sent to your phone
-                    </span>
-                  </Button>
+                  <div className="space-y-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => handleSelectAuthMethod("otp")}
+                      className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 border-2 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
+                    >
+                      <span className="font-semibold text-[oklch(0.25_0.06_155)]">OTP Verification</span>
+                      <span className="text-xs text-[oklch(0.52_0.015_240)]">
+                        Use the 6-digit code sent to your phone
+                      </span>
+                    </Button>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => handleSelectAuthMethod("password")}
-                    className="w-full h-auto py-3 flex flex-col items-start gap-1 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
-                  >
-                    <span className="font-semibold text-[oklch(0.25_0.06_155)]">Password Login</span>
-                    <span className="text-xs text-[oklch(0.52_0.015_240)]">
-                      Sign in with your password
-                    </span>
-                  </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => handleSelectAuthMethod("password")}
+                      className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 border-2 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
+                    >
+                      <span className="font-semibold text-[oklch(0.25_0.06_155)]">Password Login</span>
+                      <span className="text-xs text-[oklch(0.52_0.015_240)]">
+                        Sign in with your password
+                      </span>
+                    </Button>
+                  </div>
                 </div>
               )}
 
