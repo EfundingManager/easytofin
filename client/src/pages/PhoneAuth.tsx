@@ -31,6 +31,7 @@ export default function PhoneAuth() {
   const [rememberDevice, setRememberDevice] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
   const rateLimit = useRateLimit();
 
   const requestOtpMutation = trpc.phoneAuth.requestOtp.useMutation();
@@ -254,6 +255,7 @@ export default function PhoneAuth() {
     }
 
     setLoading(true);
+    setLoginError("");
     try {
       const result = await loginWithPasswordMutation.mutateAsync({
         phoneOrEmail: phone,
@@ -267,7 +269,9 @@ export default function PhoneAuth() {
         window.location.href = result.redirectUrl;
       }
     } catch (error: any) {
-      toast.error(error.message || "Password login failed");
+      const errorMsg = error.message || "Password login failed";
+      setLoginError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -445,9 +449,6 @@ export default function PhoneAuth() {
                       className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 border-2 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
                     >
                       <span className="font-semibold text-[oklch(0.25_0.06_155)]">OTP Verification</span>
-                      <span className="text-xs text-[oklch(0.52_0.015_240)]">
-                        Use the 6-digit code sent to your phone
-                      </span>
                     </Button>
 
                     <Button
@@ -557,6 +558,12 @@ export default function PhoneAuth() {
                       className="border-[oklch(0.88_0.008_240)]"
                     />
                   </div>
+                  {loginError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-2">
+                      <p className="text-sm text-red-800">{loginError}</p>
+                      <p className="text-xs text-red-700 font-medium">Receive OTP via SMS</p>
+                    </div>
+                  )}
                   <RememberDeviceCheckbox
                     checked={rememberDevice}
                     onChange={setRememberDevice}
