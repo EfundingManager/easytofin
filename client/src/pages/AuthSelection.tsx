@@ -26,7 +26,7 @@ export default function AuthSelection() {
                 Choose Registration Method
               </CardTitle>
               <CardDescription className="text-[oklch(0.52_0.015_240)]">
-                Select how you'd like to sign in or register
+                Select how you'd like to sign in
               </CardDescription>
             </CardHeader>
 
