@@ -202,7 +202,7 @@ export default function Navbar() {
                     <span>Login</span>
                   </Link>
                   <Link
-                    href="/email-auth"
+                    href="/signup"
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-inter text-[oklch(0.25_0.06_155)] hover:bg-[oklch(0.96_0.01_155)] transition-colors"
                   >
                     <span>+</span>
@@ -256,7 +256,7 @@ export default function Navbar() {
                 <LogIn size={16} />
                 Login
               </Link>
-              <Link href="/email-auth" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-white font-[Outfit] font-semibold hover:bg-[oklch(0.45_0.10_155)] transition-colors bg-[oklch(0.40_0.10_155)] text-sm">
+              <Link href="/signup" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-white font-[Outfit] font-semibold hover:bg-[oklch(0.45_0.10_155)] transition-colors bg-[oklch(0.40_0.10_155)] text-sm">
                 <span>+</span>
                 Sign Up
               </Link>
