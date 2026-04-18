@@ -41,64 +41,7 @@ const EmailAuth = () => {
 
   // Note: We allow authenticated users to access this page so they can switch accounts if needed
 
-  // Load Google Sign-In script and initialize button
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      if (window.google?.accounts?.id) {
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-          callback: handleGoogleSignIn,
-          ux_mode: "popup",
-          auto_select: false,
-        });
-        setGoogleLoaded(true);
-      }
-    };
-    document.head.appendChild(script);
-  }, []);
-
-  // Render Google button when it's loaded
-  useEffect(() => {
-    if (googleLoaded && window.google?.accounts?.id) {
-      const buttonElement = document.getElementById("google-signin-button");
-      if (buttonElement && buttonElement.children.length === 0) {
-        try {
-          window.google.accounts.id.renderButton(buttonElement, {
-            theme: "outline",
-            size: "large",
-            text: "signin_with",
-          });
-        } catch (error) {
-          console.error("[Gmail] Error rendering button:", error);
-        }
-      }
-    }
-  }, [googleLoaded]);
-
-  // Show loading state while checking authentication
-  if (authLoading) {
-    return (
-      <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span className="ml-2">Loading...</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
+  // Define handleGoogleSignIn before useEffect hooks to avoid hoisting issues
   const handleGoogleSignIn = async (response: any) => {
     console.log("[Gmail] Google Sign-In callback triggered", response);
 
@@ -162,6 +105,64 @@ const EmailAuth = () => {
       setLoading(false);
     }
   };
+
+  // Load Google Sign-In script and initialize button
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          callback: handleGoogleSignIn,
+          ux_mode: "popup",
+          auto_select: false,
+        });
+        setGoogleLoaded(true);
+      }
+    };
+    document.head.appendChild(script);
+  }, []);
+
+  // Render Google button when it's loaded
+  useEffect(() => {
+    if (googleLoaded && window.google?.accounts?.id) {
+      const buttonElement = document.getElementById("google-signin-button");
+      if (buttonElement && buttonElement.children.length === 0) {
+        try {
+          window.google.accounts.id.renderButton(buttonElement, {
+            theme: "outline",
+            size: "large",
+            text: "signin_with",
+          });
+        } catch (error) {
+          console.error("[Gmail] Error rendering button:", error);
+        }
+      }
+    }
+  }, [googleLoaded]);
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="ml-2">Loading...</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
