@@ -31,6 +31,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+  const [clientLoginDropdownOpen, setClientLoginDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
   const services = getServices(language);
@@ -46,6 +47,7 @@ export default function Navbar() {
     setMobileOpen(false);
     setServicesOpen(false);
     setLanguageDropdownOpen(false);
+    setClientLoginDropdownOpen(false);
   }, [location]);
 
   // Close dropdowns when clicking outside
@@ -54,6 +56,9 @@ export default function Navbar() {
       const target = e.target as HTMLElement;
       if (!target.closest('[data-language-dropdown]')) {
         setLanguageDropdownOpen(false);
+      }
+      if (!target.closest('[data-client-login-dropdown]')) {
+        setClientLoginDropdownOpen(false);
       }
     };
     document.addEventListener('click', handleClickOutside);
@@ -175,11 +180,37 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Client Login Button */}
-            <Link href="/auth-selection" className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-base">
-              <LogIn size={18} />
-              {t(language, 'nav.clientLogin')}
-            </Link>
+            {/* Client Login Dropdown */}
+            <div className="relative" data-client-login-dropdown>
+              <button
+                onClick={() => setClientLoginDropdownOpen(!clientLoginDropdownOpen)}
+                onMouseEnter={() => setClientLoginDropdownOpen(true)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-base"
+              >
+                <LogIn size={18} />
+                {t(language, 'nav.clientLogin')}
+                <ChevronDown size={14} className={`transition-transform ${clientLoginDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {clientLoginDropdownOpen && (
+                <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-[oklch(0.92_0.02_155)] py-2 z-50">
+                  <Link
+                    href="/auth-selection"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-inter text-[oklch(0.25_0.06_155)] hover:bg-[oklch(0.96_0.01_155)] transition-colors"
+                  >
+                    <LogIn size={16} />
+                    <span>Login</span>
+                  </Link>
+                  <Link
+                    href="/email-auth"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-inter text-[oklch(0.25_0.06_155)] hover:bg-[oklch(0.96_0.01_155)] transition-colors"
+                  >
+                    <span>+</span>
+                    <span>Sign Up</span>
+                  </Link>
+                </div>
+              )}
+            </div>
             <Link href="/contact" className="btn-gold text-base px-5 py-2.5">
               {t(language, 'nav.getQuote')}
             </Link>
@@ -220,10 +251,14 @@ export default function Navbar() {
               {t(language, 'nav.contact')}
             </Link>
             <div className="pt-2 space-y-2">
-              {/* Client Login Button */}
+              {/* Client Login Options for Mobile */}
               <Link href="/auth-selection" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-sm">
                 <LogIn size={16} />
-                {t(language, 'nav.clientLogin')}
+                Login
+              </Link>
+              <Link href="/email-auth" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-white font-[Outfit] font-semibold hover:bg-[oklch(0.45_0.10_155)] transition-colors bg-[oklch(0.40_0.10_155)] text-sm">
+                <span>+</span>
+                Sign Up
               </Link>
               <Link href="/contact" className="btn-gold w-full justify-center text-sm">
                 {t(language, 'nav.getQuote')}

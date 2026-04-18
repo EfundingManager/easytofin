@@ -408,19 +408,6 @@ export default function PhoneAuth() {
                     <div className="space-y-3 pt-2">
                       <Button
                         type="button"
-                        onClick={() => handleRequestOtp({ preventDefault: () => {} } as any)}
-                        disabled={loading || rateLimit.isLimited}
-                        className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 border-2 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
-                        variant="outline"
-                      >
-                        <span className="font-semibold text-[oklch(0.25_0.06_155)]">Continue with OTP</span>
-                        <span className="text-xs text-[oklch(0.52_0.015_240)]">
-                          Use the 6-digit code sent to your phone
-                        </span>
-                      </Button>
-
-                      <Button
-                        type="button"
                         onClick={() => setStep("password")}
                         className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 border-2 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
                         variant="outline"
