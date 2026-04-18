@@ -404,11 +404,6 @@ export default function PhoneAuth() {
                         className="border-[oklch(0.88_0.008_240)]"
                       />
                     </div>
-                    <RememberDeviceCheckbox
-                      checked={rememberDevice}
-                      onChange={setRememberDevice}
-                      showTooltip={true}
-                    />
                     <div className="space-y-3 pt-2">
                       <Button
                         type="button"
@@ -417,10 +412,13 @@ export default function PhoneAuth() {
                         variant="outline"
                       >
                         <span className="font-semibold text-[oklch(0.25_0.06_155)]">Continue with Password</span>
-                        <span className="text-xs text-[oklch(0.52_0.015_240)]">
-                          Sign in with your password
-                        </span>
+                        <span className="text-xs text-[oklch(0.52_0.015_240)]">with your password</span>
                       </Button>
+                      <RememberDeviceCheckbox
+                        checked={rememberDevice}
+                        onChange={setRememberDevice}
+                        showTooltip={true}
+                      />
                     </div>
                     {rateLimit.isLimited && (
                       <RateLimitAlert
