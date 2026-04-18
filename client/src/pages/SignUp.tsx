@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 
 export default function SignUp() {
   const [, setLocation] = useLocation();
+  const signupMutation = trpc.signup.registerUser.useMutation();
   const [step, setStep] = useState<"form" | "password" | "verification" | "success">("form");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -161,17 +162,23 @@ export default function SignUp() {
 
     setLoading(true);
     try {
-      // Here you would call your backend API to create the user with password
-      // For now, we'll simulate the process
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Call backend to register user with password
+      const result = await signupMutation.mutateAsync({
+        email: email.toLowerCase(),
+        phone,
+        fullName,
+        password,
+      });
 
-      setStep("verification");
-      toast.success("Account created successfully!");
+      if (result.success) {
+        setStep("verification");
+        toast.success("Account created! Please verify your email.");
 
-      // Simulate verification completion
-      setTimeout(() => {
-        setStep("success");
-      }, 2000);
+        // Redirect to email verification page after 2 seconds
+        setTimeout(() => {
+          setLocation("/verify-email-pending");
+        }, 2000);
+      }
     } catch (error: any) {
       toast.error(error.message || "Failed to create account");
     } finally {
