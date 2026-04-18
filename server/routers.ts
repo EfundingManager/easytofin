@@ -26,6 +26,7 @@ import { passwordLoginRouter } from "./routers/password-login";
 import { signupRouter } from "./routers/signup";
 import { smsVerificationRouter } from "./routers/sms-verification";
 import { passwordRecoveryRouter } from "./routers/password-recovery";
+import { deviceTrustRouter } from "./routers/device-trust";
 import * as db from "./db";
 
 export const appRouter = router({
@@ -64,6 +65,7 @@ export const appRouter = router({
   passwordReset: passwordResetRouter,
   passwordLogin: passwordLoginRouter,
   passwordRecovery: passwordRecoveryRouter,
+  deviceTrust: deviceTrustRouter,
   signup: signupRouter,
   admin: adminRouter,
   workflow: workflowRouter,
