@@ -39,7 +39,6 @@ export default function AuthSelection() {
                 <Phone className="w-6 h-6" />
                 <div className="text-center">
                   <div className="font-semibold">Sign in with Phone</div>
-                  <div className="text-xs opacity-90">Receive OTP via SMS</div>
                 </div>
               </Button>
 
@@ -51,7 +50,6 @@ export default function AuthSelection() {
                 <Mail className="w-6 h-6" />
                 <div className="text-center">
                   <div className="font-semibold">Sign in with Email</div>
-                  <div className="text-xs opacity-90">Receive OTP via email</div>
                 </div>
               </Button>
 
