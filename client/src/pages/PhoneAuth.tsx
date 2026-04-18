@@ -335,7 +335,7 @@ export default function PhoneAuth() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-[oklch(0.25_0.06_155)]">
-                    {step === "phone" && "Sign In or Register"}
+                    {step === "phone" && "Sign In"}
                     {step === "authMethod" && "Choose Sign-In Method"}
                     {step === "otp" && "Verify Your Phone"}
                     {step === "password" && "Enter Password"}
