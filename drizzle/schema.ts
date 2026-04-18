@@ -445,3 +445,48 @@ export const loginAttempts = mysqlTable("loginAttempts", {
 
 export type LoginAttempt = typeof loginAttempts.$inferSelect;
 export type InsertLoginAttempt = typeof loginAttempts.$inferInsert;
+
+
+/**
+ * Account linking for connecting OAuth and phone/email accounts
+ * Allows users to sign in with multiple methods (OAuth, phone, email)
+ */
+export const accountLinks = mysqlTable("accountLinks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // Main OAuth user ID from users table
+  phoneUserId: int("phoneUserId"), // Phone/email user ID from phoneUsers table
+  linkMethod: mysqlEnum("linkMethod", ["oauth_to_phone", "oauth_to_email"]).notNull(),
+  verificationToken: varchar("verificationToken", { length: 255 }).unique(),
+  verificationTokenExpiresAt: timestamp("verificationTokenExpiresAt"),
+  isVerified: mysqlEnum("isVerified", ["true", "false"]).default("false").notNull(),
+  verifiedAt: timestamp("verifiedAt"),
+  isPrimary: mysqlEnum("isPrimary", ["true", "false"]).default("false").notNull(), // Primary login method
+  status: mysqlEnum("status", ["pending", "active", "revoked"]).default("pending").notNull(),
+  revokedAt: timestamp("revokedAt"),
+  revokedReason: varchar("revokedReason", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AccountLink = typeof accountLinks.$inferSelect;
+export type InsertAccountLink = typeof accountLinks.$inferInsert;
+
+/**
+ * Account link verification tokens
+ * Temporary tokens for verifying account links via email/SMS
+ */
+export const accountLinkTokens = mysqlTable("accountLinkTokens", {
+  id: int("id").autoincrement().primaryKey(),
+  accountLinkId: int("accountLinkId").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  tokenType: mysqlEnum("tokenType", ["email_verification", "sms_verification"]).notNull(),
+  verificationCode: varchar("verificationCode", { length: 6 }), // For SMS verification
+  expiresAt: timestamp("expiresAt").notNull(),
+  verifiedAt: timestamp("verifiedAt"),
+  attempts: int("attempts").default(0).notNull(),
+  maxAttempts: int("maxAttempts").default(3).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AccountLinkToken = typeof accountLinkTokens.$inferSelect;
+export type InsertAccountLinkToken = typeof accountLinkTokens.$inferInsert;

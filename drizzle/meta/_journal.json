@@ -85,6 +85,13 @@
       "when": 1776548294782,
       "tag": "0011_tiny_owl",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1776551244233,
+      "tag": "0012_wonderful_maggott",
+      "breakpoints": true
     }
   ]
 }
