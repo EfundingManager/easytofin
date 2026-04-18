@@ -202,15 +202,20 @@ const EmailAuth = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
       <Navbar />
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>
-              {step === "email" && "Enter your email to get started"}
-              {step === "otp" && "Verify your email with the code we sent"}
-              {step === "password" && "Enter your password to sign in"}
-              {step === "confirmation" && "Email verified successfully"}
+          <CardHeader className="pb-4">
+            <CardTitle className="text-[oklch(0.25_0.06_155)]">
+              {step === "email" && "Sign In"}
+              {step === "otp" && "Verify Your Email"}
+              {step === "password" && "Enter Password"}
+              {step === "confirmation" && "Email Verified"}
+            </CardTitle>
+            <CardDescription className="text-[oklch(0.52_0.015_240)]">
+              {step === "email" && "Enter your email to sign in"}
+              {step === "otp" && "Enter the code sent to your email"}
+              {step === "password" && "Enter your password"}
+              {step === "confirmation" && "Your email has been verified successfully"}
             </CardDescription>
           </CardHeader>
           <CardContent className="max-h-[calc(100vh-200px)] overflow-y-auto scroll-smooth pr-2">

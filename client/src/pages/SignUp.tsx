@@ -204,7 +204,7 @@ export default function SignUp() {
             <CardHeader className="space-y-2 pb-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-2xl font-bold text-[oklch(0.25_0.06_155)]">
+                  <CardTitle className="text-[oklch(0.25_0.06_155)]">
                     Create Your Account
                   </CardTitle>
                   <CardDescription className="text-[oklch(0.52_0.015_155)] mt-1">

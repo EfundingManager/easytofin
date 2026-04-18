@@ -70,7 +70,7 @@ export default function ForgotPassword() {
                   </div>
                 </div>
 
-                <CardTitle className="text-2xl font-bold text-[oklch(0.25_0.06_155)] text-center">
+                <CardTitle className="text-[oklch(0.25_0.06_155)] text-center">
                   Recovery Instructions Sent
                 </CardTitle>
 
@@ -161,9 +161,9 @@ export default function ForgotPassword() {
         <div className="w-full max-w-md">
           <Card className="border border-[oklch(0.92_0.02_155)] shadow-lg">
             <CardHeader className="space-y-2 pb-4">
-              <CardTitle className="text-2xl font-bold text-[oklch(0.25_0.06_155)]">
-                Reset Your Password
-              </CardTitle>
+                <CardTitle className="text-[oklch(0.25_0.06_155)]">
+                  Forgot Password
+                </CardTitle>
               <CardDescription className="text-[oklch(0.52_0.015_155)]">
                 Choose how you'd like to recover your account
               </CardDescription>

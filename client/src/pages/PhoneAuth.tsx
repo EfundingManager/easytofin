@@ -349,10 +349,10 @@ export default function PhoneAuth() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <Card className="border-[oklch(0.88_0.008_240)] shadow-sm">
-            <CardHeader className="border-b border-[oklch(0.88_0.008_240)]">
+            <CardHeader className="border-b border-[oklch(0.88_0.008_240)] pb-4">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-[oklch(0.25_0.06_155)]">
