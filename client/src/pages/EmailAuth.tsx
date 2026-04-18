@@ -182,7 +182,7 @@ const EmailAuth = () => {
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Sign In to Your Account</CardTitle>
+            <CardTitle>Sign In</CardTitle>
             <CardDescription>
               {step === "email" && "Enter your email to get started"}
               {step === "otp" && "Verify your email with the code we sent"}
