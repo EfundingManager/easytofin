@@ -96,7 +96,13 @@ export class AccountLockoutService {
       };
     } catch (error) {
       console.error("[AccountLockout] Error recording failed attempt:", error);
-      throw error;
+      // Return safe defaults without exposing database errors
+      return {
+        isLocked: false,
+        failedAttempts: 1,
+        lockedUntil: null,
+        remainingAttempts: FAILED_ATTEMPT_THRESHOLD - 1,
+      };
     }
   }
 
@@ -155,7 +161,8 @@ export class AccountLockoutService {
       };
     } catch (error) {
       console.error("[AccountLockout] Error checking account lock status:", error);
-      throw error;
+      // Return safe defaults without exposing database errors
+      return { isLocked: false };
     }
   }
 

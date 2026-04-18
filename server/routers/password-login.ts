@@ -188,7 +188,15 @@ export const passwordLoginRouter = router({
         };
       } catch (error: any) {
         console.error("[Password Login] Error:", error);
-        throw error;
+        // Return user-friendly error message instead of exposing database details
+        if (error.code === "UNAUTHORIZED" || error.code === "TOO_MANY_REQUESTS") {
+          throw error; // Re-throw TRPC errors
+        }
+        // For any other errors (database, etc), return generic message
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid phone/email or password",
+        });
       }
     }),
 
