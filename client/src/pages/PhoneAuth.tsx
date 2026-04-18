@@ -14,6 +14,7 @@ import { ResendCodeButton } from "@/components/ResendCodeButton";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 import { PasswordInput } from "@/components/PasswordInput";
+import { OTPDeliveryNotification } from "@/components/OTPDeliveryNotification";
 
 type AuthStep = "phone" | "authMethod" | "otp" | "register" | "password";
 
@@ -522,6 +523,23 @@ export default function PhoneAuth() {
 
               {step === "otp" && (
                 <form onSubmit={handleVerifyOtp} className="space-y-4">
+                  <OTPDeliveryNotification
+                    phoneOrEmail={phone}
+                    onResendClick={async () => {
+                      setLoading(true);
+                      try {
+                        const result = await resendOtpMutation.mutateAsync({ phone });
+                        setDevCode(result.devCode || "");
+                        toast.success("OTP resent to your phone!");
+                      } catch (error: any) {
+                        toast.error(error.message || "Failed to resend OTP");
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    isLoading={loading}
+                    countdownSeconds={60}
+                  />
                   <div>
                     <label className="block text-sm font-medium text-[oklch(0.25_0.06_155)] mb-2">
                       Enter OTP

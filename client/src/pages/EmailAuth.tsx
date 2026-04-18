@@ -14,6 +14,7 @@ import { useLocation } from "wouter";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 import { PasswordInput } from "@/components/PasswordInput";
+import { OTPDeliveryNotification } from "@/components/OTPDeliveryNotification";
 
 type AuthStep = "email" | "authMethod" | "otp" | "password" | "confirmation";
 
@@ -304,6 +305,22 @@ const EmailAuth = () => {
 
             {step === "otp" && (
               <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <OTPDeliveryNotification
+                  phoneOrEmail={email}
+                  onResendClick={async () => {
+                    setLoading(true);
+                    try {
+                      await requestOtpMutation.mutateAsync({ email });
+                      toast.success("Verification code resent to your email!");
+                    } catch (error: any) {
+                      toast.error(error.message || "Failed to resend code");
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  isLoading={loading}
+                  countdownSeconds={60}
+                />
                 <div>
                   <label className="text-sm font-medium">Verification Code</label>
                   <Input
