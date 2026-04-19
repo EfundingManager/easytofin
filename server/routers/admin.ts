@@ -766,6 +766,121 @@ export const adminRouter = router({
     }),
 
   /**
+   * Advanced search with filters for KYC status, account age, and product interest
+   */
+  advancedSearch: adminProcedure
+    .input(
+      z.object({
+        query: z.string().optional(),
+        kycStatus: z.enum(["pending", "verified", "rejected"]).optional(),
+        accountAgeFrom: z.number().int().nonnegative().optional(),
+        accountAgeTo: z.number().int().nonnegative().optional(),
+        productInterest: z.array(z.string()).optional(),
+        page: z.number().int().positive().default(1),
+        limit: z.number().int().positive().max(100).default(10),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        return {
+          clients: [],
+          total: 0,
+          page: input.page,
+          limit: input.limit,
+        };
+      }
+
+      try {
+        let allClients: any = await db.select({
+          id: phoneUsers.id,
+          name: phoneUsers.name,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          verified: phoneUsers.verified,
+          kycStatus: phoneUsers.kycStatus,
+          createdAt: phoneUsers.createdAt,
+        }).from(phoneUsers);
+
+        if (input.query) {
+          const queryLower = input.query.toLowerCase();
+          allClients = allClients.filter((client: any) =>
+            client.name?.toLowerCase().includes(queryLower) ||
+            client.email?.toLowerCase().includes(queryLower) ||
+            client.phone?.includes(input.query)
+          );
+        }
+
+        if (input.kycStatus) {
+          allClients = allClients.filter(
+            (client: any) => client.kycStatus === input.kycStatus
+          );
+        }
+
+        if (input.accountAgeFrom !== undefined || input.accountAgeTo !== undefined) {
+          const now = Date.now();
+          allClients = allClients.filter((client: any) => {
+            const createdTime = new Date(client.createdAt).getTime();
+            const ageInDays = (now - createdTime) / (1000 * 60 * 60 * 24);
+
+            if (input.accountAgeFrom !== undefined && ageInDays < input.accountAgeFrom) {
+              return false;
+            }
+            if (input.accountAgeTo !== undefined && ageInDays > input.accountAgeTo) {
+              return false;
+            }
+            return true;
+          });
+        }
+
+        if (input.productInterest && input.productInterest.length > 0) {
+          const formsResult: any = await db.select({
+            userId: factFindingForms.userId,
+            product: factFindingForms.product,
+          }).from(factFindingForms);
+
+          const userIdsWithProducts = new Set();
+          formsResult.forEach((form: any) => {
+            if (input.productInterest!.includes(form.product)) {
+              userIdsWithProducts.add(form.userId);
+            }
+          });
+
+          allClients = allClients.filter((client: any) =>
+            userIdsWithProducts.has(client.id)
+          );
+        }
+
+        const total = allClients.length;
+        const offset = (input.page - 1) * input.limit;
+        const paginatedClients = allClients.slice(offset, offset + input.limit);
+
+        return {
+          clients: paginatedClients.map((client: any) => ({
+            id: client.id,
+            name: client.name,
+            email: client.email,
+            phone: client.phone,
+            verified: client.verified === "true",
+            kycStatus: client.kycStatus || "pending",
+            createdAt: client.createdAt,
+          })),
+          total,
+          page: input.page,
+          limit: input.limit,
+        };
+      } catch (error) {
+        console.error("[Admin] Failed to perform advanced search:", error);
+        return {
+          clients: [],
+          total: 0,
+          page: input.page,
+          limit: input.limit,
+        };
+      }
+    }),
+
+  /**
    * Get the current authenticated user's role and profile
    * Accessible by Staff, Manager, and Admin roles.
    */

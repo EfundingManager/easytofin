@@ -14,6 +14,7 @@ import { PolicyAssignmentModal } from "@/components/PolicyAssignmentModal";
 import { EmailBlasterPanel } from "@/components/EmailBlasterPanel";
 import { EmailCampaignComposer } from "@/components/EmailCampaignComposer";
 import { useLocation } from "wouter";
+import { AdvancedSearchFilters, FilterState } from "@/components/AdvancedSearchFilters";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -23,6 +24,9 @@ export default function AdminDashboard() {
   const [globalSearchQuery, setGlobalSearchQuery] = useState<string>("");
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const [selectedClientForPolicy, setSelectedClientForPolicy] = useState<{ id: number; name: string } | null>(null);
+  const [advancedFilters, setAdvancedFilters] = useState<FilterState>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   // Fetch admin data
   const statsQuery = trpc.admin.getStats.useQuery();
@@ -33,6 +37,25 @@ export default function AdminDashboard() {
     limit: 10,
     search: searchQuery || undefined,
   });
+
+  // Advanced search with filters
+  const advancedSearchResults = trpc.admin.advancedSearch.useQuery(
+    {
+      query: advancedFilters.query,
+      kycStatus: advancedFilters.kycStatus,
+      accountAgeFrom: advancedFilters.accountAgeFrom,
+      accountAgeTo: advancedFilters.accountAgeTo,
+      productInterest: advancedFilters.productInterest,
+      page: currentPage,
+      limit: 10,
+    },
+    { enabled: Object.keys(advancedFilters).length > 0 }
+  );
+
+  // Auto-switch to search results tab when filters are applied
+  if (Object.keys(advancedFilters).length > 0 && activeTab !== "search-results") {
+    setActiveTab("search-results");
+  }
 
   // Global search
   const globalSearchQuery_trimmed = globalSearchQuery.trim();
@@ -113,6 +136,15 @@ export default function AdminDashboard() {
               )}
             </div>
           </div>
+
+          {/* Advanced Filters */}
+          <AdvancedSearchFilters
+            onFiltersChange={(filters) => {
+              setAdvancedFilters(filters);
+              setCurrentPage(1);
+            }}
+            isLoading={advancedSearchResults.isLoading}
+          />
 
           {/* Search Results Dropdown */}
           {showSearchResults && globalSearchQuery_trimmed.length > 0 && (
@@ -266,6 +298,62 @@ export default function AdminDashboard() {
             {/* <TabsTrigger value="featureFlags">Feature Flags</TabsTrigger> */}
             <TabsTrigger value="configuration">Configuration</TabsTrigger>
           </TabsList>
+
+          {/* Advanced Search Results Tab */}
+          {Object.keys(advancedFilters).length > 0 && (
+            <TabsContent value="search-results" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Search Results</CardTitle>
+                  <CardDescription>
+                    Found {advancedSearchResults.data?.total || 0} clients matching your filters
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {advancedSearchResults.isLoading ? (
+                    <div className="text-center py-8">
+                      <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                      <p className="mt-4 text-muted-foreground">Searching...</p>
+                    </div>
+                  ) : advancedSearchResults.data && advancedSearchResults.data.clients.length > 0 ? (
+                    <div className="space-y-4">
+                      {advancedSearchResults.data.clients.map((client: any) => (
+                        <div
+                          key={client.id}
+                          onClick={() => setLocation(`/admin/customers/${client.id}`)}
+                          className="p-4 border rounded-lg hover:bg-accent cursor-pointer transition"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <p className="font-medium">{client.name}</p>
+                              <p className="text-sm text-muted-foreground">{client.email}</p>
+                              <div className="flex gap-2 mt-2">
+                                <Badge variant="outline" className="text-xs">
+                                  KYC: {client.kycStatus}
+                                </Badge>
+                                <Badge variant={client.verified ? "default" : "secondary"} className="text-xs">
+                                  {client.verified ? "Verified" : "Unverified"}
+                                </Badge>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-muted-foreground">
+                                Joined: {new Date(client.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>No clients found matching your filters</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-4">
