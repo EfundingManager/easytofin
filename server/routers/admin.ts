@@ -1,4 +1,4 @@
-import { adminProcedure, managerProcedure, staffProcedure, router } from "../_core/trpc";
+import { adminProcedure, managerProcedure, staffProcedure, protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, clientDocuments } from "../../drizzle/schema";
 import { eq, desc, and, inArray } from "drizzle-orm";
@@ -992,6 +992,58 @@ export const adminRouter = router({
           message: "Failed to export clients",
           csv: "",
         };
+      }
+    }),
+
+  /**
+   * Promote a user to super_admin role
+   * Only super_admin can promote users
+   */
+  promoteToSuperAdmin: protectedProcedure
+    .input(
+      z.object({
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Only super_admin can promote users
+      if (ctx.user?.role !== "super_admin") {
+        throw new Error("Only Super Admin can promote users");
+      }
+
+      if (!input.email && !input.phone) {
+        throw new Error("Email or phone is required");
+      }
+
+      const db = await getDb();
+      if (!db) {
+        throw new Error("Database connection failed");
+      }
+
+      try {
+        // Find and update user
+        let whereCondition;
+        if (input.email) {
+          whereCondition = eq(phoneUsers.email, input.email);
+        } else if (input.phone) {
+          whereCondition = eq(phoneUsers.phone, input.phone);
+        } else {
+          throw new Error("Email or phone is required");
+        }
+
+        const result = await db
+          .update(phoneUsers)
+          .set({ role: "super_admin" })
+          .where(whereCondition);
+
+        return {
+          success: true,
+          message: `User promoted to super_admin`,
+        };
+      } catch (error) {
+        console.error("[Admin] Failed to promote user:", error);
+        throw new Error("Failed to promote user");
       }
     }),
 

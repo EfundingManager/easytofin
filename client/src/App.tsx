@@ -31,6 +31,7 @@ import CustomerPortal from "./pages/CustomerPortal";
 import ClientLoginComingSoon from "./pages/ClientLoginComingSoon";
 import SignUp from "./pages/SignUp";
 import VerifyEmailToken from "./pages/VerifyEmailToken";
+import VerifyEmailPending from "./pages/VerifyEmailPending";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ResetPasswordEmail from "./pages/ResetPasswordEmail";
@@ -40,6 +41,7 @@ import ManagerDashboard from "./pages/ManagerDashboard";
 import SupportDashboard from "./pages/SupportDashboard";
 import TeamPage from "./pages/TeamPage";
 import EmailBlasterPage from "./pages/EmailBlasterPage";
+import UserManagement from "./pages/UserManagement";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -52,6 +54,7 @@ function Router() {
       <Route path="/signup" component={SignUp} />
       <Route path="/profile" component={UserProfile} />
       <Route path="/verify-email" component={VerifyEmail} />
+      <Route path="/verify-email-pending" component={VerifyEmailPending} />
       <Route path="/verify-email/:token" component={VerifyEmailToken} />
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password" component={ResetPassword} />
@@ -84,6 +87,7 @@ function Router() {
       <Route path="/support" component={SupportDashboard} />
       <Route path="/team" component={TeamPage} />
       <Route path="/email-blaster" component={EmailBlasterPage} />
+      <Route path="/user-management" component={UserManagement} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

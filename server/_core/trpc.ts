@@ -91,3 +91,21 @@ export const staffProcedure = t.procedure.use(
     });
   }),
 );
+
+/** Super Admin only — full system access and user management */
+export const superAdminProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+
+    if (!ctx.user || ctx.user.role !== 'super_admin') {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Only Super Admin can access this" });
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        user: ctx.user,
+      },
+    });
+  }),
+);
