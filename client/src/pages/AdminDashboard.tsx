@@ -164,6 +164,11 @@ export default function AdminDashboard() {
                           {globalSearchResults.data.clients.map((client: any) => (
                             <div
                               key={client.id}
+                              onClick={() => {
+                                setLocation(`/admin/customers/${client.id}`);
+                                setShowSearchResults(false);
+                                setGlobalSearchQuery("");
+                              }}
                               className="p-2 border rounded hover:bg-accent cursor-pointer transition"
                             >
                               <div className="flex items-center justify-between">

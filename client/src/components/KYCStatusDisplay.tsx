@@ -42,8 +42,8 @@ export function KYCStatusDisplay({
     },
   };
 
-  const currentConfig = statusConfig[currentStatus];
-  const CurrentIcon = currentConfig.icon;
+  const currentConfig = statusConfig[currentStatus] || statusConfig.pending;
+  const CurrentIcon = currentConfig?.icon || Clock;
 
   const handleStatusChange = async (newStatus: "pending" | "verified" | "rejected") => {
     try {
