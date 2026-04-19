@@ -52,8 +52,17 @@ export default function TwoFactorAuth() {
   const completeLoginMutation = trpc.twoFactorAuth.completeLogin.useMutation({
     onSuccess: () => {
       // Session cookie is now set by the server.
-      // Redirect to admin dashboard.
-      navigate("/admin");
+      // Redirect based on user role
+      const role = metaQuery.data?.role;
+      if (role === "super_admin") {
+        navigate("/super-admin");
+      } else if (role === "admin") {
+        navigate("/admin");
+      } else if (role === "manager" || role === "staff") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     },
     onError: (err) => {
       setError(err.message || "Verification failed. Please try again.");
