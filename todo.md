@@ -1276,3 +1276,15 @@
 - [ ] Create permissions management page in Super Admin dashboard
 - [ ] Add permission enforcement middleware to tRPC
 - [ ] Test permissions customization and enforcement
+
+
+## Phase 53: Role-Based Team Access Control - COMPLETED
+- [x] Update Team tRPC procedures with role-based permission checks
+- [x] Admin can view all members but only edit Admin/Manager/Support/Staff
+- [x] Admin has read-only access to Super Admin members
+- [x] Super Admin has full view and edit access to all members
+- [x] Update TeamPage UI to show/hide edit buttons based on current user role
+- [x] Add read-only badge/indicator for Super Admin members when viewed by Admin
+- [x] Update listMembers and getMember procedures to return canEdit and isReadOnly flags
+- [x] Update updateMemberRole to allow Admin to edit non-Super Admin members
+- [x] Update removeMember to allow Admin to remove non-Super Admin members

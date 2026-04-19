@@ -117,19 +117,49 @@ export const teamRouter = router({
           });
         }
 
-        // Only super admin can update roles
-        if (ctx.user.role !== "super_admin") {
+        // Get the member being updated
+        const memberToUpdate = await db
+          .select({ role: users.role })
+          .from(users)
+          .where(eq(users.id, input.memberId));
+
+        if (!memberToUpdate.length) {
           throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Only super admin can update member roles",
+            code: "NOT_FOUND",
+            message: "Team member not found",
           });
         }
 
-        // Cannot update own role
-        if (ctx.user.id === input.memberId) {
+        // Check permissions:
+        // - Super Admin can update anyone
+        // - Admin can only update non-Super Admin members
+        if (ctx.user.role === "super_admin") {
+          // Super admin can update anyone except themselves
+          if (ctx.user.id === input.memberId) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Cannot update your own role",
+            });
+          }
+        } else if (ctx.user.role === "admin") {
+          // Admin can only update non-Super Admin members
+          if (memberToUpdate[0].role === "super_admin") {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "Admin cannot update Super Admin members",
+            });
+          }
+          // Admin also cannot update themselves
+          if (ctx.user.id === input.memberId) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Cannot update your own role",
+            });
+          }
+        } else {
           throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Cannot update your own role",
+            code: "FORBIDDEN",
+            message: "Only Super Admin and Admin can update member roles",
           });
         }
 
@@ -166,19 +196,49 @@ export const teamRouter = router({
           });
         }
 
-        // Only super admin can remove members
-        if (ctx.user.role !== "super_admin") {
+        // Get the member being removed
+        const memberToRemove = await db
+          .select({ role: users.role })
+          .from(users)
+          .where(eq(users.id, input.memberId));
+
+        if (!memberToRemove.length) {
           throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Only super admin can remove members",
+            code: "NOT_FOUND",
+            message: "Team member not found",
           });
         }
 
-        // Cannot remove own account
-        if (ctx.user.id === input.memberId) {
+        // Check permissions:
+        // - Super Admin can remove anyone
+        // - Admin can only remove non-Super Admin members
+        if (ctx.user.role === "super_admin") {
+          // Super admin can remove anyone except themselves
+          if (ctx.user.id === input.memberId) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Cannot remove your own account",
+            });
+          }
+        } else if (ctx.user.role === "admin") {
+          // Admin can only remove non-Super Admin members
+          if (memberToRemove[0].role === "super_admin") {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "Admin cannot remove Super Admin members",
+            });
+          }
+          // Admin also cannot remove themselves
+          if (ctx.user.id === input.memberId) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Cannot remove your own account",
+            });
+          }
+        } else {
           throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Cannot remove your own account",
+            code: "FORBIDDEN",
+            message: "Only Super Admin and Admin can remove members",
           });
         }
 

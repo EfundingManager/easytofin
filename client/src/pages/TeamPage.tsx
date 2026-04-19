@@ -62,20 +62,26 @@ export default function TeamPage() {
     );
   }
 
-  // Only super admin can manage team
-  if (user?.role !== "super_admin") {
+  // Only super admin and admin can view team
+  if (user?.role !== "super_admin" && user?.role !== "admin") {
     return (
       <div className="container mx-auto py-8">
         <Card className="border-red-200 bg-red-50">
           <CardContent className="pt-6">
             <p className="text-red-800">
-              Only Super Admins can manage team members. Your current role: {user?.role}
+              Only Super Admins and Admins can manage team members. Your current role: {user?.role}
             </p>
           </CardContent>
         </Card>
       </div>
     );
   }
+
+  const canEditMember = (member: any) => {
+    if (user?.role === "super_admin") return true;
+    if (user?.role === "admin" && member.role !== "super_admin") return true;
+    return false;
+  };
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -250,35 +256,44 @@ export default function TeamPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Select
-                      value={member.role}
-                      onValueChange={(newRole) =>
-                        updateRoleMutation.mutate({
-                          memberId: member.id,
-                          role: newRole as "admin" | "manager" | "support" | "staff",
-                        })
-                      }
-                      disabled={member.id === user?.id}
-                    >
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="manager">Manager</SelectItem>
-                        <SelectItem value="support">Support</SelectItem>
-                        <SelectItem value="staff">Staff</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {member.id !== user?.id && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeMutation.mutate({ memberId: member.id })}
-                        disabled={removeMutation.isPending}
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </Button>
+                    {canEditMember(member) ? (
+                      <>
+                        <Select
+                          value={member.role}
+                          onValueChange={(newRole) =>
+                            updateRoleMutation.mutate({
+                              memberId: member.id,
+                              role: newRole as "admin" | "manager" | "support" | "staff",
+                            })
+                          }
+                          disabled={member.id === user?.id}
+                        >
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="manager">Manager</SelectItem>
+                            <SelectItem value="support">Support</SelectItem>
+                            <SelectItem value="staff">Staff</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {member.id !== user?.id && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeMutation.mutate({ memberId: member.id })}
+                            disabled={removeMutation.isPending}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </Button>
+                        )}
+                      </>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="bg-gray-100">Read-only</Badge>
+                        <span className="text-xs text-gray-500">(Super Admin)</span>
+                      </div>
                     )}
                   </div>
                 </div>
