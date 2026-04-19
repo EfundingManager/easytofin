@@ -526,7 +526,7 @@ export default function SignUp() {
 
                     <Button
                       className="w-full bg-green-600 hover:bg-green-700 text-white"
-                      onClick={() => setLocation("/admin")}
+                      onClick={() => setLocation("/client-dashboard")}
                     >
                       Go to Dashboard
                     </Button>
