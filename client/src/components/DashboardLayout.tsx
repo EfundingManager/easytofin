@@ -21,7 +21,7 @@ import {
 import { getLoginUrl } from "@/const";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Mail } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -35,7 +35,10 @@ const getMenuItems = (userRole?: string) => {
   
   // Add role-specific menu items
   if (userRole === "super_admin" || userRole === "admin" || userRole === "manager" || userRole === "support") {
-    baseItems.push({ icon: Users, label: "Team", path: "/team" });
+    baseItems.push(
+      { icon: Users, label: "Team", path: "/team" },
+      { icon: Mail, label: "Email Blaster", path: "/email-blaster" }
+    );
   }
   
   return baseItems;

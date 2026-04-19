@@ -63,7 +63,7 @@ export const permissionsRouter = router({
     .input(
       z.object({
         role: z.enum(["admin", "manager", "support", "staff"]),
-        permissions: z.record(z.boolean()),
+        permissions: z.record(z.string(), z.boolean()),
       })
     )
     .mutation(async ({ ctx, input }) => {

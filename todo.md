@@ -1288,3 +1288,19 @@
 - [x] Update listMembers and getMember procedures to return canEdit and isReadOnly flags
 - [x] Update updateMemberRole to allow Admin to edit non-Super Admin members
 - [x] Update removeMember to allow Admin to remove non-Super Admin members
+
+
+## Phase 54: Ensure Navigation Persistence on All Admin Pages
+- [ ] Check DashboardLayout structure and navigation visibility
+- [ ] Verify navigation is visible on all admin pages
+- [ ] Test navigation persistence across all tabs (Overview, KYC Review, Clients Queue, etc.)
+- [ ] Fix navigation visibility if needed
+
+
+## Phase 55: Create Email Blaster Page under Team Navigation
+- [x] Create Email Blaster tRPC procedures for bulk email sending
+- [x] Build Email Blaster page component with recipient selection
+- [x] Add Email Blaster to Team navigation menu in DashboardLayout
+- [x] Implement email template selection and preview
+- [ ] Add recipient filtering (by role, status, KYC status)
+- [ ] Test Email Blaster functionality and email delivery
