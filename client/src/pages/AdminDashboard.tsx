@@ -17,6 +17,7 @@ import { useLocation } from "wouter";
 import { AdvancedSearchFilters, FilterState } from "@/components/AdvancedSearchFilters";
 import { ExportDialog } from "@/components/ExportDialog";
 import { Download } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -31,9 +32,13 @@ export default function AdminDashboard() {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ clientId: number; clientName: string } | null>(null);
 
   // Export mutation
   const exportMutation = trpc.admin.exportClients.useMutation();
+  
+  // Delete client mutation
+  const deleteClientMutation = trpc.workflow.deleteClient.useMutation();
 
   // Fetch admin data
   const statsQuery = trpc.admin.getStats.useQuery();
@@ -112,6 +117,23 @@ export default function AdminDashboard() {
   const productStats = productStatsQuery.data;
   const recentActivity = recentActivityQuery.data;
   const clientSubmissions = clientSubmissionsQuery.data;
+
+  const handleDeleteClient = (clientId: number, clientName: string) => {
+    setDeleteConfirmation({ clientId, clientName });
+  };
+
+  const confirmDeleteClient = async () => {
+    if (!deleteConfirmation) return;
+    
+    try {
+      await deleteClientMutation.mutateAsync({ clientId: deleteConfirmation.clientId });
+      toast.success(`Client ${deleteConfirmation.clientName} deleted successfully`);
+      setDeleteConfirmation(null);
+      clientsQueueQuery.refetch();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to delete client");
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -455,6 +477,15 @@ export default function AdminDashboard() {
                                 <Plus className="h-3 w-3" />
                                 Assign
                               </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleDeleteClient(client.id, client.name)}
+                                className="gap-1"
+                              >
+                                <X className="h-3 w-3" />
+                                Delete
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -749,6 +780,39 @@ export default function AdminDashboard() {
             }
           }}
         />
+
+        {/* Delete Confirmation Dialog */}
+        {deleteConfirmation && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <CardTitle className="text-red-600">Delete Client</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Are you sure you want to delete <strong>{deleteConfirmation.clientName}</strong>? This action cannot be undone.
+                </p>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setDeleteConfirmation(null)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={confirmDeleteClient}
+                    disabled={deleteClientMutation.isPending}
+                    className="flex-1"
+                  >
+                    {deleteClientMutation.isPending ? "Deleting..." : "Delete"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

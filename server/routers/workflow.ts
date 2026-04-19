@@ -1,4 +1,5 @@
-import { adminProcedure, router } from "../_core/trpc";
+import { router } from "../_core/trpc";
+import { adminProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { phoneUsers, policyAssignments, factFindingForms } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -114,7 +115,6 @@ export const workflowRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       try {
-        // Check if customer has verified KYC status
         const clientResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.clientId));
         if (!clientResult || clientResult.length === 0) {
           throw new Error("Customer not found");
@@ -138,7 +138,6 @@ export const workflowRouter = router({
         await db.update(phoneUsers).set({ clientStatus: "customer", updatedAt: new Date() }).where(eq(phoneUsers.id, input.clientId));
         await db.update(factFindingForms).set({ policyNumber: input.policyNumber, policyAssignedAt: new Date(), updatedAt: new Date() }).where(eq(factFindingForms.phoneUserId, input.clientId));
         
-        // Get client info for notification
         const clientForNotification: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.clientId));
         if (clientForNotification && clientForNotification.length > 0) {
           const clientNotif = clientForNotification[0];
@@ -204,4 +203,27 @@ export const workflowRouter = router({
       return { queueCount: 0, inProgressCount: 0, assignedCount: 0, customerCount: 0 };
     }
   }),
+
+  deleteClient: adminProcedure
+    .input(z.object({ clientId: z.number().int().positive() }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "super_admin" && ctx.user.role !== "admin") {
+        throw new Error("You do not have permission to delete clients");
+      }
+
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        await db.delete(policyAssignments).where(eq(policyAssignments.phoneUserId, input.clientId));
+        await db.delete(factFindingForms).where(eq(factFindingForms.phoneUserId, input.clientId));
+        await db.delete(phoneUsers).where(eq(phoneUsers.id, input.clientId));
+        
+        console.log(`[Workflow] Client ${input.clientId} deleted by admin ${ctx.user.id}`);
+        return { success: true, message: "Client deleted successfully" };
+      } catch (error) {
+        console.error("[Workflow] Failed to delete client:", error);
+        throw new Error("Failed to delete client");
+      }
+    }),
 });

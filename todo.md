@@ -1226,3 +1226,21 @@
 - [x] Check account creation tRPC procedure response
 - [x] Fix redirect logic to /client-dashboard instead of /admin
 - [x] Verified TypeScript compilation successful
+
+
+## Phase 49: Add Delete Function for Client Queue
+- [ ] Investigate client queue implementation
+- [ ] Create deleteClient tRPC procedure with role-based access
+- [ ] Add delete button and confirmation dialog to UI
+- [ ] Implement delete handler with optimistic updates
+- [ ] Test delete functionality for Admin/Super Admin
+- [ ] Verify Manager/Support cannot delete clients
+
+
+## Phase 49: Add Delete Function for Client Queue - COMPLETED
+- [x] Investigate client queue implementation
+- [x] Create deleteClient tRPC mutation with role-based access (admin/super_admin only)
+- [x] Add delete button to client queue UI with destructive styling
+- [x] Add confirmation dialog for delete action
+- [x] Implement delete handler with optimistic updates and toast notifications
+- [x] Add proper error handling and permission checks
