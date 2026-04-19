@@ -36,6 +36,8 @@ import ResetPassword from "./pages/ResetPassword";
 import ResetPasswordEmail from "./pages/ResetPasswordEmail";
 import ClientDashboard from "./pages/ClientDashboard";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import ManagerDashboard from "./pages/ManagerDashboard";
+import SupportDashboard from "./pages/SupportDashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -76,6 +78,8 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/customers/:customerId" component={AdminCustomerDetail} />
       <Route path="/super-admin" component={SuperAdminDashboard} />
+      <Route path="/manager" component={ManagerDashboard} />
+      <Route path="/support" component={SupportDashboard} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

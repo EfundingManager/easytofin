@@ -1201,3 +1201,13 @@
 - [x] Create Super Admin dashboard component
 - [x] Add role-based routing for admin/super admin/manager
 - [x] Add SuperAdminDashboard route to App.tsx
+
+
+## Phase 46: Role Hierarchy with Manager and Support Dashboards - COMPLETED
+- [x] Define role permissions matrix (Super Admin, Admin, Manager, Support, Staff)
+- [x] Create ManagerDashboard with KYC review and client management
+- [x] Create SupportDashboard with limited client support features
+- [x] Add role-based permission middleware to tRPC (requirePermission, requireRole, etc.)
+- [x] Update TwoFactorAuth redirect for all roles
+- [x] Add ManagerDashboard and SupportDashboard routes to App.tsx
+- [x] Update role enum in database schema to include support

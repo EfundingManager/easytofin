@@ -58,10 +58,12 @@ export default function TwoFactorAuth() {
         navigate("/super-admin");
       } else if (role === "admin") {
         navigate("/admin");
-      } else if (role === "manager" || role === "staff") {
-        navigate("/admin");
+      } else if (role === "manager") {
+        navigate("/manager");
+      } else if (role === "support" || role === "staff") {
+        navigate("/support");
       } else {
-        navigate("/dashboard");
+        navigate("/client-dashboard");
       }
     },
     onError: (err) => {
