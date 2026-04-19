@@ -29,6 +29,7 @@ import { passwordRecoveryRouter } from "./routers/password-recovery";
 import { deviceTrustRouter } from "./routers/device-trust";
 import { accountLinkingRouter } from "./routers/account-linking";
 import { accountLockoutRouter } from "./routers/account-lockout";
+import { teamRouter } from "./routers/team";
 import * as db from "./db";
 
 export const appRouter = router({
@@ -87,7 +88,8 @@ export const appRouter = router({
   recipientUpload: recipientUploadRouter,
   deviceRegistration: deviceRegistrationRouter,
   accountLinking: accountLinkingRouter,
-  accountLockout: accountLockoutRouter,
+  accountLocking: accountLockoutRouter,
+  team: teamRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({

@@ -38,6 +38,7 @@ import ClientDashboard from "./pages/ClientDashboard";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import ManagerDashboard from "./pages/ManagerDashboard";
 import SupportDashboard from "./pages/SupportDashboard";
+import TeamPage from "./pages/TeamPage";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -80,6 +81,7 @@ function Router() {
       <Route path="/super-admin" component={SuperAdminDashboard} />
       <Route path="/manager" component={ManagerDashboard} />
       <Route path="/support" component={SupportDashboard} />
+      <Route path="/team" component={TeamPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -1244,3 +1244,24 @@
 - [x] Add confirmation dialog for delete action
 - [x] Implement delete handler with optimistic updates and toast notifications
 - [x] Add proper error handling and permission checks
+
+
+## Phase 50: Soft Delete Feature for Client Archive
+- [ ] Add isDeleted and deletedAt fields to phoneUsers table schema
+- [ ] Create archiveClient tRPC mutation with role-based access (admin/super_admin only)
+- [ ] Create restoreClient tRPC mutation with role-based access
+- [ ] Update delete button to call archiveClient instead of deleteClient
+- [ ] Create Archived Clients tab in admin dashboard
+- [ ] Add restore button with confirmation dialog in archived clients view
+- [ ] Update client queries to exclude archived clients by default
+- [ ] Test soft delete and restore workflows
+
+
+## Phase 51: Set up Team Page for Admin Team Management - COMPLETED
+- [x] Create Team management tRPC procedures (list, add, edit, remove members)
+- [x] Build Team page component with member list and details
+- [x] Add member management features (add, edit, remove team members)
+- [x] Implement role assignment and permission management
+- [x] Add team member invite functionality with email
+- [x] Create member status indicators (active, pending, inactive)
+- [x] Add Team route to App.tsx

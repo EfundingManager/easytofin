@@ -69,6 +69,10 @@ export const phoneUsers = mysqlTable("phoneUsers", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn"),
+  isDeleted: mysqlEnum("isDeleted", ["true", "false"]).default("false").notNull(),
+  deletedAt: timestamp("deletedAt"),
+  deletedBy: int("deletedBy"),
+  deletionReason: text("deletionReason"),
 });
 
 export type PhoneUser = typeof phoneUsers.$inferSelect;

@@ -37,7 +37,10 @@ export default function AdminDashboard() {
   // Export mutation
   const exportMutation = trpc.admin.exportClients.useMutation();
   
-  // Delete client mutation
+  // Archive client mutation
+  const archiveClientMutation = trpc.workflow.archiveClient.useMutation();
+  
+  // Delete client mutation (kept for hard delete if needed)
   const deleteClientMutation = trpc.workflow.deleteClient.useMutation();
 
   // Fetch admin data
@@ -126,12 +129,15 @@ export default function AdminDashboard() {
     if (!deleteConfirmation) return;
     
     try {
-      await deleteClientMutation.mutateAsync({ clientId: deleteConfirmation.clientId });
-      toast.success(`Client ${deleteConfirmation.clientName} deleted successfully`);
+      await archiveClientMutation.mutateAsync({ 
+        clientId: deleteConfirmation.clientId,
+        reason: "Archived by admin"
+      });
+      toast.success(`Client ${deleteConfirmation.clientName} archived successfully`);
       setDeleteConfirmation(null);
       clientsQueueQuery.refetch();
     } catch (error: any) {
-      toast.error(error.message || "Failed to delete client");
+      toast.error(error.message || "Failed to archive client");
     }
   };
 
@@ -319,6 +325,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="kyc">KYC Review</TabsTrigger>
             <TabsTrigger value="queue">Clients Queue</TabsTrigger>
             <TabsTrigger value="customers">Customers</TabsTrigger>
+            <TabsTrigger value="archived">Archived Clients</TabsTrigger>
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
             <TabsTrigger value="forms">Forms</TabsTrigger>
             <TabsTrigger value="emailBlaster">Email Blaster</TabsTrigger>
