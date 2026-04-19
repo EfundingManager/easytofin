@@ -257,7 +257,7 @@ export const emailAuthRouter = router({
         } as any);
 
         // Send confirmation email
-        const dashboardUrl = `${process.env.VITE_FRONTEND_URL || "https://easytofin.com"}/dashboard`;
+        const dashboardUrl = `${process.env.VITE_FRONTEND_URL || "https://easytofin.com"}/client-dashboard`;
         await sendAccountConfirmationEmail(user.email || input.email, user.name || "User", dashboardUrl);
 
         // Send welcome email if new user
@@ -268,7 +268,7 @@ export const emailAuthRouter = router({
         // Determine redirect URL based on clientStatus
         const redirectUrl = user.clientStatus === 'customer' 
           ? `/customer/${user.id}`
-          : `/user/${user.id}`;
+          : `/client-dashboard`;
 
         return {
           success: true,

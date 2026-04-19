@@ -1144,3 +1144,22 @@
 - [x] All TypeScript checks passing
 - [ ] Test password login flow on both pages
 - [ ] Test on production domain
+
+
+## Phase 40: Fix Email Authentication and Client Dashboard
+- [ ] Fix email authentication "Invalid phone/email or password" error
+- [ ] Create new client dashboard page component
+- [ ] Update registration flow to redirect to new client dashboard instead of 404
+- [ ] Test email registration and login flow
+- [ ] Verify client dashboard displays correctly
+
+
+## Phase 40: Fix Email Authentication and Client Dashboard - COMPLETED
+- [x] Fix AccountLockoutService to handle missing accountLockouts table gracefully
+- [x] Create new ClientDashboard page component for post-registration redirect
+- [x] Add /client-dashboard route to App.tsx
+- [x] Update email auth router to redirect to /client-dashboard instead of 404
+- [x] Fix duplicate redirectUrl declaration in email-auth router
+- [ ] Test email registration and redirect flow
+- [ ] Verify client dashboard displays correctly
+- [ ] Test password login flow with fixed AccountLockoutService

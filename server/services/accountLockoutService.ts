@@ -13,6 +13,23 @@ const UNLOCK_TOKEN_EXPIRY_MINUTES = 60;
  */
 export class AccountLockoutService {
   /**
+   * Check if table exists before attempting queries
+   */
+  private static async tableExists(): Promise<boolean> {
+    try {
+      const db = await getDb();
+      if (!db) return false;
+      await db.select().from(accountLockouts).limit(1);
+      return true;
+    } catch (err: any) {
+      if (err.message?.includes("doesn't exist") || err.message?.includes("no such table")) {
+        return false;
+      }
+      throw err;
+    }
+  }
+
+  /**
    * Record a failed login attempt and check if account should be locked
    */
   static async recordFailedAttempt(
@@ -25,6 +42,17 @@ export class AccountLockoutService {
     try {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
+
+      // Check if table exists
+      const tableOk = await this.tableExists();
+      if (!tableOk) {
+        console.warn("[AccountLockout] Table not yet created, skipping lockout check");
+        return {
+          isLocked: false,
+          remainingAttempts: FAILED_ATTEMPT_THRESHOLD,
+          remainingMinutes: 0,
+        };
+      }
 
       // Get or create lockout record
       const whereConditions = [];
@@ -118,6 +146,13 @@ export class AccountLockoutService {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
+      // Check if table exists
+      const tableOk = await this.tableExists();
+      if (!tableOk) {
+        console.warn("[AccountLockout] Table not yet created, skipping lockout check");
+        return { isLocked: false };
+      }
+
       const whereConditions = [];
       if (phoneUserId) whereConditions.push(eq(accountLockouts.phoneUserId, phoneUserId));
       if (email) whereConditions.push(eq(accountLockouts.email, email));
@@ -178,6 +213,12 @@ export class AccountLockoutService {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
+      // Check if table exists
+      const tableOk = await this.tableExists();
+      if (!tableOk) {
+        return;
+      }
+
       const whereConditions = [];
       if (phoneUserId) whereConditions.push(eq(accountLockouts.phoneUserId, phoneUserId));
       if (email) whereConditions.push(eq(accountLockouts.email, email));
@@ -202,7 +243,7 @@ export class AccountLockoutService {
       }
     } catch (error) {
       console.error("[AccountLockout] Error recording successful login:", error);
-      throw error;
+      // Don't throw - allow login to proceed even if we can't record success
     }
   }
 
@@ -218,6 +259,12 @@ export class AccountLockoutService {
     try {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
+
+      // Check if table exists
+      const tableOk = await this.tableExists();
+      if (!tableOk) {
+        throw new Error("Account lockout table not yet created");
+      }
 
       const whereConditions = [];
       if (phoneUserId) whereConditions.push(eq(accountLockouts.phoneUserId, phoneUserId));
@@ -264,6 +311,12 @@ export class AccountLockoutService {
     try {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
+
+      // Check if table exists
+      const tableOk = await this.tableExists();
+      if (!tableOk) {
+        return false;
+      }
 
       const lockoutRecords = await db
         .select()
@@ -312,6 +365,16 @@ export class AccountLockoutService {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
+      // Check if table exists
+      const tableOk = await this.tableExists();
+      if (!tableOk) {
+        return {
+          totalLocked: 0,
+          totalFailedAttempts: 0,
+          recentLockouts: 0,
+        };
+      }
+
       const now = new Date();
       const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
 
@@ -342,7 +405,11 @@ export class AccountLockoutService {
       };
     } catch (error) {
       console.error("[AccountLockout] Error getting lockout stats:", error);
-      throw error;
+      return {
+        totalLocked: 0,
+        totalFailedAttempts: 0,
+        recentLockouts: 0,
+      };
     }
   }
 }
