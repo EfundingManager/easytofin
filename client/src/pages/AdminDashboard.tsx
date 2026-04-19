@@ -15,6 +15,8 @@ import { EmailBlasterPanel } from "@/components/EmailBlasterPanel";
 import { EmailCampaignComposer } from "@/components/EmailCampaignComposer";
 import { useLocation } from "wouter";
 import { AdvancedSearchFilters, FilterState } from "@/components/AdvancedSearchFilters";
+import { ExportDialog } from "@/components/ExportDialog";
+import { Download } from "lucide-react";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -27,6 +29,11 @@ export default function AdminDashboard() {
   const [advancedFilters, setAdvancedFilters] = useState<FilterState>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Export mutation
+  const exportMutation = trpc.admin.exportClients.useMutation();
 
   // Fetch admin data
   const statsQuery = trpc.admin.getStats.useQuery();
@@ -303,11 +310,23 @@ export default function AdminDashboard() {
           {Object.keys(advancedFilters).length > 0 && (
             <TabsContent value="search-results" className="space-y-4">
               <Card>
-                <CardHeader>
-                  <CardTitle>Search Results</CardTitle>
-                  <CardDescription>
-                    Found {advancedSearchResults.data?.total || 0} clients matching your filters
-                  </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Search Results</CardTitle>
+                    <CardDescription>
+                      Found {advancedSearchResults.data?.total || 0} clients matching your filters
+                    </CardDescription>
+                  </div>
+                  <Button
+                    onClick={() => setShowExportDialog(true)}
+                    disabled={!advancedSearchResults.data || advancedSearchResults.data.clients.length === 0}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Export CSV
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   {advancedSearchResults.isLoading ? (
@@ -689,6 +708,47 @@ export default function AdminDashboard() {
             }}
           />
         )}
+
+        {/* Export Dialog */}
+        <ExportDialog
+          isOpen={showExportDialog}
+          onOpenChange={setShowExportDialog}
+          totalRecords={advancedSearchResults.data?.total}
+          isLoading={isExporting}
+          onExport={async (columns) => {
+            setIsExporting(true);
+            try {
+              const result = await exportMutation.mutateAsync({
+                query: advancedFilters.query,
+                kycStatus: advancedFilters.kycStatus,
+                accountAgeFrom: advancedFilters.accountAgeFrom,
+                accountAgeTo: advancedFilters.accountAgeTo,
+                productInterest: advancedFilters.productInterest,
+                columns,
+              });
+
+              if (result.success && result.csv) {
+                // Create blob and download
+                const blob = new Blob([result.csv], { type: "text/csv;charset=utf-8;" });
+                const link = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `clients-export-${new Date().toISOString().split("T")[0]}.csv`);
+                link.style.visibility = "hidden";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              } else {
+                alert("Failed to export: " + (result.message || "Unknown error"));
+              }
+            } catch (error) {
+              console.error("Export error:", error);
+              alert("Failed to export clients");
+            } finally {
+              setIsExporting(false);
+            }
+          }}
+        />
       </div>
     </DashboardLayout>
   );

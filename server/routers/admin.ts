@@ -4,6 +4,7 @@ import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, c
 import { eq, desc, and, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { getRateLimitViolations, whitelistIdentifier, resetRateLimit, getRateLimitStats } from "../rate-limit-logger";
+import { generateCSV, formatClientsForCSV, EXPORT_COLUMNS } from "../utils/csvExport";
 
 /**
  * Admin router for managing client submissions, configurations, and analytics
@@ -876,6 +877,120 @@ export const adminRouter = router({
           total: 0,
           page: input.page,
           limit: input.limit,
+        };
+      }
+    }),
+
+  /**
+   * Export filtered clients to CSV format
+   */
+  exportClients: adminProcedure
+    .input(
+      z.object({
+        query: z.string().optional(),
+        kycStatus: z.enum(["pending", "verified", "rejected"]).optional(),
+        accountAgeFrom: z.number().int().nonnegative().optional(),
+        accountAgeTo: z.number().int().nonnegative().optional(),
+        productInterest: z.array(z.string()).optional(),
+        columns: z.array(z.string()).min(1),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        return {
+          success: false,
+          message: "Database connection failed",
+          csv: "",
+        };
+      }
+
+      try {
+        // Get all clients
+        let allClients: any = await db.select({
+          id: phoneUsers.id,
+          name: phoneUsers.name,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          verified: phoneUsers.verified,
+          kycStatus: phoneUsers.kycStatus,
+          createdAt: phoneUsers.createdAt,
+        }).from(phoneUsers);
+
+        // Apply text search filter
+        if (input.query) {
+          const queryLower = input.query.toLowerCase();
+          allClients = allClients.filter((client: any) =>
+            client.name?.toLowerCase().includes(queryLower) ||
+            client.email?.toLowerCase().includes(queryLower) ||
+            client.phone?.includes(input.query)
+          );
+        }
+
+        // Apply KYC status filter
+        if (input.kycStatus) {
+          allClients = allClients.filter(
+            (client: any) => client.kycStatus === input.kycStatus
+          );
+        }
+
+        // Apply account age filter
+        if (input.accountAgeFrom !== undefined || input.accountAgeTo !== undefined) {
+          const now = Date.now();
+          allClients = allClients.filter((client: any) => {
+            const createdTime = new Date(client.createdAt).getTime();
+            const ageInDays = (now - createdTime) / (1000 * 60 * 60 * 24);
+
+            if (input.accountAgeFrom !== undefined && ageInDays < input.accountAgeFrom) {
+              return false;
+            }
+            if (input.accountAgeTo !== undefined && ageInDays > input.accountAgeTo) {
+              return false;
+            }
+            return true;
+          });
+        }
+
+        // Apply product interest filter
+        if (input.productInterest && input.productInterest.length > 0) {
+          const formsResult: any = await db.select({
+            userId: factFindingForms.userId,
+            product: factFindingForms.product,
+          }).from(factFindingForms);
+
+          const userIdsWithProducts = new Set();
+          formsResult.forEach((form: any) => {
+            if (input.productInterest!.includes(form.product)) {
+              userIdsWithProducts.add(form.userId);
+            }
+          });
+
+          allClients = allClients.filter((client: any) =>
+            userIdsWithProducts.has(client.id)
+          );
+        }
+
+        // Format clients for CSV export
+        const formattedData = formatClientsForCSV(allClients, input.columns);
+
+        // Generate CSV content
+        const csv = generateCSV({
+          columns: input.columns,
+          data: formattedData,
+        });
+
+        return {
+          success: true,
+          message: `Exported ${allClients.length} clients`,
+          csv,
+          count: allClients.length,
+        };
+      } catch (error) {
+        console.error("[Admin] Failed to export clients:", error);
+        return {
+          success: false,
+          message: "Failed to export clients",
+          csv: "",
         };
       }
     }),

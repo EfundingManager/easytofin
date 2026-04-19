@@ -1183,3 +1183,12 @@
 - [x] Add filter state management and auto-tab switching
 - [x] Display search results in dedicated tab
 - [x] Add pagination support for filtered results
+
+
+## Phase 44: CSV Export for Filtered Client Lists - COMPLETED
+- [x] Create CSV export utility function with special character handling
+- [x] Add exportClients tRPC mutation with column selection
+- [x] Build ExportDialog component with column checkboxes
+- [x] Integrate export button into search results tab
+- [x] Add export handler with file download
+- [x] Verify CSV generation with proper escaping
