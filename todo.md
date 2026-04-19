@@ -1211,3 +1211,11 @@
 - [x] Update TwoFactorAuth redirect for all roles
 - [x] Add ManagerDashboard and SupportDashboard routes to App.tsx
 - [x] Update role enum in database schema to include support
+
+
+## Phase 47: Update Navigation Labels for Role-Based Dashboards - COMPLETED
+- [x] Find navigation component showing "Page 1" and "Page 2"
+- [x] Update to show role-specific dashboard labels
+- [x] Display "Dashboard" for Super Admin/Admin/Manager/Support users
+- [x] Add "Team" menu item for admin roles
+- [x] Test navigation labels for all roles
