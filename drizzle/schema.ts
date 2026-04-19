@@ -520,3 +520,54 @@ export const accountLockouts = mysqlTable("accountLockouts", {
 
 export type AccountLockout = typeof accountLockouts.$inferSelect;
 export type InsertAccountLockout = typeof accountLockouts.$inferInsert;
+
+
+/**
+ * Role permissions configuration
+ * Allows Super Admins to customize permissions for each role
+ */
+export const rolePermissions = mysqlTable("rolePermissions", {
+  id: int("id").autoincrement().primaryKey(),
+  role: mysqlEnum("role", ["admin", "manager", "support", "staff"]).notNull().unique(),
+  // Client Management Permissions
+  canViewClients: mysqlEnum("canViewClients", ["true", "false"]).default("true").notNull(),
+  canEditClients: mysqlEnum("canEditClients", ["true", "false"]).default("true").notNull(),
+  canDeleteClients: mysqlEnum("canDeleteClients", ["true", "false"]).default("false").notNull(),
+  canArchiveClients: mysqlEnum("canArchiveClients", ["true", "false"]).default("false").notNull(),
+  canRestoreClients: mysqlEnum("canRestoreClients", ["true", "false"]).default("false").notNull(),
+  // KYC Management Permissions
+  canViewKYC: mysqlEnum("canViewKYC", ["true", "false"]).default("true").notNull(),
+  canApproveKYC: mysqlEnum("canApproveKYC", ["true", "false"]).default("false").notNull(),
+  canRejectKYC: mysqlEnum("canRejectKYC", ["true", "false"]).default("false").notNull(),
+  canReviewDocuments: mysqlEnum("canReviewDocuments", ["true", "false"]).default("false").notNull(),
+  // Policy Management Permissions
+  canViewPolicies: mysqlEnum("canViewPolicies", ["true", "false"]).default("true").notNull(),
+  canEditPolicies: mysqlEnum("canEditPolicies", ["true", "false"]).default("false").notNull(),
+  canDeletePolicies: mysqlEnum("canDeletePolicies", ["true", "false"]).default("false").notNull(),
+  // Form Management Permissions
+  canViewForms: mysqlEnum("canViewForms", ["true", "false"]).default("true").notNull(),
+  canEditForms: mysqlEnum("canEditForms", ["true", "false"]).default("false").notNull(),
+  canCreateForms: mysqlEnum("canCreateForms", ["true", "false"]).default("false").notNull(),
+  canDeleteForms: mysqlEnum("canDeleteForms", ["true", "false"]).default("false").notNull(),
+  // Email Campaign Permissions
+  canViewCampaigns: mysqlEnum("canViewCampaigns", ["true", "false"]).default("true").notNull(),
+  canCreateCampaigns: mysqlEnum("canCreateCampaigns", ["true", "false"]).default("false").notNull(),
+  canSendCampaigns: mysqlEnum("canSendCampaigns", ["true", "false"]).default("false").notNull(),
+  canDeleteCampaigns: mysqlEnum("canDeleteCampaigns", ["true", "false"]).default("false").notNull(),
+  // Team Management Permissions
+  canManageTeam: mysqlEnum("canManageTeam", ["true", "false"]).default("false").notNull(),
+  canInviteMembers: mysqlEnum("canInviteMembers", ["true", "false"]).default("false").notNull(),
+  canRemoveMembers: mysqlEnum("canRemoveMembers", ["true", "false"]).default("false").notNull(),
+  canChangeRoles: mysqlEnum("canChangeRoles", ["true", "false"]).default("false").notNull(),
+  // System Configuration Permissions
+  canAccessConfiguration: mysqlEnum("canAccessConfiguration", ["true", "false"]).default("false").notNull(),
+  canManagePermissions: mysqlEnum("canManagePermissions", ["true", "false"]).default("false").notNull(),
+  canViewAuditLogs: mysqlEnum("canViewAuditLogs", ["true", "false"]).default("false").notNull(),
+  canExportData: mysqlEnum("canExportData", ["true", "false"]).default("false").notNull(),
+  updatedBy: int("updatedBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RolePermission = typeof rolePermissions.$inferSelect;
+export type InsertRolePermission = typeof rolePermissions.$inferInsert;

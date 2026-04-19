@@ -1265,3 +1265,14 @@
 - [x] Add team member invite functionality with email
 - [x] Create member status indicators (active, pending, inactive)
 - [x] Add Team route to App.tsx
+
+
+## Phase 52: Permissions Management UI for Role Customization
+- [ ] Create rolePermissions database table schema
+- [ ] Build tRPC procedures for getting and updating role permissions
+- [ ] Create permissions matrix UI component
+- [ ] Implement permission checkboxes for each role
+- [ ] Add save and update functionality for permissions
+- [ ] Create permissions management page in Super Admin dashboard
+- [ ] Add permission enforcement middleware to tRPC
+- [ ] Test permissions customization and enforcement

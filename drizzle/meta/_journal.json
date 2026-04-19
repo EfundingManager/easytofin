@@ -113,6 +113,13 @@
       "when": 1776615187354,
       "tag": "0015_vengeful_golden_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1776617005066,
+      "tag": "0016_woozy_leo",
+      "breakpoints": true
     }
   ]
 }
