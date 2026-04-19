@@ -1304,3 +1304,11 @@
 - [x] Implement email template selection and preview
 - [ ] Add recipient filtering (by role, status, KYC status)
 - [ ] Test Email Blaster functionality and email delivery
+
+## Phase 56: Move Email Blaster and Email Campaigns out of Dashboard
+- [x] Remove Email Blaster tab from AdminDashboard
+- [x] Remove Email Campaigns tab from AdminDashboard
+- [x] Remove EmailBlasterPanel and EmailCampaignComposer imports from AdminDashboard
+- [x] Update EmailBlasterPage to include both Email Blaster and Email Campaigns tabs
+- [x] Add top-level tabs for Email Blaster vs Email Campaigns on dedicated page
+- [x] Create placeholder for Email Campaign Composer (coming soon)

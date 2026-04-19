@@ -6,13 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus, Mail } from "lucide-react";
+import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { PolicyAssignmentModal } from "@/components/PolicyAssignmentModal";
 // Feature flags disabled - table not yet migrated
 // import { FeatureFlagsPanel } from "@/components/FeatureFlagsPanel";
-import { EmailBlasterPanel } from "@/components/EmailBlasterPanel";
-import { EmailCampaignComposer } from "@/components/EmailCampaignComposer";
+
 import { useLocation } from "wouter";
 import { AdvancedSearchFilters, FilterState } from "@/components/AdvancedSearchFilters";
 import { ExportDialog } from "@/components/ExportDialog";
@@ -328,8 +327,6 @@ export default function AdminDashboard() {
             <TabsTrigger value="archived">Archived Clients</TabsTrigger>
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
             <TabsTrigger value="forms">Forms</TabsTrigger>
-            <TabsTrigger value="emailBlaster">Email Blaster</TabsTrigger>
-            <TabsTrigger value="emailCampaign">Email Campaigns</TabsTrigger>
             {/* Feature Flags tab disabled - table not yet migrated */}
             {/* <TabsTrigger value="featureFlags">Feature Flags</TabsTrigger> */}
             <TabsTrigger value="configuration">Configuration</TabsTrigger>
@@ -655,29 +652,6 @@ export default function AdminDashboard() {
           {/* <TabsContent value="featureFlags" className="space-y-4">
             <FeatureFlagsPanel />
           </TabsContent> */}
-
-          {/* Email Blaster Tab */}
-          <TabsContent value="emailBlaster" className="space-y-4">
-            <EmailBlasterPanel />
-          </TabsContent>
-
-          {/* Email Campaign Tab */}
-          <TabsContent value="emailCampaign" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Mail className="h-5 w-5" />
-                  Email Campaign Composer
-                </CardTitle>
-                <CardDescription>
-                  Create, preview, and schedule email campaigns using SendGrid templates
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <EmailCampaignComposer />
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           {/* Configuration Tab */}
           <TabsContent value="configuration" className="space-y-4">
