@@ -1327,3 +1327,11 @@
 - [x] Gmail button now loads immediately without loading spinner
 - [x] Gmail login redirects directly to admin dashboard
 - [x] Added proper error handling and retry logic for script loading
+
+## Bug Fix: Google Sign-In Popup Blocking Errors on Email-Auth
+- [x] Added use_fedcm_for_prompt flag to Google Sign-In initialization for FedCM support
+- [x] Added locale parameter to renderButton configuration
+- [x] Added onClick handler to Google button div for proper user interaction context
+- [x] Improved error messages for Google Sign-In failures
+- [x] Verified Google button renders without loading spinner
+- [x] Console errors no longer appear after updates

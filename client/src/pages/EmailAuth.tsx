@@ -63,6 +63,7 @@ const EmailAuth = () => {
           size: "large",
           width: "100%",
           text: "signin_with",
+          locale: "en",
         });
         console.log("Google Sign-In button rendered successfully");
       } catch (error) {
@@ -152,6 +153,7 @@ const EmailAuth = () => {
           ux_mode: "popup",
           auto_select: false,
           itp_support: true,
+          use_fedcm_for_prompt: true,
         });
         console.log("Google Sign-In API initialized successfully");
         return true;
@@ -168,7 +170,7 @@ const EmailAuth = () => {
 
     if (!response.credential) {
       console.error("[Gmail] No credential in response", response);
-      toast.error("Google Sign-in failed");
+      toast.error("Google Sign-in failed - please try again or use email/password");
       return;
     }
 
@@ -365,7 +367,14 @@ const EmailAuth = () => {
                   </div>
                 )}
                 {googleLoaded && (
-                  <div id="google-signin-button" className="flex justify-center" />
+                  <div 
+                    id="google-signin-button" 
+                    className="flex justify-center"
+                    onClick={(e) => {
+                      // Ensure click is captured in user interaction context
+                      e.preventDefault();
+                    }}
+                  />
                 )}
 
                 <div className="relative">
