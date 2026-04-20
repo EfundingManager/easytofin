@@ -1342,3 +1342,11 @@
 - [x] Updated Gmail callback to redirect based on user role (admin/super_admin/manager/support to /admin)
 - [x] Added role-based redirection logic for clients and regular users
 - [x] Verified endpoint returns correct redirectUrl in response
+
+## Bug Fix: Gmail Login Redirection with Account Confirmation
+- [x] Created GmailConfirmation page component with confirmation messaging
+- [x] Updated EmailAuth to redirect to confirmation page after Gmail login
+- [x] Added confirmation page with "Proceed to Dashboard" button
+- [x] Implemented URL parameter passing for redirect URL and email
+- [x] Added proper logging for debugging Gmail login flow
+- [x] Updated Gmail callback to include email in response

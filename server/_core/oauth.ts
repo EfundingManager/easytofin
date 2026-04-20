@@ -55,7 +55,15 @@ export function registerOAuthRoutes(app: Express) {
         redirectUrl = `/user/${phoneUser.id}`;
       }
 
-      res.json({ success: true, redirectUrl });
+      // Check if Gmail account needs confirmation (new users)
+      const requiresConfirmation = !phoneUser.emailVerified || phoneUser.emailVerified !== "true";
+      
+      res.json({ 
+        success: true, 
+        redirectUrl,
+        email: phoneUser.email,
+        requiresConfirmation: false // Gmail is already verified by Google, so no confirmation needed
+      });
     } catch (error) {
       console.error("[Gmail] Callback failed", error);
       res.status(500).json({ error: "Gmail callback failed" });

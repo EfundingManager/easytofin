@@ -201,11 +201,17 @@ const EmailAuth = () => {
 
       if (result.ok) {
         const responseData = await result.json();
-        // Redirect to the URL provided by backend based on user role and client status
-        toast.success("Gmail login successful!");
-        window.location.href = responseData.redirectUrl || "/dashboard";
+        console.log("[Gmail] Backend response:", responseData);
+        
+        // Redirect to confirmation page with redirect URL and email
+        const confirmationUrl = `/gmail-confirmation?redirectUrl=${encodeURIComponent(responseData.redirectUrl || "/dashboard")}&email=${encodeURIComponent(responseData.email || "")}`.substring(0, 2000);
+        console.log("[Gmail] Redirecting to confirmation page:", confirmationUrl);
+        toast.success("Gmail account verified! Proceeding to dashboard...");
+        window.location.href = confirmationUrl;
       } else {
-        toast.error("Google Sign-in failed");
+        const errorData = await result.json().catch(() => ({}));
+        console.error("[Gmail] Backend error:", errorData);
+        toast.error(errorData.error || "Google Sign-in failed");
       }
     } catch (error) {
       console.error("[Gmail] Error:", error);

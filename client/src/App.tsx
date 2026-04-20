@@ -42,6 +42,7 @@ import SupportDashboard from "./pages/SupportDashboard";
 import TeamPage from "./pages/TeamPage";
 import EmailBlasterPage from "./pages/EmailBlasterPage";
 import UserManagement from "./pages/UserManagement";
+import GmailConfirmation from "./pages/GmailConfirmation";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -88,6 +89,7 @@ function Router() {
       <Route path="/team" component={TeamPage} />
       <Route path="/email-blaster" component={EmailBlasterPage} />
       <Route path="/user-management" component={UserManagement} />
+      <Route path="/gmail-confirmation" component={GmailConfirmation} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
