@@ -1351,9 +1351,10 @@
 - [x] Added proper logging for debugging Gmail login flow
 - [x] Updated Gmail callback to include email in response
 
-## Feature: Gmail Login Auto-Creates Client Profile
-- [x] Checked Gmail callback and found it was creating users with clientStatus = "queue"
-- [x] Updated Gmail callback to set clientStatus = "customer" for automatic client profile creation
-- [x] Verified redirection logic already redirects to /customer/{id} for customers
-- [x] Gmail login now skips user dashboard and goes directly to client dashboard
-- [x] Tested Gmail login creates client profile and redirects to client dashboard
+## Feature: Gmail Login Policy-Based Redirection
+- [x] Added hasUserPolicy() function to db.ts to check policy assignments
+- [x] Updated Gmail callback to check if user has a policy assigned
+- [x] Redirects to /customer/{id} if policy exists
+- [x] Redirects to /user/{id} if no policy assigned
+- [x] Reverted Gmail users to clientStatus = "queue" instead of "customer"
+- [x] Gmail login redirection now based on policy assignment status

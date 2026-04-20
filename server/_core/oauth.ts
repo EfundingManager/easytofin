@@ -29,7 +29,7 @@ export function registerOAuthRoutes(app: Express) {
           name: name || email,
           phone: null,
           emailVerified: "true",
-          clientStatus: "customer", // Gmail users are automatically created as clients
+          clientStatus: "queue", // Start as queue, will be determined by policy assignment
           role: "user",
           loginMethod: "google",
         });
@@ -45,14 +45,18 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: sessionDuration });
 
-      // Determine redirect URL based on role and clientStatus
+      // Determine redirect URL based on role and policy assignment
       let redirectUrl = "/dashboard";
       if (phoneUser.role === "admin" || phoneUser.role === "super_admin" || phoneUser.role === "manager" || phoneUser.role === "support") {
         redirectUrl = "/admin";
-      } else if (phoneUser.clientStatus === "customer") {
-        redirectUrl = `/customer/${phoneUser.id}`;
       } else {
-        redirectUrl = `/user/${phoneUser.id}`;
+        // Check if user has a policy assigned
+        const hasPolicy = await db.hasUserPolicy(phoneUser.id);
+        if (hasPolicy) {
+          redirectUrl = `/customer/${phoneUser.id}`;
+        } else {
+          redirectUrl = `/user/${phoneUser.id}`;
+        }
       }
 
       // Check if Gmail account needs confirmation (new users)
