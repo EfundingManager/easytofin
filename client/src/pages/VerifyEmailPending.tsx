@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, CheckCircle2, Clock, ArrowRight } from "lucide-react";
@@ -9,7 +9,9 @@ import { trpc } from "@/lib/trpc";
 
 export default function VerifyEmailPending() {
   const [, setLocation] = useLocation();
+  const search = useSearch();
   const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
 
@@ -21,12 +23,31 @@ export default function VerifyEmailPending() {
   });
 
   useEffect(() => {
-    // Get email from session or localStorage
-    const storedEmail = localStorage.getItem("pendingVerificationEmail");
-    if (storedEmail) {
-      setEmail(storedEmail);
+    // Get email and userId from URL params or localStorage
+    const params = new URLSearchParams(search);
+    const paramEmail = params.get("email");
+    const paramUserId = params.get("userId");
+    
+    if (paramEmail) {
+      setEmail(paramEmail);
+      localStorage.setItem("pendingVerificationEmail", paramEmail);
+    } else {
+      const storedEmail = localStorage.getItem("pendingVerificationEmail");
+      if (storedEmail) {
+        setEmail(storedEmail);
+      }
     }
-  }, []);
+    
+    if (paramUserId) {
+      setUserId(paramUserId);
+      localStorage.setItem("pendingVerificationUserId", paramUserId);
+    } else {
+      const storedUserId = localStorage.getItem("pendingVerificationUserId");
+      if (storedUserId) {
+        setUserId(storedUserId);
+      }
+    }
+  }, [search]);
 
   const handleResendEmail = async () => {
     if (!email) return;
@@ -39,7 +60,11 @@ export default function VerifyEmailPending() {
   };
 
   const handleContinue = () => {
-    setLocation("/");
+    if (userId) {
+      setLocation(`/user/${userId}`);
+    } else {
+      setLocation("/");
+    }
   };
 
   return (
@@ -113,7 +138,7 @@ export default function VerifyEmailPending() {
                 onClick={handleContinue}
                 className="w-full bg-blue-600 hover:bg-blue-700"
               >
-                Continue to Home
+                {userId ? "Go to Dashboard" : "Continue to Home"}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
 

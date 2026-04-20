@@ -1379,10 +1379,10 @@
 - [x] Customers redirect to /customer/{id} based on policy assignment
 - [x] Regular users redirect to /user/{id} if no policy assigned
 
-## Bug Fix: Create Account Button Not Creating User
-- [x] Found Create Account button in SignUp component
-- [x] Verified backend endpoint properly creates user and returns userId
-- [x] Updated frontend to redirect to /user/{id} instead of /verify-email-pending
-- [x] Backend already returns userId in response
-- [x] SignUp component now redirects to /user/{id} after account creation
-- [x] Create Account button now creates user and redirects correctly
+## Feature: Email Verification Flow with Dashboard Access
+- [x] SignUp component redirects to /verify-email-pending with userId and email
+- [x] VerifyEmailPending page accepts userId and email from URL params
+- [x] Stores userId and email in localStorage for persistence
+- [x] Shows "Go to Dashboard" button when userId is present
+- [x] Clicking button redirects to /user/{id} dashboard
+- [x] Email verification flow now complete with dashboard access option

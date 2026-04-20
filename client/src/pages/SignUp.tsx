@@ -171,12 +171,13 @@ export default function SignUp() {
       });
 
       if (result.success) {
-        setStep("success");
-        toast.success("Account created successfully!");
+        setStep("verification");
+        toast.success("Account created! Please verify your email.");
 
-        // Redirect to user dashboard after 2 seconds
+        // Redirect to email verification page with userId after 2 seconds
         setTimeout(() => {
-          setLocation(`/user/${result.userId}`);
+          const email = result.email || "";
+          setLocation(`/verify-email-pending?userId=${result.userId}&email=${encodeURIComponent(email)}`);
         }, 2000);
       }
     } catch (error: any) {
