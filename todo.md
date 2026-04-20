@@ -1350,3 +1350,10 @@
 - [x] Implemented URL parameter passing for redirect URL and email
 - [x] Added proper logging for debugging Gmail login flow
 - [x] Updated Gmail callback to include email in response
+
+## Feature: Gmail Login Auto-Creates Client Profile
+- [x] Checked Gmail callback and found it was creating users with clientStatus = "queue"
+- [x] Updated Gmail callback to set clientStatus = "customer" for automatic client profile creation
+- [x] Verified redirection logic already redirects to /customer/{id} for customers
+- [x] Gmail login now skips user dashboard and goes directly to client dashboard
+- [x] Tested Gmail login creates client profile and redirects to client dashboard

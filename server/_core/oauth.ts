@@ -29,7 +29,7 @@ export function registerOAuthRoutes(app: Express) {
           name: name || email,
           phone: null,
           emailVerified: "true",
-          clientStatus: "queue",
+          clientStatus: "customer", // Gmail users are automatically created as clients
           role: "user",
           loginMethod: "google",
         });
