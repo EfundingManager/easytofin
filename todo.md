@@ -1319,3 +1319,11 @@
 - [x] Added /verify-email-pending route to App.tsx router
 - [x] Tested route - now loads correctly with proper UI showing email verification instructions
 - [x] Component includes navbar, footer, and resend verification email functionality
+
+## Bug Fix: Gmail Login Keep Loading on Email-Auth Page
+- [x] Added initializeGoogleSignIn() function to properly initialize Google Sign-In API
+- [x] Added useEffect hooks for Google Sign-In script loading and button rendering
+- [x] Updated handleGoogleSignIn to decode JWT token and skip VerifyEmailPending
+- [x] Gmail button now loads immediately without loading spinner
+- [x] Gmail login redirects directly to admin dashboard
+- [x] Added proper error handling and retry logic for script loading

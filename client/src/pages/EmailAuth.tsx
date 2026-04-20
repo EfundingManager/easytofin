@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,9 +43,126 @@ const EmailAuth = () => {
   const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
   const loginWithPasswordMutation = trpc.passwordLogin.loginWithPassword.useMutation();
 
+
+  // Render Google button after it's mounted in DOM
+  useEffect(() => {
+    if (!googleLoaded) return;
+
+    const googleWindow = window as any;
+    if (!googleWindow.google || !googleWindow.google.accounts) {
+      console.warn("Google API not available for rendering button");
+      return;
+    }
+
+    const buttonElement = document.getElementById("google-signin-button");
+    if (buttonElement) {
+      try {
+        googleWindow.google.accounts.id.renderButton(buttonElement, {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          width: "100%",
+          text: "signin_with",
+        });
+        console.log("Google Sign-In button rendered successfully");
+      } catch (error) {
+        console.error("Error rendering Google button:", error);
+      }
+    } else {
+      console.warn("Google button element not found in DOM");
+    }
+  }, [googleLoaded]);
+
+  // Load Google Sign-In script on mount
+  useEffect(() => {
+    let retryCount = 0;
+    const maxRetries = 5;
+    let timeoutId: NodeJS.Timeout;
+
+    const loadGoogleSignIn = () => {
+      const googleWindow = window as any;
+
+      // Check if Google API is already loaded
+      if (googleWindow.google && googleWindow.google.accounts) {
+        console.log("Google API already available, initializing...");
+        if (initializeGoogleSignIn()) {
+          setGoogleLoaded(true);
+        }
+        return;
+      }
+
+      // Check if script already exists
+      const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+      if (existingScript) {
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(`Retrying Google Sign-In initialization (${retryCount}/${maxRetries})`);
+          timeoutId = setTimeout(loadGoogleSignIn, 600);
+        } else {
+          console.error("Failed to load Google Sign-In after retries");
+        }
+        return;
+      }
+
+      // Create and load the script
+      console.log("Loading Google Sign-In script...");
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = false;
+      script.onload = () => {
+        console.log("Google Sign-In script loaded, initializing...");
+        timeoutId = setTimeout(() => {
+          if (initializeGoogleSignIn()) {
+            setGoogleLoaded(true);
+          }
+        }, 300);
+      };
+      script.onerror = () => {
+        console.error("Failed to load Google Sign-In script from CDN");
+      };
+      document.head.appendChild(script);
+    };
+
+    loadGoogleSignIn();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, []);
+
   // Note: We allow authenticated users to access this page so they can switch accounts if needed
 
+
   // Define handleGoogleSignIn before useEffect hooks to avoid hoisting issues
+  // Initialize Google Sign-In API
+  const initializeGoogleSignIn = () => {
+    const googleWindow = window as any;
+    if (googleWindow.google && googleWindow.google.accounts) {
+      try {
+        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+        if (!clientId) {
+          console.error("Google Client ID not configured");
+          return false;
+        }
+
+        googleWindow.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleSignIn,
+          ux_mode: "popup",
+          auto_select: false,
+          itp_support: true,
+        });
+        console.log("Google Sign-In API initialized successfully");
+        return true;
+      } catch (error) {
+        console.error("Error initializing Google Sign-In API:", error);
+        return false;
+      }
+    }
+    return false;
+  };
+
   const handleGoogleSignIn = async (response: any) => {
     console.log("[Gmail] Google Sign-In callback triggered", response);
 
@@ -57,15 +174,35 @@ const EmailAuth = () => {
 
     try {
       setLoading(true);
+      // Decode the JWT token to get user info
+      const base64Url = response.credential.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      const data = JSON.parse(jsonPayload);
+
       // Send token to backend for verification
       const result = await fetch("/api/oauth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: response.credential }),
+        body: JSON.stringify({
+          token: response.credential,
+          googleId: data.sub,
+          email: data.email,
+          name: data.name,
+          picture: data.picture,
+        }),
       });
 
       if (result.ok) {
-        window.location.href = "/admin";
+        const responseData = await result.json();
+        // Skip VerifyEmailPending and redirect directly to dashboard
+        toast.success("Gmail login successful!");
+        window.location.href = responseData.redirectUrl || "/admin";
       } else {
         toast.error("Google Sign-in failed");
       }
