@@ -1358,3 +1358,14 @@
 - [x] Redirects to /user/{id} if no policy assigned
 - [x] Reverted Gmail users to clientStatus = "queue" instead of "customer"
 - [x] Gmail login redirection now based on policy assignment status
+
+## Feature: SMS-Based 2FA for Admin Roles During Gmail Login
+- [x] Created Gmail2FAVerification page component for OTP entry
+- [x] Updated Gmail callback to check if user is admin/manager/support role
+- [x] Generate and store OTP codes in database for admin users
+- [x] Implemented /api/auth/verify-gmail-otp endpoint for OTP verification
+- [x] Implemented /api/auth/resend-gmail-otp endpoint for resending OTP
+- [x] Create session after successful OTP verification
+- [x] Redirect to admin dashboard after 2FA success
+- [ ] Integrate Twilio SMS sending for OTP delivery
+- [ ] Add retry logic and rate limiting for OTP attempts

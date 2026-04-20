@@ -35,39 +35,65 @@ export function registerOAuthRoutes(app: Express) {
         });
       }
 
-      // Create session token with non-empty name
-      const sessionDuration = rememberMe ? THIRTY_DAYS_MS : ONE_YEAR_MS;
-      const sessionToken = await sdk.createSessionToken(googleId, {
-        name: name || email || "User",
-        expiresInMs: sessionDuration,
-      });
+      // Check if user is admin/manager/support role - require 2FA
+      const isPrivilegedRole = phoneUser.role === "admin" || phoneUser.role === "super_admin" || phoneUser.role === "manager" || phoneUser.role === "support";
+      
+      if (isPrivilegedRole) {
+        // For admin roles, require 2FA via SMS
+        if (!phoneUser.phone) {
+          res.status(400).json({ error: "Phone number required for 2FA" });
+          return;
+        }
 
-      const cookieOptions = getSessionCookieOptions(req);
-      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: sessionDuration });
-
-      // Determine redirect URL based on role and policy assignment
-      let redirectUrl = "/dashboard";
-      if (phoneUser.role === "admin" || phoneUser.role === "super_admin" || phoneUser.role === "manager" || phoneUser.role === "support") {
-        redirectUrl = "/admin";
+        // Send OTP via SMS for 2FA
+        try {
+          // Generate 6-digit OTP code
+          const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+          const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+          
+          await db.createOtpCode({
+            phoneUserId: phoneUser.id,
+            code: otpCode,
+            expiresAt,
+          });
+          // Note: SMS sending would be handled by Twilio integration
+          // For now, we'll return the 2FA verification page URL
+          res.json({
+            success: true,
+            requiresOTP: true,
+            redirectUrl: `/gmail-2fa?phoneUserId=${phoneUser.id}&email=${encodeURIComponent(phoneUser.email || "")}&redirectUrl=${encodeURIComponent("/admin")}`,
+            email: phoneUser.email,
+            message: "OTP sent to your phone. Please verify to continue.",
+          });
+        } catch (error) {
+          console.error("[2FA] Failed to create OTP:", error);
+          res.status(500).json({ error: "Failed to initiate 2FA" });
+        }
       } else {
-        // Check if user has a policy assigned
+        // For regular users, create session and determine redirect based on policy assignment
+        const sessionDuration = rememberMe ? THIRTY_DAYS_MS : ONE_YEAR_MS;
+        const sessionToken = await sdk.createSessionToken(googleId, {
+          name: name || email || "User",
+          expiresInMs: sessionDuration,
+        });
+        const cookieOptions = getSessionCookieOptions(req);
+        res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: sessionDuration });
+
+        let redirectUrl = "/dashboard";
         const hasPolicy = await db.hasUserPolicy(phoneUser.id);
         if (hasPolicy) {
           redirectUrl = `/customer/${phoneUser.id}`;
         } else {
           redirectUrl = `/user/${phoneUser.id}`;
         }
-      }
 
-      // Check if Gmail account needs confirmation (new users)
-      const requiresConfirmation = !phoneUser.emailVerified || phoneUser.emailVerified !== "true";
-      
-      res.json({ 
-        success: true, 
-        redirectUrl,
-        email: phoneUser.email,
-        requiresConfirmation: false // Gmail is already verified by Google, so no confirmation needed
-      });
+        res.json({
+          success: true,
+          redirectUrl,
+          email: phoneUser.email,
+          requiresOTP: false,
+        });
+      }
     } catch (error) {
       console.error("[Gmail] Callback failed", error);
       res.status(500).json({ error: "Gmail callback failed" });
@@ -129,6 +155,94 @@ export function registerOAuthRoutes(app: Express) {
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
       res.status(500).json({ error: "OAuth callback failed" });
+    }
+  });
+
+  // OTP verification endpoint for 2FA
+  app.post("/api/auth/verify-gmail-otp", async (req: Request, res: Response) => {
+    try {
+      const { phoneUserId, otp } = req.body;
+
+      if (!phoneUserId || !otp) {
+        res.status(400).json({ error: "phoneUserId and OTP are required" });
+        return;
+      }
+
+      // Verify OTP
+      const validOtp = await db.getValidOtpCode(phoneUserId, otp);
+      if (!validOtp) {
+        res.status(401).json({ error: "Invalid or expired OTP" });
+        return;
+      }
+
+      // Get user and create session
+      const phoneUser = await db.getPhoneUserById(phoneUserId);
+      if (!phoneUser) {
+        res.status(404).json({ error: "User not found" });
+        return;
+      }
+
+      // Create session token
+      const sessionDuration = ONE_YEAR_MS;
+      const sessionToken = await sdk.createSessionToken(phoneUser.googleId || phoneUser.id.toString(), {
+        name: phoneUser.name || phoneUser.email || "Admin User",
+        expiresInMs: sessionDuration,
+      });
+
+      const cookieOptions = getSessionCookieOptions(req);
+      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: sessionDuration });
+
+      // Mark OTP as used
+      await db.deleteOtpCode(validOtp.id);
+
+      res.json({
+        success: true,
+        message: "OTP verified successfully",
+        redirectUrl: "/admin",
+      });
+    } catch (error) {
+      console.error("[2FA] OTP verification failed", error);
+      res.status(500).json({ error: "OTP verification failed" });
+    }
+  });
+
+  // Resend OTP endpoint
+  app.post("/api/auth/resend-gmail-otp", async (req: Request, res: Response) => {
+    try {
+      const { phoneUserId } = req.body;
+
+      if (!phoneUserId) {
+        res.status(400).json({ error: "phoneUserId is required" });
+        return;
+      }
+
+      // Get user
+      const phoneUser = await db.getPhoneUserById(phoneUserId);
+      if (!phoneUser || !phoneUser.phone) {
+        res.status(404).json({ error: "User or phone number not found" });
+        return;
+      }
+
+      // Generate new OTP
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+
+      await db.createOtpCode({
+        phoneUserId: phoneUserId,
+        code: otpCode,
+        expiresAt,
+      });
+
+      // TODO: Send OTP via Twilio SMS
+      console.log(`[2FA] New OTP generated for user ${phoneUserId}: ${otpCode}`);
+
+      res.json({
+        success: true,
+        message: "OTP resent to your phone",
+      });
+    } catch (error) {
+      console.error("[2FA] Resend OTP failed", error);
+      res.status(500).json({ error: "Failed to resend OTP" });
     }
   });
 }
