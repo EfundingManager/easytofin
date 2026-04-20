@@ -171,12 +171,12 @@ export default function SignUp() {
       });
 
       if (result.success) {
-        setStep("verification");
-        toast.success("Account created! Please verify your email.");
+        setStep("success");
+        toast.success("Account created successfully!");
 
-        // Redirect to email verification page after 2 seconds
+        // Redirect to user dashboard after 2 seconds
         setTimeout(() => {
-          setLocation("/verify-email-pending");
+          setLocation(`/user/${result.userId}`);
         }, 2000);
       }
     } catch (error: any) {

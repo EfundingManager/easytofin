@@ -1378,3 +1378,11 @@
 - [x] Admin roles redirect to /admin via 2FA flow
 - [x] Customers redirect to /customer/{id} based on policy assignment
 - [x] Regular users redirect to /user/{id} if no policy assigned
+
+## Bug Fix: Create Account Button Not Creating User
+- [x] Found Create Account button in SignUp component
+- [x] Verified backend endpoint properly creates user and returns userId
+- [x] Updated frontend to redirect to /user/{id} instead of /verify-email-pending
+- [x] Backend already returns userId in response
+- [x] SignUp component now redirects to /user/{id} after account creation
+- [x] Create Account button now creates user and redirects correctly
