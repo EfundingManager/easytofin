@@ -188,23 +188,22 @@ const EmailAuth = () => {
       const data = JSON.parse(jsonPayload);
 
       // Send token to backend for verification
-      const result = await fetch("/api/oauth/google", {
+      const result = await fetch("/api/gmail/callback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: response.credential,
           googleId: data.sub,
           email: data.email,
           name: data.name,
-          picture: data.picture,
+          rememberMe: rememberDevice,
         }),
       });
 
       if (result.ok) {
         const responseData = await result.json();
-        // Skip VerifyEmailPending and redirect directly to dashboard
+        // Redirect to the URL provided by backend based on user role and client status
         toast.success("Gmail login successful!");
-        window.location.href = responseData.redirectUrl || "/admin";
+        window.location.href = responseData.redirectUrl || "/dashboard";
       } else {
         toast.error("Google Sign-in failed");
       }

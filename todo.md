@@ -1335,3 +1335,10 @@
 - [x] Improved error messages for Google Sign-In failures
 - [x] Verified Google button renders without loading spinner
 - [x] Console errors no longer appear after updates
+
+## Bug Fix: Gmail Login Redirection to Client Dashboard
+- [x] Found Gmail callback endpoint at /api/gmail/callback (not /api/oauth/google)
+- [x] Updated EmailAuth handleGoogleSignIn to use correct /api/gmail/callback endpoint
+- [x] Updated Gmail callback to redirect based on user role (admin/super_admin/manager/support to /admin)
+- [x] Added role-based redirection logic for clients and regular users
+- [x] Verified endpoint returns correct redirectUrl in response

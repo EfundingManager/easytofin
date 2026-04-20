@@ -45,9 +45,11 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: sessionDuration });
 
-      // Determine redirect URL based on clientStatus and 2FA requirement
+      // Determine redirect URL based on role and clientStatus
       let redirectUrl = "/dashboard";
-      if (phoneUser.clientStatus === "customer") {
+      if (phoneUser.role === "admin" || phoneUser.role === "super_admin" || phoneUser.role === "manager" || phoneUser.role === "support") {
+        redirectUrl = "/admin";
+      } else if (phoneUser.clientStatus === "customer") {
         redirectUrl = `/customer/${phoneUser.id}`;
       } else {
         redirectUrl = `/user/${phoneUser.id}`;
