@@ -16,6 +16,7 @@ export default function VerifyEmail() {
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [lastResendTime, setLastResendTime] = useState<number | null>(null);
 
+  const [userId, setUserId] = useState<string | null>(null);
   const verifyEmailMutation = trpc.emailVerification.verifyEmail.useMutation();
   const resendEmailMutation = trpc.emailVerification.resendVerificationEmail.useMutation();
 
@@ -38,13 +39,18 @@ export default function VerifyEmail() {
 
   useEffect(() => {
     const verifyToken = async () => {
-      // Get token from URL
+      // Get token and userId from URL
       const params = new URLSearchParams(window.location.search);
       const token = params.get('token');
+      const userIdParam = params.get('userId');
 
       if (!token) {
         setStatus('error');
         return;
+      }
+
+      if (userIdParam) {
+        setUserId(userIdParam);
       }
 
       try {
@@ -55,9 +61,13 @@ export default function VerifyEmail() {
           setStatus('success');
           toast.success('Email verified successfully!');
 
-          // Redirect to home after 3 seconds
+          // Redirect to dashboard or home after 3 seconds
           setTimeout(() => {
-            setLocation('/');
+            if (userIdParam) {
+              setLocation(`/user/${userIdParam}`);
+            } else {
+              setLocation('/');
+            }
           }, 3000);
         } else {
           setStatus('error');
@@ -255,10 +265,16 @@ export default function VerifyEmail() {
                   )}
 
                   <Button
-                    onClick={() => setLocation('/')}
+                    onClick={() => {
+                      if (userId) {
+                        setLocation(`/user/${userId}`);
+                      } else {
+                        setLocation('/');
+                      }
+                    }}
                     className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white"
                   >
-                    Go to Home
+                    {userId ? 'Go to Dashboard' : 'Go to Home'}
                   </Button>
                 </div>
               )}

@@ -57,11 +57,11 @@ function generateToken(): string {
 }
 
 // Send email (using built-in notification system or external service)
-async function sendVerificationEmail(email: string, token: string, userName: string): Promise<boolean> {
+async function sendVerificationEmail(email: string, token: string, userName: string, userId?: number): Promise<boolean> {
   try {
     // In production, integrate with email service (SendGrid, AWS SES, etc.)
     // For now, we'll log it and return success
-    const verificationUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
+    const verificationUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${token}${userId ? `&userId=${userId}` : ''}`;
     
     console.log(`📧 Email Verification Link for ${email}:`);
     console.log(`   ${verificationUrl}`);
@@ -135,7 +135,7 @@ export const emailVerificationRouter = router({
         }
 
         // Send verification email
-        const emailSent = await sendVerificationEmail(input.email, token, user[0].name || 'User');
+        const emailSent = await sendVerificationEmail(input.email, token, user[0].name || 'User', ctx.user.id);
 
         if (!emailSent) {
           return { success: false, error: 'Failed to send verification email' };
@@ -277,7 +277,7 @@ export const emailVerificationRouter = router({
         });
 
         // Send verification email
-        const emailSent = await sendVerificationEmail(input.email, token, user[0].name || 'User');
+        const emailSent = await sendVerificationEmail(input.email, token, user[0].name || 'User', ctx.user.id);
 
         if (!emailSent) {
           return { success: false, error: 'Failed to send verification email' };

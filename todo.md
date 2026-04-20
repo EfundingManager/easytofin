@@ -1386,3 +1386,11 @@
 - [x] Shows "Go to Dashboard" button when userId is present
 - [x] Clicking button redirects to /user/{id} dashboard
 - [x] Email verification flow now complete with dashboard access option
+
+## Feature: Email Verification Callback Handler
+- [x] Email verification token generation and storage already exists in database
+- [x] Backend endpoint verifyEmail handles verification link clicks and updates user status
+- [x] VerifyEmail page created with token verification and user status updates
+- [x] Updated email service to include userId in verification links
+- [x] User emailVerified status updated when email is verified
+- [x] VerifyEmail page redirects to /user/{id} after successful verification
