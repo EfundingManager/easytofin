@@ -26,17 +26,21 @@ export default function GmailConfirmation() {
     setEmail(userEmail);
     
     console.log("[Gmail Confirmation] Page loaded with:", { url, userEmail });
+    
+    // Auto-redirect after 2 seconds
+    const timer = setTimeout(() => {
+      console.log("[Gmail Confirmation] Auto-redirecting to:", url);
+      window.location.href = url;
+    }, 2000);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const handleProceedToDashboard = async () => {
     try {
       setLoading(true);
       console.log("[Gmail Confirmation] User proceeding to dashboard:", redirectUrl);
-      
-      // Small delay to show the loading state
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Redirect to the dashboard
+      // Redirect immediately to the dashboard
       window.location.href = redirectUrl;
     } catch (error) {
       console.error("[Gmail Confirmation] Error:", error);
@@ -98,7 +102,7 @@ export default function GmailConfirmation() {
 
             <div className="text-center">
               <p className="text-xs text-slate-500">
-                You will be redirected automatically if you don't click the button.
+                Redirecting automatically in 2 seconds...
               </p>
             </div>
           </CardContent>

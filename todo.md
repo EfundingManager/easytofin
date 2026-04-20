@@ -1369,3 +1369,12 @@
 - [x] Redirect to admin dashboard after 2FA success
 - [ ] Integrate Twilio SMS sending for OTP delivery
 - [ ] Add retry logic and rate limiting for OTP attempts
+
+## Bug Fix: Gmail Login Redirection Not Working Correctly
+- [x] Identified issue: GmailConfirmation page wasn't auto-redirecting
+- [x] Updated GmailConfirmation to auto-redirect after 2 seconds
+- [x] EmailAuth handleGoogleSignIn properly passes redirectUrl to confirmation page
+- [x] GmailConfirmation now redirects to correct dashboard based on redirectUrl
+- [x] Admin roles redirect to /admin via 2FA flow
+- [x] Customers redirect to /customer/{id} based on policy assignment
+- [x] Regular users redirect to /user/{id} if no policy assigned
