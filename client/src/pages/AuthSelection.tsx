@@ -23,10 +23,10 @@ export default function AuthSelection() {
           <Card className="border-[oklch(0.88_0.008_240)]">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-[Outfit] font-800 text-[oklch(0.18_0.015_240)]">
-                Choose Sign In Method
+                Choose Registration Method
               </CardTitle>
               <CardDescription className="text-[oklch(0.52_0.015_240)]">
-                Select how you'd like to sign in
+                Select how you'd like to sign in or register
               </CardDescription>
             </CardHeader>
 
@@ -39,6 +39,7 @@ export default function AuthSelection() {
                 <Phone className="w-6 h-6" />
                 <div className="text-center">
                   <div className="font-semibold">Sign in with Phone</div>
+                  <div className="text-xs opacity-90">Receive OTP via SMS</div>
                 </div>
               </Button>
 
@@ -50,6 +51,7 @@ export default function AuthSelection() {
                 <Mail className="w-6 h-6" />
                 <div className="text-center">
                   <div className="font-semibold">Sign in with Email</div>
+                  <div className="text-xs opacity-90">Receive OTP via email</div>
                 </div>
               </Button>
 

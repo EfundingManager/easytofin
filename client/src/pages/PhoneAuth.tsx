@@ -13,8 +13,6 @@ import { RateLimitAlert } from "@/components/RateLimitAlert";
 import { ResendCodeButton } from "@/components/ResendCodeButton";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
-import { PasswordInput } from "@/components/PasswordInput";
-import { OTPDeliveryNotification } from "@/components/OTPDeliveryNotification";
 
 type AuthStep = "phone" | "authMethod" | "otp" | "register" | "password";
 
@@ -33,8 +31,6 @@ export default function PhoneAuth() {
   const [rememberDevice, setRememberDevice] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [password, setPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
-  const [showSmsOtpFallback, setShowSmsOtpFallback] = useState(false);
   const rateLimit = useRateLimit();
 
   const requestOtpMutation = trpc.phoneAuth.requestOtp.useMutation();
@@ -258,7 +254,6 @@ export default function PhoneAuth() {
     }
 
     setLoading(true);
-    setLoginError("");
     try {
       const result = await loginWithPasswordMutation.mutateAsync({
         phoneOrEmail: phone,
@@ -272,27 +267,7 @@ export default function PhoneAuth() {
         window.location.href = result.redirectUrl;
       }
     } catch (error: any) {
-      const errorMsg = error.message || "Password login failed";
-      setLoginError(errorMsg);
-      setShowSmsOtpFallback(true);
-      toast.error(errorMsg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUseSmsOtp = async () => {
-    setLoading(true);
-    try {
-      const result = await requestOtpMutation.mutateAsync({ phone });
-      setDevCode(result.devCode || "");
-      setIsNewUser(result.isNewUser || false);
-      setStep("otp");
-      setLoginError("");
-      setShowSmsOtpFallback(false);
-      toast.success("OTP sent to your phone!");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send OTP");
+      toast.error(error.message || "Password login failed");
     } finally {
       setLoading(false);
     }
@@ -349,21 +324,21 @@ export default function PhoneAuth() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
           <Card className="border-[oklch(0.88_0.008_240)] shadow-sm">
-            <CardHeader className="border-b border-[oklch(0.88_0.008_240)] pb-4">
+            <CardHeader className="border-b border-[oklch(0.88_0.008_240)]">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-[oklch(0.25_0.06_155)]">
-                    {step === "phone" && "Sign In"}
+                    {step === "phone" && "Sign In or Register"}
                     {step === "authMethod" && "Choose Sign-In Method"}
                     {step === "otp" && "Verify Your Phone"}
                     {step === "password" && "Enter Password"}
                     {step === "register" && "Complete Registration"}
                   </CardTitle>
                   <CardDescription className="text-[oklch(0.52_0.015_240)]">
-                    {step === "phone" && "Enter your phone number to Sign In with your phone number"}
+                    {step === "phone" && "Enter your phone number"}
                     {step === "authMethod" && `Signing in with ${phone}`}
                     {step === "otp" && "Enter the 6-digit code sent to your phone"}
                     {step === "password" && "Enter your password"}
@@ -386,7 +361,7 @@ export default function PhoneAuth() {
               </div>
             </CardHeader>
 
-            <CardContent className="max-h-[calc(100vh-200px)] overflow-y-auto scroll-smooth pr-2">
+            <CardContent className="max-h-[calc(100vh-200px)] overflow-y-auto">
               {step === "phone" && (
                 <div className="space-y-4">
                   {/* Google Sign-In Button */}
@@ -411,7 +386,7 @@ export default function PhoneAuth() {
                   </div>
 
                   {/* Phone Sign-In Form */}
-                  <div className="space-y-4">
+                  <form onSubmit={handleRequestOtp} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-[oklch(0.25_0.06_155)] mb-2">
                         Phone Number
@@ -423,37 +398,22 @@ export default function PhoneAuth() {
                         onChange={(e) => setPhone(e.target.value)}
                         disabled={loading}
                         className="border-[oklch(0.88_0.008_240)]"
-                        autoComplete="tel"
-                        name="phone"
                       />
                     </div>
-                    <PasswordInput
-                      label="Password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                      autoComplete="current-password"
-                      name="password"
-                    />
-                    <RememberDeviceCheckbox
-                      checked={rememberDevice}
-                      onChange={setRememberDevice}
-                      showTooltip={true}
-                    />
                     <Button
-                      type="button"
-                      onClick={(e: any) => handlePasswordLogin(e)}
-                      disabled={loading || !phone || !password}
+                      type="submit"
+                      disabled={loading || rateLimit.isLimited}
                       className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white disabled:opacity-50"
                     >
                       {loading ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Logging in...
+                          Sending OTP...
                         </>
+                      ) : rateLimit.isLimited ? (
+                        `Retry in ${rateLimit.formatTimeRemaining(rateLimit.timeRemaining)}`
                       ) : (
-                        "Login"
+                        "Continue"
                       )}
                     </Button>
                     {rateLimit.isLimited && (
@@ -463,83 +423,46 @@ export default function PhoneAuth() {
                         onFormatTime={rateLimit.formatTimeRemaining}
                       />
                     )}
-                    {loginError && showSmsOtpFallback && (
-                      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <p className="text-sm text-red-800 mb-3">{loginError}</p>
-                        <Button
-                          type="button"
-                          onClick={handleUseSmsOtp}
-                          disabled={loading}
-                          variant="outline"
-                          className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                        >
-                          {loading ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Sending OTP...
-                            </>
-                          ) : (
-                            "Receive OTP via SMS"
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
+                  </form>
                 </div>
               )}
 
               {step === "authMethod" && (
-                <div className="space-y-4 pb-4">
+                <div className="space-y-3">
                   <div className="bg-[oklch(0.95_0.008_240)] p-3 rounded-lg">
                     <p className="text-sm text-[oklch(0.52_0.015_240)]">
                       Choose how you'd like to sign in
                     </p>
                   </div>
 
-                  <div className="space-y-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => handleSelectAuthMethod("otp")}
-                      className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 border-2 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
-                    >
-                      <span className="font-semibold text-[oklch(0.25_0.06_155)]">OTP Verification</span>
-                    </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleSelectAuthMethod("otp")}
+                    className="w-full h-auto py-3 flex flex-col items-start gap-1 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
+                  >
+                    <span className="font-semibold text-[oklch(0.25_0.06_155)]">OTP Verification</span>
+                    <span className="text-xs text-[oklch(0.52_0.015_240)]">
+                      Use the 6-digit code sent to your phone
+                    </span>
+                  </Button>
 
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => handleSelectAuthMethod("password")}
-                      className="w-full h-auto py-4 px-4 flex flex-col items-start gap-2 border-2 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
-                    >
-                      <span className="font-semibold text-[oklch(0.25_0.06_155)]">Password Login</span>
-                      <span className="text-xs text-[oklch(0.52_0.015_240)]">
-                        Sign in with your password
-                      </span>
-                    </Button>
-                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleSelectAuthMethod("password")}
+                    className="w-full h-auto py-3 flex flex-col items-start gap-1 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
+                  >
+                    <span className="font-semibold text-[oklch(0.25_0.06_155)]">Password Login</span>
+                    <span className="text-xs text-[oklch(0.52_0.015_240)]">
+                      Sign in with your password
+                    </span>
+                  </Button>
                 </div>
               )}
 
               {step === "otp" && (
                 <form onSubmit={handleVerifyOtp} className="space-y-4">
-                  <OTPDeliveryNotification
-                    phoneOrEmail={phone}
-                    onResendClick={async () => {
-                      setLoading(true);
-                      try {
-                        const result = await resendOtpMutation.mutateAsync({ phone });
-                        setDevCode(result.devCode || "");
-                        toast.success("OTP resent to your phone!");
-                      } catch (error: any) {
-                        toast.error(error.message || "Failed to resend OTP");
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                    isLoading={loading}
-                    countdownSeconds={60}
-                  />
                   <div>
                     <label className="block text-sm font-medium text-[oklch(0.25_0.06_155)] mb-2">
                       Enter OTP
@@ -630,12 +553,6 @@ export default function PhoneAuth() {
                       className="border-[oklch(0.88_0.008_240)]"
                     />
                   </div>
-                  {loginError && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-2">
-                      <p className="text-sm text-red-800">{loginError}</p>
-                      <p className="text-xs text-red-700 font-medium">Receive OTP via SMS</p>
-                    </div>
-                  )}
                   <RememberDeviceCheckbox
                     checked={rememberDevice}
                     onChange={setRememberDevice}

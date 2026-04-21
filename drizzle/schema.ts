@@ -16,7 +16,7 @@ export const users = mysqlTable("users", {
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin", "manager", "support", "staff", "super_admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "admin", "manager", "staff", "super_admin"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -40,7 +40,7 @@ export const phoneUsers = mysqlTable("phoneUsers", {
   twoFactorSecret: text("twoFactorSecret"),
   verified: mysqlEnum("verified", ["true", "false"]).default("false").notNull(),
   emailVerified: mysqlEnum("emailVerified", ["true", "false"]).default("false").notNull(),
-  role: mysqlEnum("role", ["user", "admin", "manager", "support", "staff", "super_admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "admin", "manager", "staff", "super_admin"]).default("user").notNull(),
   googleId: varchar("googleId", { length: 255 }),
   picture: text("picture"),
   loginMethod: varchar("loginMethod", { length: 64 }),
@@ -69,10 +69,6 @@ export const phoneUsers = mysqlTable("phoneUsers", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn"),
-  isDeleted: mysqlEnum("isDeleted", ["true", "false"]).default("false").notNull(),
-  deletedAt: timestamp("deletedAt"),
-  deletedBy: int("deletedBy"),
-  deletionReason: text("deletionReason"),
 });
 
 export type PhoneUser = typeof phoneUsers.$inferSelect;
@@ -406,168 +402,3 @@ export const passwordResetTokens = mysqlTable("passwordResetTokens", {
 });
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
-
-
-/**
- * SMS verification tokens for phone verification
- * Used for SMS-based verification during signup and account recovery
- */
-export const smsVerificationTokens = mysqlTable("smsVerificationTokens", {
-  id: int("id").autoincrement().primaryKey(),
-  phoneUserId: int("phoneUserId").notNull(),
-  phone: varchar("phone", { length: 20 }).notNull(),
-  otp: varchar("otp", { length: 6 }).notNull(),
-  expiresAt: timestamp("expiresAt").notNull(),
-  verifiedAt: timestamp("verifiedAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type SmsVerificationToken = typeof smsVerificationTokens.$inferSelect;
-export type InsertSmsVerificationToken = typeof smsVerificationTokens.$inferInsert;
-
-
-/**
- * Login attempt tracking for security monitoring
- * Tracks failed login attempts to detect suspicious activity
- */
-export const loginAttempts = mysqlTable("loginAttempts", {
-  id: int("id").autoincrement().primaryKey(),
-  phoneUserId: int("phoneUserId"),
-  email: varchar("email", { length: 320 }),
-  phone: varchar("phone", { length: 20 }),
-  attemptType: mysqlEnum("attemptType", ["password", "otp", "email_link"]).notNull(),
-  status: mysqlEnum("status", ["success", "failed"]).notNull(),
-  failureReason: varchar("failureReason", { length: 255 }), // e.g., "invalid_password", "expired_otp", "rate_limited"
-  ipAddress: varchar("ipAddress", { length: 45 }), // IPv4 or IPv6
-  userAgent: text("userAgent"),
-  deviceFingerprint: varchar("deviceFingerprint", { length: 255 }),
-  location: varchar("location", { length: 255 }), // Approximate location from IP
-  alertSent: mysqlEnum("alertSent", ["true", "false"]).default("false").notNull(),
-  alertSentAt: timestamp("alertSentAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type LoginAttempt = typeof loginAttempts.$inferSelect;
-export type InsertLoginAttempt = typeof loginAttempts.$inferInsert;
-
-
-/**
- * Account linking for connecting OAuth and phone/email accounts
- * Allows users to sign in with multiple methods (OAuth, phone, email)
- */
-export const accountLinks = mysqlTable("accountLinks", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId"), // Main OAuth user ID from users table
-  phoneUserId: int("phoneUserId"), // Phone/email user ID from phoneUsers table
-  linkMethod: mysqlEnum("linkMethod", ["oauth_to_phone", "oauth_to_email"]).notNull(),
-  verificationToken: varchar("verificationToken", { length: 255 }).unique(),
-  verificationTokenExpiresAt: timestamp("verificationTokenExpiresAt"),
-  isVerified: mysqlEnum("isVerified", ["true", "false"]).default("false").notNull(),
-  verifiedAt: timestamp("verifiedAt"),
-  isPrimary: mysqlEnum("isPrimary", ["true", "false"]).default("false").notNull(), // Primary login method
-  status: mysqlEnum("status", ["pending", "active", "revoked"]).default("pending").notNull(),
-  revokedAt: timestamp("revokedAt"),
-  revokedReason: varchar("revokedReason", { length: 255 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type AccountLink = typeof accountLinks.$inferSelect;
-export type InsertAccountLink = typeof accountLinks.$inferInsert;
-
-/**
- * Account link verification tokens
- * Temporary tokens for verifying account links via email/SMS
- */
-export const accountLinkTokens = mysqlTable("accountLinkTokens", {
-  id: int("id").autoincrement().primaryKey(),
-  accountLinkId: int("accountLinkId").notNull(),
-  token: varchar("token", { length: 255 }).notNull().unique(),
-  tokenType: mysqlEnum("tokenType", ["email_verification", "sms_verification"]).notNull(),
-  verificationCode: varchar("verificationCode", { length: 6 }), // For SMS verification
-  expiresAt: timestamp("expiresAt").notNull(),
-  verifiedAt: timestamp("verifiedAt"),
-  attempts: int("attempts").default(0).notNull(),
-  maxAttempts: int("maxAttempts").default(3).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type AccountLinkToken = typeof accountLinkTokens.$inferSelect;
-export type InsertAccountLinkToken = typeof accountLinkTokens.$inferInsert;
-
-
-/**
- * Account lockout tracking for brute force protection
- * Locks accounts after 5 failed login attempts for 30 minutes
- */
-export const accountLockouts = mysqlTable("accountLockouts", {
-  id: int("id").autoincrement().primaryKey(),
-  phoneUserId: int("phoneUserId"),
-  email: varchar("email", { length: 320 }),
-  phone: varchar("phone", { length: 20 }),
-  failedAttempts: int("failedAttempts").default(0).notNull(),
-  maxFailedAttempts: int("maxFailedAttempts").default(5).notNull(),
-  isLocked: mysqlEnum("isLocked", ["true", "false"]).default("false").notNull(),
-  lockedUntil: timestamp("lockedUntil"),
-  lastFailedAttempt: timestamp("lastFailedAttempt"),
-  lastFailureReason: varchar("lastFailureReason", { length: 255 }),
-  unlockMethod: mysqlEnum("unlockMethod", ["time_based", "email_verification", "sms_verification"]).default("time_based"),
-  unlockToken: varchar("unlockToken", { length: 255 }).unique(),
-  unlockTokenExpiresAt: timestamp("unlockTokenExpiresAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type AccountLockout = typeof accountLockouts.$inferSelect;
-export type InsertAccountLockout = typeof accountLockouts.$inferInsert;
-
-
-/**
- * Role permissions configuration
- * Allows Super Admins to customize permissions for each role
- */
-export const rolePermissions = mysqlTable("rolePermissions", {
-  id: int("id").autoincrement().primaryKey(),
-  role: mysqlEnum("role", ["admin", "manager", "support", "staff"]).notNull().unique(),
-  // Client Management Permissions
-  canViewClients: mysqlEnum("canViewClients", ["true", "false"]).default("true").notNull(),
-  canEditClients: mysqlEnum("canEditClients", ["true", "false"]).default("true").notNull(),
-  canDeleteClients: mysqlEnum("canDeleteClients", ["true", "false"]).default("false").notNull(),
-  canArchiveClients: mysqlEnum("canArchiveClients", ["true", "false"]).default("false").notNull(),
-  canRestoreClients: mysqlEnum("canRestoreClients", ["true", "false"]).default("false").notNull(),
-  // KYC Management Permissions
-  canViewKYC: mysqlEnum("canViewKYC", ["true", "false"]).default("true").notNull(),
-  canApproveKYC: mysqlEnum("canApproveKYC", ["true", "false"]).default("false").notNull(),
-  canRejectKYC: mysqlEnum("canRejectKYC", ["true", "false"]).default("false").notNull(),
-  canReviewDocuments: mysqlEnum("canReviewDocuments", ["true", "false"]).default("false").notNull(),
-  // Policy Management Permissions
-  canViewPolicies: mysqlEnum("canViewPolicies", ["true", "false"]).default("true").notNull(),
-  canEditPolicies: mysqlEnum("canEditPolicies", ["true", "false"]).default("false").notNull(),
-  canDeletePolicies: mysqlEnum("canDeletePolicies", ["true", "false"]).default("false").notNull(),
-  // Form Management Permissions
-  canViewForms: mysqlEnum("canViewForms", ["true", "false"]).default("true").notNull(),
-  canEditForms: mysqlEnum("canEditForms", ["true", "false"]).default("false").notNull(),
-  canCreateForms: mysqlEnum("canCreateForms", ["true", "false"]).default("false").notNull(),
-  canDeleteForms: mysqlEnum("canDeleteForms", ["true", "false"]).default("false").notNull(),
-  // Email Campaign Permissions
-  canViewCampaigns: mysqlEnum("canViewCampaigns", ["true", "false"]).default("true").notNull(),
-  canCreateCampaigns: mysqlEnum("canCreateCampaigns", ["true", "false"]).default("false").notNull(),
-  canSendCampaigns: mysqlEnum("canSendCampaigns", ["true", "false"]).default("false").notNull(),
-  canDeleteCampaigns: mysqlEnum("canDeleteCampaigns", ["true", "false"]).default("false").notNull(),
-  // Team Management Permissions
-  canManageTeam: mysqlEnum("canManageTeam", ["true", "false"]).default("false").notNull(),
-  canInviteMembers: mysqlEnum("canInviteMembers", ["true", "false"]).default("false").notNull(),
-  canRemoveMembers: mysqlEnum("canRemoveMembers", ["true", "false"]).default("false").notNull(),
-  canChangeRoles: mysqlEnum("canChangeRoles", ["true", "false"]).default("false").notNull(),
-  // System Configuration Permissions
-  canAccessConfiguration: mysqlEnum("canAccessConfiguration", ["true", "false"]).default("false").notNull(),
-  canManagePermissions: mysqlEnum("canManagePermissions", ["true", "false"]).default("false").notNull(),
-  canViewAuditLogs: mysqlEnum("canViewAuditLogs", ["true", "false"]).default("false").notNull(),
-  canExportData: mysqlEnum("canExportData", ["true", "false"]).default("false").notNull(),
-  updatedBy: int("updatedBy"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type RolePermission = typeof rolePermissions.$inferSelect;
-export type InsertRolePermission = typeof rolePermissions.$inferInsert;

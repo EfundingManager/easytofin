@@ -23,13 +23,6 @@ import { recipientUploadRouter } from "./routers/recipient-upload";
 import { deviceRegistrationRouter } from "./routers/device-registration";
 import { passwordResetRouter } from "./routers/password-reset";
 import { passwordLoginRouter } from "./routers/password-login";
-import { signupRouter } from "./routers/signup";
-import { smsVerificationRouter } from "./routers/sms-verification";
-import { passwordRecoveryRouter } from "./routers/password-recovery";
-import { deviceTrustRouter } from "./routers/device-trust";
-import { accountLinkingRouter } from "./routers/account-linking";
-import { accountLockoutRouter } from "./routers/account-lockout";
-import { teamRouter } from "./routers/team";
 import * as db from "./db";
 
 export const appRouter = router({
@@ -67,15 +60,11 @@ export const appRouter = router({
   emailAuth: emailAuthRouter,
   passwordReset: passwordResetRouter,
   passwordLogin: passwordLoginRouter,
-  passwordRecovery: passwordRecoveryRouter,
-  deviceTrust: deviceTrustRouter,
-  signup: signupRouter,
   admin: adminRouter,
   workflow: workflowRouter,
   profile: profileRouter,
   profileProgress: profileProgressRouter,
   emailVerification: emailVerificationRouter,
-  smsVerification: smsVerificationRouter,
   documents: documentsRouter,
   documentReview: documentReviewRouter,
   policies: policiesRouter,
@@ -87,9 +76,6 @@ export const appRouter = router({
   emailCampaign: emailCampaignRouter,
   recipientUpload: recipientUploadRouter,
   deviceRegistration: deviceRegistrationRouter,
-  accountLinking: accountLinkingRouter,
-  accountLocking: accountLockoutRouter,
-  team: teamRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({

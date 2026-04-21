@@ -318,21 +318,3 @@ export async function getClientDocumentsByStatus(phoneUserId: number, status: "p
   );
 }
 
-
-// Policy Assignment Helpers
-export async function hasUserPolicy(phoneUserId: number): Promise<boolean> {
-  const db = await getDb();
-  if (!db) {
-    return false;
-  }
-
-  try {
-    const { policyAssignments } = await import("../drizzle/schema");
-    const { eq } = await import("drizzle-orm");
-    const result = await db.select().from(policyAssignments).where(eq(policyAssignments.phoneUserId, phoneUserId)).limit(1);
-    return result.length > 0;
-  } catch (error) {
-    console.error("[Database] Error checking user policy:", error);
-    return false;
-  }
-}

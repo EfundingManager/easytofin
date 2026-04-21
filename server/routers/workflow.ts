@@ -1,5 +1,4 @@
-import { router } from "../_core/trpc";
-import { adminProcedure } from "../_core/trpc";
+import { adminProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { phoneUsers, policyAssignments, factFindingForms } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -115,6 +114,7 @@ export const workflowRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       try {
+        // Check if customer has verified KYC status
         const clientResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.clientId));
         if (!clientResult || clientResult.length === 0) {
           throw new Error("Customer not found");
@@ -138,6 +138,7 @@ export const workflowRouter = router({
         await db.update(phoneUsers).set({ clientStatus: "customer", updatedAt: new Date() }).where(eq(phoneUsers.id, input.clientId));
         await db.update(factFindingForms).set({ policyNumber: input.policyNumber, policyAssignedAt: new Date(), updatedAt: new Date() }).where(eq(factFindingForms.phoneUserId, input.clientId));
         
+        // Get client info for notification
         const clientForNotification: any = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.clientId));
         if (clientForNotification && clientForNotification.length > 0) {
           const clientNotif = clientForNotification[0];
@@ -203,110 +204,4 @@ export const workflowRouter = router({
       return { queueCount: 0, inProgressCount: 0, assignedCount: 0, customerCount: 0 };
     }
   }),
-
-  deleteClient: adminProcedure
-    .input(z.object({ clientId: z.number().int().positive() }))
-    .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "super_admin" && ctx.user.role !== "admin") {
-        throw new Error("You do not have permission to delete clients");
-      }
-
-      const db = await getDb();
-      if (!db) throw new Error("Database connection failed");
-
-      try {
-        await db.delete(policyAssignments).where(eq(policyAssignments.phoneUserId, input.clientId));
-        await db.delete(factFindingForms).where(eq(factFindingForms.phoneUserId, input.clientId));
-        await db.delete(phoneUsers).where(eq(phoneUsers.id, input.clientId));
-        
-        console.log(`[Workflow] Client ${input.clientId} deleted by admin ${ctx.user.id}`);
-        return { success: true, message: "Client deleted successfully" };
-      } catch (error) {
-        console.error("[Workflow] Failed to delete client:", error);
-        throw new Error("Failed to delete client");
-      }
-    }),
-
-  archiveClient: adminProcedure
-    .input(z.object({ clientId: z.number().int().positive(), reason: z.string().optional() }))
-    .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "super_admin" && ctx.user.role !== "admin") {
-        throw new Error("You do not have permission to archive clients");
-      }
-
-      const db = await getDb();
-      if (!db) throw new Error("Database connection failed");
-
-      try {
-        await db.update(phoneUsers).set({
-          isDeleted: "true",
-          deletedAt: new Date(),
-          deletedBy: ctx.user.id,
-          deletionReason: input.reason,
-          updatedAt: new Date(),
-        }).where(eq(phoneUsers.id, input.clientId));
-        
-        console.log(`[Workflow] Client ${input.clientId} archived by admin ${ctx.user.id}`);
-        return { success: true, message: "Client archived successfully" };
-      } catch (error) {
-        console.error("[Workflow] Failed to archive client:", error);
-        throw new Error("Failed to archive client");
-      }
-    }),
-
-  restoreClient: adminProcedure
-    .input(z.object({ clientId: z.number().int().positive() }))
-    .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "super_admin" && ctx.user.role !== "admin") {
-        throw new Error("You do not have permission to restore clients");
-      }
-
-      const db = await getDb();
-      if (!db) throw new Error("Database connection failed");
-
-      try {
-        await db.update(phoneUsers).set({
-          isDeleted: "false",
-          deletedAt: null,
-          deletedBy: null,
-          deletionReason: null,
-          updatedAt: new Date(),
-        }).where(eq(phoneUsers.id, input.clientId));
-        
-        console.log(`[Workflow] Client ${input.clientId} restored by admin ${ctx.user.id}`);
-        return { success: true, message: "Client restored successfully" };
-      } catch (error) {
-        console.error("[Workflow] Failed to restore client:", error);
-        throw new Error("Failed to restore client");
-      }
-    }),
-
-  getArchivedClients: adminProcedure
-    .input(z.object({ page: z.number().int().positive().default(1), limit: z.number().int().positive().max(100).default(10) }))
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) return { clients: [], total: 0, page: input.page, limit: input.limit };
-      try {
-        const offset = (input.page - 1) * input.limit;
-        const archivedClients: any = await db.select({
-          id: phoneUsers.id,
-          name: phoneUsers.name,
-          email: phoneUsers.email,
-          phone: phoneUsers.phone,
-          deletedAt: phoneUsers.deletedAt,
-          deletionReason: phoneUsers.deletionReason,
-          createdAt: phoneUsers.createdAt,
-        }).from(phoneUsers).where(eq(phoneUsers.isDeleted, "true")).limit(input.limit).offset(offset);
-        const totalResult: any = await db.select().from(phoneUsers).where(eq(phoneUsers.isDeleted, "true"));
-        return {
-          clients: archivedClients,
-          total: totalResult.length,
-          page: input.page,
-          limit: input.limit,
-        };
-      } catch (error) {
-        console.error("[Workflow] Failed to get archived clients:", error);
-        return { clients: [], total: 0, page: input.page, limit: input.limit };
-      }
-    }),
 });

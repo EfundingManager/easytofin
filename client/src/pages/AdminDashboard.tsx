@@ -6,17 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus } from "lucide-react";
+import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus, Mail } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { PolicyAssignmentModal } from "@/components/PolicyAssignmentModal";
 // Feature flags disabled - table not yet migrated
 // import { FeatureFlagsPanel } from "@/components/FeatureFlagsPanel";
-
+import { EmailBlasterPanel } from "@/components/EmailBlasterPanel";
+import { EmailCampaignComposer } from "@/components/EmailCampaignComposer";
 import { useLocation } from "wouter";
-import { AdvancedSearchFilters, FilterState } from "@/components/AdvancedSearchFilters";
-import { ExportDialog } from "@/components/ExportDialog";
-import { Download } from "lucide-react";
-import { toast } from "sonner";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -26,21 +23,6 @@ export default function AdminDashboard() {
   const [globalSearchQuery, setGlobalSearchQuery] = useState<string>("");
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const [selectedClientForPolicy, setSelectedClientForPolicy] = useState<{ id: number; name: string } | null>(null);
-  const [advancedFilters, setAdvancedFilters] = useState<FilterState>({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-  const [showExportDialog, setShowExportDialog] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const [deleteConfirmation, setDeleteConfirmation] = useState<{ clientId: number; clientName: string } | null>(null);
-
-  // Export mutation
-  const exportMutation = trpc.admin.exportClients.useMutation();
-  
-  // Archive client mutation
-  const archiveClientMutation = trpc.workflow.archiveClient.useMutation();
-  
-  // Delete client mutation (kept for hard delete if needed)
-  const deleteClientMutation = trpc.workflow.deleteClient.useMutation();
 
   // Fetch admin data
   const statsQuery = trpc.admin.getStats.useQuery();
@@ -51,25 +33,6 @@ export default function AdminDashboard() {
     limit: 10,
     search: searchQuery || undefined,
   });
-
-  // Advanced search with filters
-  const advancedSearchResults = trpc.admin.advancedSearch.useQuery(
-    {
-      query: advancedFilters.query,
-      kycStatus: advancedFilters.kycStatus,
-      accountAgeFrom: advancedFilters.accountAgeFrom,
-      accountAgeTo: advancedFilters.accountAgeTo,
-      productInterest: advancedFilters.productInterest,
-      page: currentPage,
-      limit: 10,
-    },
-    { enabled: Object.keys(advancedFilters).length > 0 }
-  );
-
-  // Auto-switch to search results tab when filters are applied
-  if (Object.keys(advancedFilters).length > 0 && activeTab !== "search-results") {
-    setActiveTab("search-results");
-  }
 
   // Global search
   const globalSearchQuery_trimmed = globalSearchQuery.trim();
@@ -120,26 +83,6 @@ export default function AdminDashboard() {
   const recentActivity = recentActivityQuery.data;
   const clientSubmissions = clientSubmissionsQuery.data;
 
-  const handleDeleteClient = (clientId: number, clientName: string) => {
-    setDeleteConfirmation({ clientId, clientName });
-  };
-
-  const confirmDeleteClient = async () => {
-    if (!deleteConfirmation) return;
-    
-    try {
-      await archiveClientMutation.mutateAsync({ 
-        clientId: deleteConfirmation.clientId,
-        reason: "Archived by admin"
-      });
-      toast.success(`Client ${deleteConfirmation.clientName} archived successfully`);
-      setDeleteConfirmation(null);
-      clientsQueueQuery.refetch();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to archive client");
-    }
-  };
-
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -170,15 +113,6 @@ export default function AdminDashboard() {
               )}
             </div>
           </div>
-
-          {/* Advanced Filters */}
-          <AdvancedSearchFilters
-            onFiltersChange={(filters) => {
-              setAdvancedFilters(filters);
-              setCurrentPage(1);
-            }}
-            isLoading={advancedSearchResults.isLoading}
-          />
 
           {/* Search Results Dropdown */}
           {showSearchResults && globalSearchQuery_trimmed.length > 0 && (
@@ -230,11 +164,6 @@ export default function AdminDashboard() {
                           {globalSearchResults.data.clients.map((client: any) => (
                             <div
                               key={client.id}
-                              onClick={() => {
-                                setLocation(`/admin/customers/${client.id}`);
-                                setShowSearchResults(false);
-                                setGlobalSearchQuery("");
-                              }}
                               className="p-2 border rounded hover:bg-accent cursor-pointer transition"
                             >
                               <div className="flex items-center justify-between">
@@ -324,81 +253,14 @@ export default function AdminDashboard() {
             <TabsTrigger value="kyc">KYC Review</TabsTrigger>
             <TabsTrigger value="queue">Clients Queue</TabsTrigger>
             <TabsTrigger value="customers">Customers</TabsTrigger>
-            <TabsTrigger value="archived">Archived Clients</TabsTrigger>
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
             <TabsTrigger value="forms">Forms</TabsTrigger>
+            <TabsTrigger value="emailBlaster">Email Blaster</TabsTrigger>
+            <TabsTrigger value="emailCampaign">Email Campaigns</TabsTrigger>
             {/* Feature Flags tab disabled - table not yet migrated */}
             {/* <TabsTrigger value="featureFlags">Feature Flags</TabsTrigger> */}
             <TabsTrigger value="configuration">Configuration</TabsTrigger>
           </TabsList>
-
-          {/* Advanced Search Results Tab */}
-          {Object.keys(advancedFilters).length > 0 && (
-            <TabsContent value="search-results" className="space-y-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle>Search Results</CardTitle>
-                    <CardDescription>
-                      Found {advancedSearchResults.data?.total || 0} clients matching your filters
-                    </CardDescription>
-                  </div>
-                  <Button
-                    onClick={() => setShowExportDialog(true)}
-                    disabled={!advancedSearchResults.data || advancedSearchResults.data.clients.length === 0}
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    Export CSV
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  {advancedSearchResults.isLoading ? (
-                    <div className="text-center py-8">
-                      <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                      <p className="mt-4 text-muted-foreground">Searching...</p>
-                    </div>
-                  ) : advancedSearchResults.data && advancedSearchResults.data.clients.length > 0 ? (
-                    <div className="space-y-4">
-                      {advancedSearchResults.data.clients.map((client: any) => (
-                        <div
-                          key={client.id}
-                          onClick={() => setLocation(`/admin/customers/${client.id}`)}
-                          className="p-4 border rounded-lg hover:bg-accent cursor-pointer transition"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="font-medium">{client.name}</p>
-                              <p className="text-sm text-muted-foreground">{client.email}</p>
-                              <div className="flex gap-2 mt-2">
-                                <Badge variant="outline" className="text-xs">
-                                  KYC: {client.kycStatus}
-                                </Badge>
-                                <Badge variant={client.verified ? "default" : "secondary"} className="text-xs">
-                                  {client.verified ? "Verified" : "Unverified"}
-                                </Badge>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs text-muted-foreground">
-                                Joined: {new Date(client.createdAt).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <p>No clients found matching your filters</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          )}
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-4">
@@ -480,15 +342,6 @@ export default function AdminDashboard() {
                               >
                                 <Plus className="h-3 w-3" />
                                 Assign
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleDeleteClient(client.id, client.name)}
-                                className="gap-1"
-                              >
-                                <X className="h-3 w-3" />
-                                Delete
                               </Button>
                             </div>
                           </div>
@@ -653,6 +506,29 @@ export default function AdminDashboard() {
             <FeatureFlagsPanel />
           </TabsContent> */}
 
+          {/* Email Blaster Tab */}
+          <TabsContent value="emailBlaster" className="space-y-4">
+            <EmailBlasterPanel />
+          </TabsContent>
+
+          {/* Email Campaign Tab */}
+          <TabsContent value="emailCampaign" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="h-5 w-5" />
+                  Email Campaign Composer
+                </CardTitle>
+                <CardDescription>
+                  Create, preview, and schedule email campaigns using SendGrid templates
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <EmailCampaignComposer />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Configuration Tab */}
           <TabsContent value="configuration" className="space-y-4">
             <Card>
@@ -719,80 +595,6 @@ export default function AdminDashboard() {
               customersQuery.refetch();
             }}
           />
-        )}
-
-        {/* Export Dialog */}
-        <ExportDialog
-          isOpen={showExportDialog}
-          onOpenChange={setShowExportDialog}
-          totalRecords={advancedSearchResults.data?.total}
-          isLoading={isExporting}
-          onExport={async (columns) => {
-            setIsExporting(true);
-            try {
-              const result = await exportMutation.mutateAsync({
-                query: advancedFilters.query,
-                kycStatus: advancedFilters.kycStatus,
-                accountAgeFrom: advancedFilters.accountAgeFrom,
-                accountAgeTo: advancedFilters.accountAgeTo,
-                productInterest: advancedFilters.productInterest,
-                columns,
-              });
-
-              if (result.success && result.csv) {
-                // Create blob and download
-                const blob = new Blob([result.csv], { type: "text/csv;charset=utf-8;" });
-                const link = document.createElement("a");
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", `clients-export-${new Date().toISOString().split("T")[0]}.csv`);
-                link.style.visibility = "hidden";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              } else {
-                alert("Failed to export: " + (result.message || "Unknown error"));
-              }
-            } catch (error) {
-              console.error("Export error:", error);
-              alert("Failed to export clients");
-            } finally {
-              setIsExporting(false);
-            }
-          }}
-        />
-
-        {/* Delete Confirmation Dialog */}
-        {deleteConfirmation && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <Card className="w-full max-w-md">
-              <CardHeader>
-                <CardTitle className="text-red-600">Delete Client</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Are you sure you want to delete <strong>{deleteConfirmation.clientName}</strong>? This action cannot be undone.
-                </p>
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => setDeleteConfirmation(null)}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={confirmDeleteClient}
-                    disabled={deleteClientMutation.isPending}
-                    className="flex-1"
-                  >
-                    {deleteClientMutation.isPending ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         )}
       </div>
     </DashboardLayout>

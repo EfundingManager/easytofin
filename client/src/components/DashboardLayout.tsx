@@ -1,3 +1,4 @@
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -19,30 +20,17 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
-import { useAuth } from "@/_core/hooks/useAuth";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Mail } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
-// Menu items will be generated based on user role
-const getMenuItems = (userRole?: string) => {
-  const baseItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  ];
-  
-  // Add role-specific menu items
-  if (userRole === "super_admin" || userRole === "admin" || userRole === "manager" || userRole === "support") {
-    baseItems.push(
-      { icon: Users, label: "Team", path: "/team" },
-      { icon: Mail, label: "Email Blaster", path: "/email-blaster" }
-    );
-  }
-  
-  return baseItems;
-};
+const menuItems = [
+  { icon: LayoutDashboard, label: "Page 1", path: "/" },
+  { icon: Users, label: "Page 2", path: "/some-path" },
+];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;
@@ -59,17 +47,10 @@ export default function DashboardLayout({
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
   const { loading, user } = useAuth();
-  const [menuItems, setMenuItems] = useState<ReturnType<typeof getMenuItems>>([]);
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
-
-  useEffect(() => {
-    if (user) {
-      setMenuItems(getMenuItems(user.role));
-    }
-  }, [user]);
 
   if (loading) {
     return <DashboardLayoutSkeleton />
@@ -131,15 +112,8 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [menuItems, setMenuItems] = useState<ReturnType<typeof getMenuItems>>([]);
-  const activeMenuItem = menuItems.find((item: any) => item.path === location);
+  const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    if (user) {
-      setMenuItems(getMenuItems(user.role));
-    }
-  }, [user]);
 
   useEffect(() => {
     if (isCollapsed) {
@@ -206,7 +180,7 @@ function DashboardLayoutContent({
 
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
-              {menuItems.map((item: any) => {
+              {menuItems.map(item => {
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>
