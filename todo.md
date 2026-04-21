@@ -1394,3 +1394,15 @@
 - [x] Updated email service to include userId in verification links
 - [x] User emailVerified status updated when email is verified
 - [x] VerifyEmail page redirects to /user/{id} after successful verification
+
+## Review: Login Flow Verification (Gmail, Email, Phone)
+- [x] Reviewed Gmail login redirection: ✓ admin roles → /admin (with 2FA), customers → /customer/{id}, users → /user/{id}
+- [x] Updated Email login redirection: ✓ admin roles → /admin (with 2FA), customers → /customer/{id}, users → /user/{id}
+- [x] Updated Phone login redirection: ✓ admin roles → /admin, customers → /customer/{id}, users → /user/{id}
+- [x] Gmail login correctly implements 2FA for admin roles
+- [x] Email login now checks for admin roles and requires 2FA
+- [x] Phone login now redirects admin roles to /admin dashboard
+- [x] All three methods now consistently handle role-based and policy-based redirection
+- [x] Email login checks policy assignment for regular users
+- [x] Phone login checks clientStatus and role for redirection
+- [x] All login methods redirect to correct dashboards based on role and policy

@@ -235,10 +235,19 @@ export const phoneAuthRouter = router({
           } as any);
           console.log("[Phone Auth] Session cookie set successfully");
 
-          // Determine redirect URL based on clientStatus
-          const redirectUrl = user.clientStatus === 'customer' 
-            ? `/customer/${user.id}`
-            : `/user/${user.id}`;
+          // Determine redirect URL based on role and clientStatus
+          let redirectUrl = `/user/${user.id}`;
+          
+          // Check if user is admin/manager/support role
+          const isPrivilegedRole = user.role === "admin" || user.role === "super_admin" || user.role === "manager" || user.role === "support";
+          
+          if (isPrivilegedRole) {
+            // Admin roles redirect to admin dashboard
+            redirectUrl = `/admin`;
+          } else if (user.clientStatus === 'customer') {
+            // Customers redirect to customer dashboard
+            redirectUrl = `/customer/${user.id}`;
+          }
 
           return {
             success: true,

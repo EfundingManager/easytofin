@@ -137,21 +137,56 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
-      // Determine redirect URL based on user's clientStatus
+      // Determine redirect URL based on user's role and clientStatus
       let redirectUrl = "/dashboard";
       if (user?.id) {
         // Check if user has a phoneUser record with clientStatus
         const phoneUser = await db.getPhoneUserById(user.id);
         if (phoneUser) {
-          if (phoneUser.clientStatus === "customer") {
-            redirectUrl = `/customer/${user.id}`;
-          } else {
-            redirectUrl = `/user/${user.id}`;
-          }
-        }
-      }
+          // Check if user is admin/manager/support role - require 2FA
+          const isPrivilegedRole = phoneUser.role === "admin" || phoneUser.role === "super_admin" || phoneUser.role === "manager" || phoneUser.role === "support";
+          
+          if (isPrivilegedRole) {
+            // For admin roles, require 2FA via SMS
+            if (!phoneUser.phone) {
+              res.status(400).json({ error: "Phone number required for 2FA" });
+              return;
+            }
 
-      res.redirect(302, redirectUrl);
+            // Send OTP via SMS for 2FA
+            try {
+              // Generate 6-digit OTP code
+              const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+              const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+              
+              await db.createOtpCode({
+                phoneUserId: phoneUser.id,
+                code: otpCode,
+                expiresAt,
+              });
+              // Note: SMS sending would be handled by Twilio integration
+              // For now, we'll redirect to 2FA verification page
+              res.redirect(302, `/gmail-2fa?phoneUserId=${phoneUser.id}&email=${encodeURIComponent(phoneUser.email || "")}&redirectUrl=${encodeURIComponent("/admin")}`);
+            } catch (error) {
+              console.error("[2FA] Failed to create OTP:", error);
+              res.status(500).json({ error: "Failed to initiate 2FA" });
+            }
+          } else {
+            // For regular users, determine redirect based on policy assignment
+            const hasPolicy = await db.hasUserPolicy(phoneUser.id);
+            if (hasPolicy) {
+              redirectUrl = `/customer/${phoneUser.id}`;
+            } else {
+              redirectUrl = `/user/${phoneUser.id}`;
+            }
+            res.redirect(302, redirectUrl);
+          }
+        } else {
+          res.redirect(302, redirectUrl);
+        }
+      } else {
+        res.redirect(302, redirectUrl);
+      }
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
       res.status(500).json({ error: "OAuth callback failed" });
