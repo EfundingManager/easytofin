@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,8 +32,6 @@ const EmailAuth = () => {
   const [isNewUser, setIsNewUser] = useState(false);
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
 
-
-
   // Initialize mutations at the top level (before any conditional returns)
   const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation();
   const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
@@ -41,43 +39,95 @@ const EmailAuth = () => {
 
   // Note: We allow authenticated users to access this page so they can switch accounts if needed
 
-  // Load Google Sign-In script and initialize button
+  // Load Google Sign-In script
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
+    const loadGoogleSignIn = async () => {
+      // Check if script is already loaded
       if (window.google?.accounts?.id) {
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-          callback: handleGoogleSignIn,
-          ux_mode: "popup",
-          auto_select: false,
-        });
+        console.log("[Gmail] Google Sign-In already loaded");
         setGoogleLoaded(true);
+        return;
       }
+
+      // Create and load the script
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        console.log("[Gmail] Google Sign-In script loaded");
+        // Wait a tick to ensure window.google is available
+        setTimeout(() => {
+          if (window.google?.accounts?.id) {
+            console.log("[Gmail] Initializing Google Sign-In with FedCM");
+            window.google.accounts.id.initialize({
+              client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+              callback: handleGoogleSignIn,
+              ux_mode: "popup",
+              auto_select: false,
+              use_fedcm_for_prompt: true, // Enable FedCM to avoid popup blocking
+              locale: "en",
+            });
+            console.log("[Gmail] Google Sign-In initialized");
+            setGoogleLoaded(true);
+          } else {
+            console.error("[Gmail] window.google not available after script load");
+          }
+        }, 0);
+      };
+      
+      script.onerror = () => {
+        console.error("[Gmail] Failed to load Google Sign-In script");
+      };
+      
+      document.head.appendChild(script);
     };
-    document.head.appendChild(script);
+
+    loadGoogleSignIn();
   }, []);
 
   // Render Google button when it's loaded
   useEffect(() => {
-    if (googleLoaded && window.google?.accounts?.id) {
+    if (googleLoaded && window.google?.accounts?.id && step === "email") {
       const buttonElement = document.getElementById("google-signin-button");
       if (buttonElement && buttonElement.children.length === 0) {
         try {
+          console.log("[Gmail] Rendering Google Sign-In button");
           window.google.accounts.id.renderButton(buttonElement, {
             theme: "outline",
             size: "large",
             text: "signin_with",
+            locale: "en",
           });
+          console.log("[Gmail] Button rendered successfully");
         } catch (error) {
           console.error("[Gmail] Error rendering button:", error);
+          // Fallback: create a custom button
+          console.log("[Gmail] Creating fallback custom button");
+          buttonElement.innerHTML = "";
+          const customButton = document.createElement("button");
+          customButton.type = "button";
+          customButton.textContent = "Sign in with Google";
+          customButton.className = "w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors";
+          customButton.onclick = async (e) => {
+            e.preventDefault();
+            console.log("[Gmail] Custom button clicked");
+            setLoading(true);
+            try {
+              const result = await window.google.accounts.id.promptAsync();
+              console.log("[Gmail] promptAsync result:", result);
+            } catch (error) {
+              console.error("[Gmail] promptAsync error:", error);
+              toast.error("Failed to open Google Sign-In");
+              setLoading(false);
+            }
+          };
+          buttonElement.appendChild(customButton);
         }
       }
     }
-  }, [googleLoaded]);
+  }, [googleLoaded, step]);
 
   // Show loading state while checking authentication
   if (authLoading) {
@@ -292,8 +342,8 @@ const EmailAuth = () => {
                   {step === "confirmation" && "Registration Confirmed"}
                 </CardTitle>
                 <CardDescription>
-                  {step === "email" && "Sign in to your EasyToFin account"}
-                  {step === "authMethod" && `Signing in with ${email}`}
+                  {step === "email" && "Enter your email to get started"}
+                  {step === "authMethod" && "Select your preferred authentication method"}
                   {step === "otp" && "Enter the 6-digit code sent to your email"}
                   {step === "password" && "Enter your password"}
                   {step === "confirmation" && "Your email has been verified"}
@@ -400,7 +450,7 @@ const EmailAuth = () => {
                 >
                   <span className="font-semibold text-slate-900">Password Login</span>
                   <span className="text-xs text-slate-600">
-                    Sign in with your password
+                    Use your password to sign in
                   </span>
                 </Button>
               </div>
@@ -408,6 +458,12 @@ const EmailAuth = () => {
 
             {step === "otp" && (
               <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <p className="text-sm text-slate-600">
+                    We've sent a 6-digit code to <strong>{email}</strong>
+                  </p>
+                </div>
+
                 <div>
                   <label className="text-sm font-medium">Verification Code</label>
                   <Input
@@ -416,18 +472,10 @@ const EmailAuth = () => {
                     value={code}
                     onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                     maxLength={6}
-                    disabled={loading}
+                    disabled={loading || verifyOtpMutation.isPending}
+                    className="text-center text-2xl tracking-widest font-mono"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Enter the 6-digit code sent to {email}
-                  </p>
                 </div>
-
-                <RememberDeviceCheckbox
-                  checked={rememberDevice}
-                  onChange={setRememberDevice}
-                  showTooltip={true}
-                />
 
                 <Button
                   type="submit"
@@ -444,116 +492,94 @@ const EmailAuth = () => {
                   )}
                 </Button>
 
-                <button
+                <Button
                   type="button"
-                  onClick={() => setShowForgotPassword(true)}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-2 w-full text-center"
+                  variant="ghost"
+                  onClick={() => {
+                    setCode("");
+                    setStep("email");
+                  }}
+                  className="w-full text-sm"
                 >
-                  Forgot Password?
-                </button>
+                  Didn't receive the code? Try again
+                </Button>
               </form>
             )}
 
             {step === "password" && (
               <form onSubmit={handlePasswordLogin} className="space-y-4">
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <p className="text-sm text-slate-600">
+                    Signing in as <strong>{email}</strong>
+                  </p>
+                </div>
+
                 <div>
                   <label className="text-sm font-medium">Password</label>
                   <Input
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
+                    disabled={loading || loginWithPasswordMutation.isPending}
                   />
                 </div>
 
-                <RememberDeviceCheckbox
-                  checked={rememberDevice}
-                  onChange={setRememberDevice}
-                  showTooltip={true}
-                />
+                <div className="flex items-center justify-between text-sm">
+                  <RememberDeviceCheckbox checked={rememberDevice} onChange={setRememberDevice} />
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
 
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={loading || isLimited || loginWithPasswordMutation.isPending}
+                  disabled={loading || !password || loginWithPasswordMutation.isPending}
                 >
                   {loading || loginWithPasswordMutation.isPending ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Logging in...
+                      Signing in...
                     </>
                   ) : (
-                    "Login"
+                    "Sign In"
                   )}
                 </Button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowForgotPassword(true)}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-2 w-full text-center"
-                >
-                  Forgot Password?
-                </button>
               </form>
             )}
 
             {step === "confirmation" && (
-              <div className="space-y-4">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                  <div className="mb-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle2 className="w-6 h-6 text-green-600" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-green-900 mb-2">
-                      Email Verified!
-                    </h3>
-                    <p className="text-sm text-green-700 mb-4">
-                      Your email <span className="font-semibold">{email}</span> has been verified successfully.
-                    </p>
-                  </div>
-
-                  <div className="bg-white rounded p-4 mb-4 text-left">
-                    <p className="text-sm text-slate-600 mb-2">
-                      <strong>Next step:</strong> Complete your profile to finish registration
-                    </p>
-                    <ul className="text-xs text-slate-500 space-y-1 ml-4">
-                      <li>✓ Personal information</li>
-                      <li>✓ Contact details</li>
-                      <li>✓ Account preferences</li>
-                    </ul>
-                  </div>
+              <div className="space-y-4 text-center">
+                <div className="flex justify-center">
+                  <CheckCircle2 className="w-12 h-12 text-green-600" />
                 </div>
-
+                <div>
+                  <p className="text-sm text-slate-600 mb-2">
+                    Your email has been verified successfully!
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Redirecting to complete your profile...
+                  </p>
+                </div>
                 <Button
-                  type="button"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
                   onClick={handleConfirmRegistration}
+                  className="w-full"
                   disabled={loading}
                 >
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Proceeding...
+                      Redirecting...
                     </>
                   ) : (
-                    "Complete Registration"
+                    "Continue to Profile"
                   )}
                 </Button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep("email");
-                    setCode("");
-                    setEmail("");
-                    setSelectedAuthMethod(null);
-                    setIsNewUser(false);
-                  }}
-                  className="w-full text-sm text-slate-600 hover:text-slate-900 font-medium py-2"
-                >
-                  Use a different email
-                </button>
               </div>
             )}
           </CardContent>
