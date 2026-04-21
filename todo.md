@@ -1144,3 +1144,13 @@
 - [x] All TypeScript checks passing
 - [ ] Test password login flow on both pages
 - [ ] Test on production domain
+
+
+## Phase 66: Resend SMS/Email Codes with Visual Countdown
+- [x] Create useCountdownTimer hook for 5-minute cooldown
+- [x] Add resend SMS code button to 2FA verification UI
+- [x] Add resend email OTP button to email verification UI
+- [x] Implement visual countdown display (MM:SS format)
+- [x] Create CountdownDisplay reusable component
+- [x] Backend rate limiting already implemented in two-factor-auth router
+- [x] Create comprehensive tests for countdown timer

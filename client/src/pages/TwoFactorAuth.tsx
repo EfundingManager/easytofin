@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useSearch } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Shield, Phone, RefreshCw, Loader2, CheckCircle2 } from "lucide-react";
+import { Shield, Phone, RefreshCw, Loader2, CheckCircle2, Clock } from "lucide-react";
+import { useCountdownTimer } from "@/hooks/useCountdownTimer";
 
 /**
  * Phone 2FA Challenge Page
@@ -24,8 +25,7 @@ export default function TwoFactorAuth() {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
-  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const resendTimer = useCountdownTimer(300); // 5-minute cooldown
 
   // ── Fetch challenge metadata (masked phone, role) ──────────────────────────
   const metaQuery = trpc.twoFactorAuth.getChallengeMeta.useQuery(
@@ -41,7 +41,7 @@ export default function TwoFactorAuth() {
     onSuccess: () => {
       setOtpSent(true);
       setError(null);
-      startCooldown(60);
+      resendTimer.start();
     },
     onError: (err) => {
       setError(err.message || "Failed to send verification code.");
@@ -68,27 +68,6 @@ export default function TwoFactorAuth() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [metaQuery.data]);
-
-  // Cleanup cooldown timer on unmount
-  useEffect(() => {
-    return () => {
-      if (cooldownRef.current) clearInterval(cooldownRef.current);
-    };
-  }, []);
-
-  function startCooldown(seconds: number) {
-    setResendCooldown(seconds);
-    if (cooldownRef.current) clearInterval(cooldownRef.current);
-    cooldownRef.current = setInterval(() => {
-      setResendCooldown((prev) => {
-        if (prev <= 1) {
-          clearInterval(cooldownRef.current!);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  }
 
   function handleRequestOtp() {
     if (!pendingToken) return;
@@ -211,24 +190,27 @@ export default function TwoFactorAuth() {
           </form>
 
           {/* Resend */}
-          <div className="text-center">
-            {resendCooldown > 0 ? (
-              <p className="text-sm text-gray-500">
-                Resend code in{" "}
-                <span className="font-semibold text-gray-700">{resendCooldown}s</span>
-              </p>
+          <div className="text-center space-y-2">
+            {!resendTimer.isEnabled ? (
+              <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
+                <Clock className="h-4 w-4 text-amber-600" />
+                <p className="text-sm text-amber-800">
+                  Resend code in{" "}
+                  <span className="font-mono font-semibold text-amber-900">{resendTimer.formattedTime}</span>
+                </p>
+              </div>
             ) : (
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="text-green-700 hover:text-green-800"
+                className="w-full text-green-700 hover:text-green-800 hover:bg-green-50"
                 onClick={handleRequestOtp}
                 disabled={isLoading}
               >
                 {requestOtpMutation.isPending ? (
-                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <RefreshCw className="mr-1 h-3 w-3" />
+                  <RefreshCw className="mr-2 h-4 w-4" />
                 )}
                 Resend Code
               </Button>

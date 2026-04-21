@@ -13,6 +13,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
+import { useCountdownTimer } from "@/hooks/useCountdownTimer";
+import { Clock } from "lucide-react";
 
 type AuthStep = "email" | "authMethod" | "otp" | "password" | "confirmation";
 
@@ -31,10 +33,19 @@ const EmailAuth = () => {
   const [password, setPassword] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
+  const otpResendTimer = useCountdownTimer(300); // 5-minute cooldown for OTP resend
 
   // Initialize mutations at the top level (before any conditional returns)
-  const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation();
-  const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation();
+  const requestOtpMutation = trpc.emailAuth.requestOtp.useMutation({
+    onSuccess: () => {
+      otpResendTimer.start();
+    },
+  });
+  const verifyOtpMutation = trpc.emailAuth.verifyOtp.useMutation({
+    onSuccess: () => {
+      otpResendTimer.reset();
+    },
+  });
   const loginWithPasswordMutation = trpc.passwordLogin.loginWithPassword.useMutation();
 
   // Note: We allow authenticated users to access this page so they can switch accounts if needed
@@ -492,17 +503,49 @@ const EmailAuth = () => {
                   )}
                 </Button>
 
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setCode("");
-                    setStep("email");
-                  }}
-                  className="w-full text-sm"
-                >
-                  Didn't receive the code? Try again
-                </Button>
+                <div className="space-y-2">
+                  {!otpResendTimer.isEnabled ? (
+                    <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
+                      <Clock className="h-4 w-4 text-amber-600" />
+                      <p className="text-sm text-amber-800">
+                        Resend code in{" "}
+                        <span className="font-mono font-semibold text-amber-900">{otpResendTimer.formattedTime}</span>
+                      </p>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setCode("");
+                        requestOtpMutation.mutate({ email });
+                      }}
+                      disabled={requestOtpMutation.isPending}
+                      className="w-full text-sm"
+                    >
+                      {requestOtpMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        "Resend Code"
+                      )}
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setCode("");
+                      setStep("email");
+                      otpResendTimer.reset();
+                    }}
+                    className="w-full text-sm"
+                  >
+                    Use a different email
+                  </Button>
+                </div>
               </form>
             )}
 
