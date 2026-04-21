@@ -1406,3 +1406,11 @@
 - [x] Email login checks policy assignment for regular users
 - [x] Phone login checks clientStatus and role for redirection
 - [x] All login methods redirect to correct dashboards based on role and policy
+
+## Bug Fix: Gmail Login Redirects to /email-auth Instead of Dashboard
+- [x] Debugged Gmail login flow and identified GmailConfirmation page as intermediate step
+- [x] Verified Gmail callback returns correct redirectUrl and requiresOTP status
+- [x] Updated EmailAuth handleGoogleSignIn to directly redirect to dashboard
+- [x] Admin roles now redirect to 2FA page, regular users to dashboard
+- [x] Gmail login now correctly redirects based on role and policy assignment
+- [x] Removed unnecessary GmailConfirmation intermediate page

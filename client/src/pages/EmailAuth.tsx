@@ -203,11 +203,20 @@ const EmailAuth = () => {
         const responseData = await result.json();
         console.log("[Gmail] Backend response:", responseData);
         
-        // Redirect to confirmation page with redirect URL and email
-        const confirmationUrl = `/gmail-confirmation?redirectUrl=${encodeURIComponent(responseData.redirectUrl || "/dashboard")}&email=${encodeURIComponent(responseData.email || "")}`.substring(0, 2000);
-        console.log("[Gmail] Redirecting to confirmation page:", confirmationUrl);
-        toast.success("Gmail account verified! Proceeding to dashboard...");
-        window.location.href = confirmationUrl;
+        // Check if 2FA is required
+        if (responseData.requiresOTP) {
+          // Redirect to 2FA verification page
+          const twoFaUrl = responseData.redirectUrl;
+          console.log("[Gmail] Redirecting to 2FA page:", twoFaUrl);
+          toast.info("2FA verification required. Sending OTP...");
+          window.location.href = twoFaUrl;
+        } else {
+          // Directly redirect to dashboard for regular users
+          const dashboardUrl = responseData.redirectUrl || "/dashboard";
+          console.log("[Gmail] Redirecting directly to dashboard:", dashboardUrl);
+          toast.success("Gmail account verified! Proceeding to dashboard...");
+          window.location.href = dashboardUrl;
+        }
       } else {
         const errorData = await result.json().catch(() => ({}));
         console.error("[Gmail] Backend error:", errorData);
