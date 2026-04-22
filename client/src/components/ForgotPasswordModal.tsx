@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { useCountdownTimer } from "@/hooks/useCountdownTimer";
+import { CountdownDisplay } from "@/components/CountdownDisplay";
 
 interface ForgotPasswordModalProps {
   open: boolean;
@@ -31,9 +33,18 @@ export function ForgotPasswordModal({
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [token, setToken] = useState("");
+  const resendTimer = useCountdownTimer(300); // 5-minute cooldown
 
-  const requestResetMutation = trpc.passwordReset.requestReset.useMutation();
-  const verifyOtpMutation = trpc.passwordReset.verifyOtp.useMutation();
+  const requestResetMutation = trpc.passwordReset.requestReset.useMutation({
+    onSuccess: () => {
+      resendTimer.start();
+    },
+  });
+  const verifyOtpMutation = trpc.passwordReset.verifyOtp.useMutation({
+    onSuccess: () => {
+      resendTimer.reset();
+    },
+  });
   const resetPasswordMutation = trpc.passwordReset.resetPassword.useMutation();
 
   const handleRequestReset = async () => {
@@ -55,13 +66,45 @@ export function ForgotPasswordModal({
       });
 
       if (result.success) {
-      showToast("Success", result.message);
+        showToast("Success", result.message);
         setStep("verify");
       }
     } catch (error: any) {
       showToast(
         "Error",
         error.message || "Failed to request password reset",
+        "destructive"
+      );
+    }
+  };
+
+  const handleResendCode = async () => {
+    const identifier = resetMethod === "email" ? email : phone;
+    if (!identifier) {
+      showToast(
+        "Error",
+        `Please enter your ${resetMethod}`,
+        "destructive"
+      );
+      return;
+    }
+
+    try {
+      const result = await requestResetMutation.mutateAsync({
+        email: resetMethod === "email" ? email : undefined,
+        phone: resetMethod === "phone" ? phone : undefined,
+        resetMethod,
+      });
+
+      if (result.success) {
+        showToast("Success", `Code resent to your ${resetMethod}`);
+        setOtp("");
+        resendTimer.start();
+      }
+    } catch (error: any) {
+      showToast(
+        "Error",
+        error.message || "Failed to resend code",
         "destructive"
       );
     }
@@ -85,7 +128,7 @@ export function ForgotPasswordModal({
 
       if (result.success) {
         setToken(result.tokenId.toString());
-      showToast("Success", "Code verified successfully");
+        showToast("Success", "Code verified successfully");
         setStep("reset");
       }
     } catch (error: any) {
@@ -119,7 +162,7 @@ export function ForgotPasswordModal({
       });
 
       if (result.success) {
-      showToast("Success", "Password reset successfully");
+        showToast("Success", "Password reset successfully");
         setStep("success");
       }
     } catch (error: any) {
@@ -141,6 +184,7 @@ export function ForgotPasswordModal({
       setNewPassword("");
       setConfirmPassword("");
       setToken("");
+      resendTimer.reset();
       onSuccess?.();
     } else {
       onOpenChange(false);
@@ -207,7 +251,7 @@ export function ForgotPasswordModal({
 
         {step === "verify" && (
           <div className="space-y-4">
-            <div className="rounded-lg bg-blue-50 p-4">
+            <div className="rounded-lg bg-blue-50 p-4 border border-blue-200">
               <p className="text-sm text-blue-900">
                 We've sent a 6-digit code to your {resetMethod}. Please enter it below.
               </p>
@@ -222,13 +266,13 @@ export function ForgotPasswordModal({
                 maxLength={6}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                className="text-center text-2xl tracking-widest"
+                className="text-center text-2xl tracking-widest font-mono"
               />
             </div>
 
             <Button
               onClick={handleVerifyOtp}
-              disabled={verifyOtpMutation.isPending}
+              disabled={verifyOtpMutation.isPending || otp.length !== 6}
               className="w-full"
             >
               {verifyOtpMutation.isPending && (
@@ -237,9 +281,25 @@ export function ForgotPasswordModal({
               Verify Code
             </Button>
 
+            {/* Resend code with countdown */}
+            <div className="pt-2">
+              <CountdownDisplay
+                isEnabled={resendTimer.isEnabled}
+                formattedTime={resendTimer.formattedTime}
+                onResend={handleResendCode}
+                isLoading={requestResetMutation.isPending}
+                label="Resend Code"
+                variant={resetMethod === "email" ? "email" : "sms"}
+              />
+            </div>
+
             <Button
               variant="outline"
-              onClick={() => setStep("request")}
+              onClick={() => {
+                setStep("request");
+                setOtp("");
+                resendTimer.reset();
+              }}
               className="w-full"
             >
               Back
@@ -249,6 +309,12 @@ export function ForgotPasswordModal({
 
         {step === "reset" && (
           <div className="space-y-4">
+            <div className="rounded-lg bg-green-50 p-4 border border-green-200">
+              <p className="text-sm text-green-900">
+                Code verified! Now set your new password.
+              </p>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="newPassword">New Password</Label>
               <Input
@@ -276,7 +342,7 @@ export function ForgotPasswordModal({
 
             <Button
               onClick={handleResetPassword}
-              disabled={resetPasswordMutation.isPending}
+              disabled={resetPasswordMutation.isPending || !newPassword || !confirmPassword}
               className="w-full"
             >
               {resetPasswordMutation.isPending && (
