@@ -1,4 +1,3 @@
-import { router, publicProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
 import { phoneUsers } from "../../drizzle/schema";
@@ -6,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { THIRTY_DAYS_MS, DEFAULT_SESSION_MS } from "../../shared/const";
 import crypto from "crypto";
+import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 
 export const passwordLoginRouter = router({
   /**
@@ -107,6 +107,59 @@ export const passwordLoginRouter = router({
       } catch (error: any) {
         console.error("[Password Login] Error:", error);
         throw error;
+      }
+    }),
+
+  /**
+   * Set password for first-time users (after email/phone login)
+   */
+  setPassword: protectedProcedure
+    .input(
+      z.object({
+        password: z.string()
+          .min(8, "Password must be at least 8 characters")
+          .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+          .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+          .regex(/[0-9]/, "Password must contain at least one number")
+          .regex(/[!@#$%^&*]/, "Password must contain at least one special character (!@#$%^&*)"),
+        confirmPassword: z.string(),
+      })
+      .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+      })
+    )
+    .mutation(async ({ input, ctx }: any) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database connection failed" });
+
+      try {
+        if (!ctx.user?.id) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to set a password",
+          });
+        }
+
+        // Hash the password using crypto
+        const passwordHash = crypto.createHash("sha256").update(input.password).digest("hex");
+
+        // Update user password
+        await db
+          .update(phoneUsers)
+          .set({ passwordHash })
+          .where(eq(phoneUsers.id, ctx.user.id));
+
+        return {
+          success: true,
+          message: "Password set successfully! You can now log in with your password.",
+        };
+      } catch (error: any) {
+        console.error("[Set Password] Error:", error);
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to set password" });
       }
     }),
 
