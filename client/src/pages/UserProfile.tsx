@@ -325,8 +325,8 @@ export default function UserProfile() {
                     >
                       <Checkbox
                         checked={selectedServices.includes(service.id)}
-                        onChange={() => handleServiceToggle(service.id)}
                         className="mt-1"
+                        onClick={(e) => e.stopPropagation()}
                       />
                       <div className="flex-1">
                         <p className="font-medium text-sm">{service.label}</p>
