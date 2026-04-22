@@ -325,6 +325,7 @@ export default function UserProfile() {
                     >
                       <Checkbox
                         checked={selectedServices.includes(service.id)}
+                        onCheckedChange={() => handleServiceToggle(service.id)}
                         className="mt-1"
                         onClick={(e) => e.stopPropagation()}
                       />
