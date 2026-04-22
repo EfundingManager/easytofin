@@ -302,14 +302,22 @@ const EmailAuth = () => {
         setStep("confirmation");
         toast.success("Email verified successfully!");
       } else {
-        // For existing users, proceed directly to login
-        toast.success("Login successful!");
-        if (result.redirectUrl) {
-          console.log("[EmailAuth] Redirecting to:", result.redirectUrl);
-          window.location.href = result.redirectUrl;
+        // For existing users, check if SMS 2FA is required
+        if (result.requiresSMS2FA) {
+          console.log("[EmailAuth] SMS 2FA required for role:", result.userRole);
+          toast.success("Email verified! Please complete SMS verification.");
+          // Redirect to 2FA verification page
+          window.location.href = result.redirectUrl || '/2fa-verification';
         } else {
-          console.log("[EmailAuth] No redirectUrl, redirecting to /dashboard");
-          window.location.href = "/dashboard";
+          // For regular users, proceed directly to login
+          toast.success("Login successful!");
+          if (result.redirectUrl) {
+            console.log("[EmailAuth] Redirecting to:", result.redirectUrl);
+            window.location.href = result.redirectUrl;
+          } else {
+            console.log("[EmailAuth] No redirectUrl, redirecting to /dashboard");
+            window.location.href = "/dashboard";
+          }
         }
       }
     } catch (error: any) {

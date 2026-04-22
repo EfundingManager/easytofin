@@ -265,16 +265,41 @@ export const emailAuthRouter = router({
           await sendWelcomeEmail(user.email || input.email, user.name || "User", dashboardUrl);
         }
 
-        // Determine redirect URL based on clientStatus
-        const redirectUrl = user.clientStatus === 'customer' 
-          ? `/customer/${user.id}`
-          : `/user/${user.id}`;
+        // Determine redirect URL based on role and user status
+        const isNewUser = input.isNewUser;
+        const userRole = user.role || 'user';
+        
+        let redirectUrl: string;
+        let requiresSMS2FA = false;
+        
+        // New users always go to user dashboard
+        if (isNewUser) {
+          redirectUrl = '/dashboard';
+        } else {
+          // Existing users: redirect based on role
+          if (userRole === 'admin') {
+            // Admin users require SMS 2FA before accessing admin dashboard
+            requiresSMS2FA = true;
+            redirectUrl = '/2fa-verification'; // Temporary redirect to 2FA page
+           } else if (userRole === 'staff' || userRole === 'super_admin') {
+            // Staff and super admin roles also require 2FA
+            requiresSMS2FA = true;
+            redirectUrl = '/2fa-verification';
+          } else {
+            // Regular users go to user dashboard
+            redirectUrl = user.clientStatus === 'customer' 
+              ? `/customer/${user.id}`
+              : `/dashboard`;
+          }
+        }
 
         return {
           success: true,
           message: "Email verified successfully",
           userId: user.id,
           clientStatus: user.clientStatus,
+          userRole,
+          requiresSMS2FA,
           redirectUrl,
           user: {
             id: user.id,
@@ -283,8 +308,9 @@ export const emailAuthRouter = router({
             name: user.name,
             emailVerified: user.emailVerified,
             clientStatus: user.clientStatus,
+            role: userRole,
           },
-          isNewRegistration: input.isNewUser,
+          isNewRegistration: isNewUser,
         };
       } catch (error: any) {
         console.error("Error verifying OTP:", error);

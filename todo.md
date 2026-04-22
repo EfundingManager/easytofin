@@ -1163,3 +1163,15 @@
 - [x] Add resend code button with rate limiting
 - [x] Support both email and phone reset methods
 - [x] Add success confirmation with next step guidance
+
+
+## Phase 68: Email and Phone Login Role-Based Redirection with SMS 2FA
+- [x] Review email and phone login implementations
+- [x] Update email login to detect new vs existing users
+- [x] Update phone login to detect new vs existing users
+- [x] Implement role-based redirection (new users → /dashboard, existing → role-based)
+- [x] Add SMS 2FA requirement for admin users after email/phone login
+- [x] Update backend to return user role and new user status
+- [x] Update frontend to handle requiresSMS2FA flag
+- [x] Verify admin users are redirected to 2FA page
+- [x] All TypeScript errors resolved and dev server running

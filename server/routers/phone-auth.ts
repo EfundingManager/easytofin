@@ -235,22 +235,41 @@ export const phoneAuthRouter = router({
           } as any);
           console.log("[Phone Auth] Session cookie set successfully");
 
-          // Determine redirect URL based on clientStatus
-          const redirectUrl = user.clientStatus === 'customer' 
-            ? `/customer/${user.id}`
-            : `/user/${user.id}`;
+          // Determine redirect URL based on role and user status
+          const userRole = user.role || 'user';
+          let redirectUrl: string;
+          let requiresSMS2FA = false;
+          
+          // Existing users: redirect based on role
+          if (userRole === 'admin') {
+            // Admin users require SMS 2FA before accessing admin dashboard
+            requiresSMS2FA = true;
+            redirectUrl = '/2fa-verification';
+          } else if (userRole === 'staff' || userRole === 'super_admin') {
+            // Staff and super admin roles also require 2FA
+            requiresSMS2FA = true;
+            redirectUrl = '/2fa-verification';
+          } else {
+            // Regular users go to user dashboard
+            redirectUrl = user.clientStatus === 'customer' 
+              ? `/customer/${user.id}`
+              : `/dashboard`;
+          }
 
           return {
             success: true,
             message: "Login successful",
             userId: user.id,
             clientStatus: user.clientStatus,
+            userRole,
+            requiresSMS2FA,
             redirectUrl,
             user: {
               id: user.id,
               phone: user.phone,
               email: user.email,
               name: user.name,
+              role: userRole,
             },
           };
         } else {
@@ -284,21 +303,24 @@ export const phoneAuthRouter = router({
             maxAge: sessionDuration,
           } as any);
 
-          // New users always start in queue status
-          const redirectUrl = `/user/${newUser.id}`;
+          // New users always go to user dashboard
+          const newUserRedirectUrl = `/dashboard`;
 
           return {
             success: true,
             message: "Registration successful",
             userId: newUser.id,
             clientStatus: newUser.clientStatus,
-            redirectUrl,
+            userRole: 'user',
+            requiresSMS2FA: false,
+            redirectUrl: newUserRedirectUrl,
             isNewRegistration: true,
             user: {
               id: newUser.id,
               phone: newUser.phone,
               email: newUser.email,
               name: newUser.name,
+              role: 'user',
             },
           };
         }
