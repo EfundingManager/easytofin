@@ -65,6 +65,7 @@ function Router() {
       <Route path="/terms" component={TermsOfBusiness} />
       <Route path="/2fa" component={TwoFactorAuth} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/customers/:customerId" component={AdminCustomerDetail} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
