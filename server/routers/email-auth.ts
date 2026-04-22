@@ -286,10 +286,10 @@ export const emailAuthRouter = router({
             requiresSMS2FA = true;
             redirectUrl = '/2fa-verification';
           } else {
-            // Regular users go to user dashboard
+            // Regular users go to role-based dashboard
             redirectUrl = user.clientStatus === 'customer' 
-              ? `/customer/${user.id}`
-              : `/dashboard`;
+              ? `/customer/dashboard`
+              : `/user/dashboard`;
           }
         }
 

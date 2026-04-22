@@ -88,8 +88,8 @@ export const gmailAuthRouter = router({
 
         // Determine redirect URL based on clientStatus
         const redirectUrl = existingUser.clientStatus === 'customer' 
-          ? `/customer/${existingUser.id}`
-          : `/user/${existingUser.id}`;
+          ? `/customer/dashboard`
+          : `/user/dashboard`;
 
         return {
           success: true,

@@ -1185,3 +1185,13 @@
 - [x] Add success confirmation and next steps guidance
 - [x] Add password visibility toggle (show/hide)
 - [x] All TypeScript errors resolved and dev server running
+
+
+## Phase 70: Role-Based Landing Page Redirection for Existing Users
+- [x] Review current login redirection logic and role assignments
+- [x] Create user landing page at /user/dashboard (UserLanding.tsx)
+- [x] Create customer landing page at /customer/dashboard (CustomerLanding.tsx)
+- [x] Update email/phone/password login routers with correct redirect URLs
+- [x] Update Gmail login router with correct redirect URLs
+- [x] Add routes to App.tsx for /user/dashboard and /customer/dashboard
+- [x] Verify default role assignment as 'user' and all TypeScript errors resolved

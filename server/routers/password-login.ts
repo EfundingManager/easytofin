@@ -82,15 +82,15 @@ export const passwordLoginRouter = router({
         }
 
         // Determine redirect URL based on user role
-        let redirectUrl = "/dashboard";
+        let redirectUrl = "/user/dashboard";
         if (phoneUser.role === "admin" || phoneUser.role === "super_admin") {
-          redirectUrl = "/admin";
+          redirectUrl = "/admin/dashboard";
         } else if (phoneUser.role === "manager" || phoneUser.role === "staff") {
-          redirectUrl = "/admin";
+          redirectUrl = "/admin/dashboard";
         } else if (phoneUser.clientStatus === "customer") {
-          redirectUrl = `/customer/${phoneUser.id}`;
+          redirectUrl = `/customer/dashboard`;
         } else {
-          redirectUrl = `/user/${phoneUser.id}`;
+          redirectUrl = `/user/dashboard`;
         }
 
         return {

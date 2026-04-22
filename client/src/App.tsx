@@ -29,6 +29,8 @@ import TwoFactorAuth from "./pages/TwoFactorAuth";
 import UserPortal from "./pages/UserPortal";
 import CustomerPortal from "./pages/CustomerPortal";
 import ClientLoginComingSoon from "./pages/ClientLoginComingSoon";
+import UserLanding from "./pages/UserLanding";
+import CustomerLanding from "./pages/CustomerLanding";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -43,6 +45,8 @@ function Router() {
       <Route path="/fact-finding" component={FactFindingForm} />
       <Route path="/fact-finding/:product" component={FactFindingForm} />
       <Route path="/dashboard" component={UserDashboard} />
+      <Route path="/user/dashboard" component={UserLanding} />
+      <Route path="/customer/dashboard" component={CustomerLanding} />
       <Route path="/user/:userId" component={UserPortal} />
       <Route path="/customer/:customerId" component={CustomerPortal} />
       <Route path="/user-portal" component={UserPortal} />

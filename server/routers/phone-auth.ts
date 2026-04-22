@@ -250,10 +250,10 @@ export const phoneAuthRouter = router({
             requiresSMS2FA = true;
             redirectUrl = '/2fa-verification';
           } else {
-            // Regular users go to user dashboard
+            // Regular users go to role-based dashboard
             redirectUrl = user.clientStatus === 'customer' 
-              ? `/customer/${user.id}`
-              : `/dashboard`;
+              ? `/customer/dashboard`
+              : `/user/dashboard`;
           }
 
           return {
@@ -304,7 +304,7 @@ export const phoneAuthRouter = router({
           } as any);
 
           // New users always go to user dashboard
-          const newUserRedirectUrl = `/dashboard`;
+          const newUserRedirectUrl = `/user/dashboard`;
 
           return {
             success: true,
