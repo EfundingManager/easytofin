@@ -85,8 +85,10 @@ export const passwordLoginRouter = router({
         let redirectUrl = "/user/dashboard";
         if (phoneUser.role === "admin" || phoneUser.role === "super_admin") {
           redirectUrl = "/admin/dashboard";
-        } else if (phoneUser.role === "manager" || phoneUser.role === "staff") {
-          redirectUrl = "/admin/dashboard";
+        } else if (phoneUser.role === "manager") {
+          redirectUrl = "/manager/dashboard";
+        } else if (phoneUser.role === "staff") {
+          redirectUrl = "/staff/dashboard";
         } else if (phoneUser.clientStatus === "customer") {
           redirectUrl = `/customer/dashboard`;
         } else {

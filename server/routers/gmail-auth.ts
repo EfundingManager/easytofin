@@ -86,10 +86,19 @@ export const gmailAuthRouter = router({
           expiresInMs: sessionDuration,
         });
 
-        // Determine redirect URL based on clientStatus
-        const redirectUrl = existingUser.clientStatus === 'customer' 
-          ? `/customer/dashboard`
-          : `/user/dashboard`;
+        // Determine redirect URL based on role and clientStatus
+        let redirectUrl = "/user/dashboard";
+        if (userRole === "admin" || userRole === "super_admin") {
+          redirectUrl = "/admin/dashboard";
+        } else if (userRole === "manager") {
+          redirectUrl = "/manager/dashboard";
+        } else if (userRole === "staff") {
+          redirectUrl = "/staff/dashboard";
+        } else if (existingUser.clientStatus === 'customer') {
+          redirectUrl = `/customer/dashboard`;
+        } else {
+          redirectUrl = `/user/dashboard`;
+        }
 
         return {
           success: true,

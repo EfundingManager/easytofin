@@ -274,17 +274,17 @@ export const emailAuthRouter = router({
         
         // New users always go to user dashboard
         if (isNewUser) {
-          redirectUrl = '/dashboard';
+          redirectUrl = '/user/dashboard';
         } else {
           // Existing users: redirect based on role
-          if (userRole === 'admin') {
-            // Admin users require SMS 2FA before accessing admin dashboard
+          if (userRole === 'admin' || userRole === 'super_admin') {
+            // Admin and super admin require SMS 2FA
             requiresSMS2FA = true;
-            redirectUrl = '/2fa-verification'; // Temporary redirect to 2FA page
-           } else if (userRole === 'staff' || userRole === 'super_admin') {
-            // Staff and super admin roles also require 2FA
+            redirectUrl = '/2fa';
+          } else if (userRole === 'manager' || userRole === 'staff') {
+            // Manager and staff require SMS 2FA
             requiresSMS2FA = true;
-            redirectUrl = '/2fa-verification';
+            redirectUrl = '/2fa';
           } else {
             // Regular users go to role-based dashboard
             redirectUrl = user.clientStatus === 'customer' 

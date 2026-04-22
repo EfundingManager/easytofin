@@ -21,6 +21,9 @@ import AuthSelection from "./pages/AuthSelection";
 import EmailAuth from "./pages/EmailAuth";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminCustomerDetail from "./pages/AdminCustomerDetail";
+import ManagerDashboard from "./pages/ManagerDashboard";
+import SupportDashboard from "./pages/SupportDashboard";
+import StaffDashboard from "./pages/StaffDashboard";
 import UserProfile from "./pages/UserProfile";
 import VerifyEmail from "./pages/VerifyEmail";
 import FactFindingForm from "./pages/FactFindingForm";
@@ -67,6 +70,9 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/customers/:customerId" component={AdminCustomerDetail} />
+      <Route path="/manager/dashboard" component={ManagerDashboard} />
+      <Route path="/support/dashboard" component={SupportDashboard} />
+      <Route path="/staff/dashboard" component={StaffDashboard} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
