@@ -239,16 +239,35 @@ export const phoneAuthRouter = router({
           const userRole = user.role || 'user';
           let redirectUrl: string;
           let requiresSMS2FA = false;
+          let twoFASessionToken: string | undefined;
           
           // Existing users: redirect based on role
           if (userRole === 'admin' || userRole === 'super_admin') {
             // Admin and super admin require SMS 2FA
             requiresSMS2FA = true;
             redirectUrl = '/2fa';
+            // Create 2FA session token for admin users
+            twoFASessionToken = await sdk.createSessionToken(
+              openId,
+              { expiresInMs: 15 * 60 * 1000, name: user.name || 'Admin' }
+            );
+            opts.res.cookie('2fa_session', twoFASessionToken, {
+              ...cookieOptions,
+              maxAge: 15 * 60 * 1000,
+            } as any);
           } else if (userRole === 'manager' || userRole === 'staff') {
             // Manager and staff require SMS 2FA
             requiresSMS2FA = true;
             redirectUrl = '/2fa';
+            // Create 2FA session token for manager/staff users
+            twoFASessionToken = await sdk.createSessionToken(
+              openId,
+              { expiresInMs: 15 * 60 * 1000, name: user.name || 'Staff' }
+            );
+            opts.res.cookie('2fa_session', twoFASessionToken, {
+              ...cookieOptions,
+              maxAge: 15 * 60 * 1000,
+            } as any);
           } else {
             // Regular users go to role-based dashboard
             redirectUrl = user.clientStatus === 'customer' 

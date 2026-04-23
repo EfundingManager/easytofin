@@ -270,7 +270,13 @@ const EmailAuth = () => {
       setIsNewUser(result.isNewUser || false);
       setStep("authMethod");
       setSelectedAuthMethod(null);
-      toast.success("OTP sent to your email");
+      // Show dev code in development
+      if (result.devCode) {
+        console.log("[DEV] OTP Code:", result.devCode);
+        toast.success(`OTP sent! Dev code: ${result.devCode}`);
+      } else {
+        toast.success("OTP sent to your email");
+      }
     } catch (error: any) {
       toast.error(error.message || "Failed to send OTP");
     } finally {

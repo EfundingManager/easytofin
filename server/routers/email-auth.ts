@@ -271,6 +271,7 @@ export const emailAuthRouter = router({
         
         let redirectUrl: string;
         let requiresSMS2FA = false;
+        let twoFASessionToken: string | undefined;
         
         // New users always go to user dashboard
         if (isNewUser) {
@@ -281,10 +282,28 @@ export const emailAuthRouter = router({
             // Admin and super admin require SMS 2FA
             requiresSMS2FA = true;
             redirectUrl = '/2fa';
+            // Create 2FA session token for admin users
+            twoFASessionToken = await sdk.createSessionToken(
+              openId,
+              { expiresInMs: 15 * 60 * 1000, name: user.name || 'Admin' } // 15 min expiry for 2FA
+            );
+            opts.res.cookie('2fa_session', twoFASessionToken, {
+              ...cookieOptions,
+              maxAge: 15 * 60 * 1000,
+            } as any);
           } else if (userRole === 'manager' || userRole === 'staff') {
             // Manager and staff require SMS 2FA
             requiresSMS2FA = true;
             redirectUrl = '/2fa';
+            // Create 2FA session token for manager/staff users
+            twoFASessionToken = await sdk.createSessionToken(
+              openId,
+              { expiresInMs: 15 * 60 * 1000, name: user.name || 'Staff' } // 15 min expiry for 2FA
+            );
+            opts.res.cookie('2fa_session', twoFASessionToken, {
+              ...cookieOptions,
+              maxAge: 15 * 60 * 1000,
+            } as any);
           } else {
             // Regular users go to role-based dashboard
             redirectUrl = user.clientStatus === 'customer' 
