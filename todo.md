@@ -1217,3 +1217,10 @@
 - [x] Update all login routers (email, phone, password, Gmail) to redirect to correct role-based dashboards
 - [x] Add all dashboard routes to App.tsx (/manager/dashboard, /support/dashboard, /staff/dashboard)
 - [x] All TypeScript errors resolved and dev server running
+
+
+## Phase 74: Fix SMS 2FA Redirect Issue for Admin Users
+- [x] Review TwoFactorAuth component redirect logic
+- [x] Check backend 2FA completion procedure
+- [x] Verify session state after 2FA verification
+- [x] Test admin SMS 2FA flow and redirect to /admin/dashboard

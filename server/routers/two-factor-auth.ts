@@ -231,6 +231,7 @@ export const twoFactorAuthRouter = router({
           email: user.email,
           role: user.role,
         },
+        userRole: user.role,
       };
     }),
 
@@ -264,6 +265,7 @@ export const twoFactorAuthRouter = router({
       return {
         maskedPhone: maskPhone(user.phone),
         role: user.role,
+        userRole: user.role,
       };
     }),
 });

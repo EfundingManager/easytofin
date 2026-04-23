@@ -50,10 +50,19 @@ export default function TwoFactorAuth() {
 
   // ── Complete login mutation ────────────────────────────────────────────────
   const completeLoginMutation = trpc.twoFactorAuth.completeLogin.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       // Session cookie is now set by the server.
-      // Redirect to admin dashboard.
-      navigate("/admin");
+      // Redirect based on user role
+      const roleRedirects: Record<string, string> = {
+        admin: "/admin/dashboard",
+        super_admin: "/admin/dashboard",
+        manager: "/manager/dashboard",
+        staff: "/staff/dashboard",
+        customer: "/customer/dashboard",
+        user: "/user/dashboard",
+      };
+      const redirectUrl = roleRedirects[data?.userRole] || "/user/dashboard";
+      navigate(redirectUrl);
     },
     onError: (err) => {
       setError(err.message || "Verification failed. Please try again.");
@@ -104,6 +113,7 @@ export default function TwoFactorAuth() {
 
   const maskedPhone = metaQuery.data?.maskedPhone ?? "your registered phone";
   const role = metaQuery.data?.role ?? "";
+  const userRole = metaQuery.data?.userRole ?? "";
   const isLoading =
     metaQuery.isLoading ||
     requestOtpMutation.isPending ||
@@ -122,9 +132,9 @@ export default function TwoFactorAuth() {
             Two-Factor Verification
           </CardTitle>
           <CardDescription className="text-gray-600">
-            {role && (
+            {userRole && (
               <span className="inline-block mb-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold uppercase tracking-wide">
-                {role}
+                {userRole}
               </span>
             )}
             <br />
