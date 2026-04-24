@@ -100,11 +100,12 @@ const EmailAuth = () => {
 
   // Render Google button when it's loaded
   useEffect(() => {
-    if (googleLoaded && window.google?.accounts?.id && step === "email") {
-      const buttonElement = document.getElementById("google-signin-button");
+    if (googleLoaded && window.google?.accounts?.id && (step === "email" || step === "authMethod")) {
+      const buttonId = step === "email" ? "google-signin-button" : "google-signin-button-authmethod";
+      const buttonElement = document.getElementById(buttonId);
       if (buttonElement && buttonElement.children.length === 0) {
         try {
-          console.log("[Gmail] Rendering Google Sign-In button");
+          console.log("[Gmail] Rendering Google Sign-In button on", step);
           window.google.accounts.id.renderButton(buttonElement, {
             theme: "outline",
             size: "large",
@@ -482,6 +483,19 @@ const EmailAuth = () => {
                     Use your password to sign in
                   </span>
                 </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t"></span>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-muted-foreground">Or</span>
+                  </div>
+                </div>
+
+                {googleLoaded && (
+                  <div id="google-signin-button-authmethod" className="flex justify-center" />
+                )}
               </div>
             )}
 

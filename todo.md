@@ -1232,3 +1232,12 @@
 - [x] Update frontend EmailAuth to pass token as URL parameter
 - [x] Verify admin users redirect to /admin/dashboard after 2FA
 - [x] All TypeScript errors resolved and dev server running
+
+
+## Phase 75: Add Gmail Login Option to EmailAuth Page
+- [x] Add Gmail login button to EmailAuth "authMethod" step
+- [x] Display Gmail as an alternative authentication method alongside OTP and Password
+- [x] Ensure Gmail button is properly rendered and functional
+- [x] Updated useEffect to render Gmail button on both email and authMethod steps
+- [x] Added divider separator between OTP/Password options and Gmail option
+- [x] All TypeScript errors resolved and dev server running
