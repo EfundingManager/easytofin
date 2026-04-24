@@ -13,7 +13,7 @@ import {
 } from "../db";
 import { sendSMSVerification, verifySMSCode } from "../verification";
 import { rateLimiter, RATE_LIMIT_CONFIG } from "../rate-limiter";
-import { COOKIE_NAME, ONE_YEAR_MS, THIRTY_DAYS_MS } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS, THIRTY_DAYS_MS, PENDING_2FA_COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "../_core/cookies";
 import { sdk } from "../_core/sdk";
 
@@ -251,7 +251,7 @@ export const phoneAuthRouter = router({
               openId,
               { expiresInMs: 15 * 60 * 1000, name: user.name || 'Admin' }
             );
-            opts.res.cookie('2fa_session', twoFASessionToken, {
+            opts.res.cookie(PENDING_2FA_COOKIE_NAME, twoFASessionToken, {
               ...cookieOptions,
               maxAge: 15 * 60 * 1000,
             } as any);
@@ -264,7 +264,7 @@ export const phoneAuthRouter = router({
               openId,
               { expiresInMs: 15 * 60 * 1000, name: user.name || 'Staff' }
             );
-            opts.res.cookie('2fa_session', twoFASessionToken, {
+            opts.res.cookie(PENDING_2FA_COOKIE_NAME, twoFASessionToken, {
               ...cookieOptions,
               maxAge: 15 * 60 * 1000,
             } as any);
@@ -283,6 +283,7 @@ export const phoneAuthRouter = router({
             userRole,
             requiresSMS2FA,
             redirectUrl,
+            twoFASessionToken,
             user: {
               id: user.id,
               phone: user.phone,

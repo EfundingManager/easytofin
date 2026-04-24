@@ -38,7 +38,8 @@ export default function TwoFactorAuth() {
 
   // ── Request OTP mutation ───────────────────────────────────────────────────
   const requestOtpMutation = trpc.twoFactorAuth.requestPhoneOtp.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("[2FA] OTP request successful. Dev code:", data?.devCode);
       setOtpSent(true);
       setError(null);
       resendTimer.start();
@@ -72,7 +73,15 @@ export default function TwoFactorAuth() {
 
   // Auto-request OTP on page load once metadata is available
   useEffect(() => {
+    console.log("[2FA] useEffect triggered:", {
+      metaQueryData: metaQuery.data,
+      otpSent,
+      isPending: requestOtpMutation.isPending,
+      metaQueryLoading: metaQuery.isLoading,
+      metaQueryError: metaQuery.error,
+    });
     if (metaQuery.data && !otpSent && !requestOtpMutation.isPending) {
+      console.log("[2FA] Requesting OTP...");
       handleRequestOtp();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

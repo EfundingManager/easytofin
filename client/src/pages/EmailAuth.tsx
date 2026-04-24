@@ -312,8 +312,12 @@ const EmailAuth = () => {
         if (result.requiresSMS2FA) {
           console.log("[EmailAuth] SMS 2FA required for role:", result.userRole);
           toast.success("Email verified! Please complete SMS verification.");
-          // Redirect to 2FA verification page
-          window.location.href = result.redirectUrl || '/2fa-verification';
+          // Redirect to 2FA verification page with token
+          const redirectUrl = result.redirectUrl || '/2fa';
+          const urlWithToken = result.twoFASessionToken 
+            ? `${redirectUrl}?token=${encodeURIComponent(result.twoFASessionToken)}`
+            : redirectUrl;
+          window.location.href = urlWithToken;
         } else {
           // For regular users, proceed directly to login
           toast.success("Login successful!");

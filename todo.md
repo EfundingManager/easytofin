@@ -1223,4 +1223,12 @@
 - [x] Review TwoFactorAuth component redirect logic
 - [x] Check backend 2FA completion procedure
 - [x] Verify session state after 2FA verification
-- [x] Test admin SMS 2FA flow and redirect to /admin/dashboard
+- [x] Fix 2FA session cookie name consistency (2fa_session → pending_2fa_token)
+- [x] Update backend to return userRole in completeLogin response
+- [x] Update backend to return userRole in getChallengeMeta response
+- [x] Implement role-based redirect mapping in TwoFactorAuth component
+- [x] Update email-auth router to return twoFASessionToken
+- [x] Update phone-auth router to return twoFASessionToken
+- [x] Update frontend EmailAuth to pass token as URL parameter
+- [x] Verify admin users redirect to /admin/dashboard after 2FA
+- [x] All TypeScript errors resolved and dev server running
