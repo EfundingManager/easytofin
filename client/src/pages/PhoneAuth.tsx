@@ -110,6 +110,7 @@ export default function PhoneAuth() {
           callback: handleGoogleSignIn,
           ux_mode: "popup",
           auto_select: false,
+          use_fedcm_for_prompt: true,
           itp_support: true,
         });
         console.log("Google Sign-In API initialized successfully");
@@ -141,6 +142,7 @@ export default function PhoneAuth() {
           size: "large",
           width: "100%",
           text: "signin_with",
+          locale: "en",
         });
         console.log("Google Sign-In button rendered successfully");
       } catch (error) {
@@ -187,7 +189,7 @@ export default function PhoneAuth() {
       const script = document.createElement("script");
       script.src = "https://accounts.google.com/gsi/client";
       script.async = true;
-      script.defer = false;
+      script.defer = true;
       script.onload = () => {
         console.log("Google Sign-In script loaded, initializing...");
         timeoutId = setTimeout(() => {

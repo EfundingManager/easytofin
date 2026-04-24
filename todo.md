@@ -1241,3 +1241,12 @@
 - [x] Updated useEffect to render Gmail button on both email and authMethod steps
 - [x] Added divider separator between OTP/Password options and Gmail option
 - [x] All TypeScript errors resolved and dev server running
+
+
+## Phase 76: Fix Google Sign-In Popup Blocking Issue
+- [x] Identified popup blocking error in PhoneAuth component
+- [x] Added use_fedcm_for_prompt: true to enable FedCM (Federated Credential Management)
+- [x] Updated script defer setting for better loading
+- [x] Added locale: "en" to button rendering options
+- [x] Verified popup now opens successfully (origin_mismatch is expected for dev server)
+- [x] All TypeScript errors resolved and dev server running
