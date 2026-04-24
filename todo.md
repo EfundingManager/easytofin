@@ -1250,3 +1250,12 @@
 - [x] Added locale: "en" to button rendering options
 - [x] Verified popup now opens successfully (origin_mismatch is expected for dev server)
 - [x] All TypeScript errors resolved and dev server running
+
+
+## Phase 77: Test Gmail Login Flow on EmailAuth and PhoneAuth Pages
+- [ ] Test Gmail button visibility on EmailAuth page
+- [ ] Test Gmail button click and popup opening on EmailAuth page
+- [ ] Test Gmail button visibility on PhoneAuth page
+- [ ] Test Gmail button click and popup opening on PhoneAuth page
+- [ ] Verify role-based redirection after Gmail login
+- [ ] Fix admin dashboard access denied issue

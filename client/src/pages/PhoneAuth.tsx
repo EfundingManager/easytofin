@@ -108,7 +108,6 @@ export default function PhoneAuth() {
         googleWindow.google.accounts.id.initialize({
           client_id: clientId,
           callback: handleGoogleSignIn,
-          ux_mode: "popup",
           auto_select: false,
           use_fedcm_for_prompt: true,
           itp_support: true,
@@ -136,17 +135,41 @@ export default function PhoneAuth() {
     const buttonElement = document.getElementById("google-signin-button");
     if (buttonElement) {
       try {
-        googleWindow.google.accounts.id.renderButton(buttonElement, {
-          type: "standard",
-          theme: "outline",
-          size: "large",
-          width: "100%",
-          text: "signin_with",
-          locale: "en",
-        });
-        console.log("Google Sign-In button rendered successfully");
+        // Clear any existing content
+        if (buttonElement.children.length === 0) {
+          googleWindow.google.accounts.id.renderButton(buttonElement, {
+            type: "standard",
+            theme: "outline",
+            size: "large",
+            width: "100%",
+            text: "signin_with",
+            locale: "en",
+          });
+          console.log("Google Sign-In button rendered successfully");
+        }
       } catch (error) {
         console.error("Error rendering Google button:", error);
+        // Fallback: create a custom button
+        console.log("Creating fallback custom button");
+        buttonElement.innerHTML = "";
+        const customButton = document.createElement("button");
+        customButton.type = "button";
+        customButton.textContent = "Sign in with Google";
+        customButton.className = "w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors";
+        customButton.onclick = async (e) => {
+          e.preventDefault();
+          console.log("Custom button clicked");
+          setLoading(true);
+          try {
+            const result = await googleWindow.google.accounts.id.promptAsync();
+            console.log("promptAsync result:", result);
+          } catch (error) {
+            console.error("promptAsync error:", error);
+            toast.error("Failed to open Google Sign-In");
+            setLoading(false);
+          }
+        };
+        buttonElement.appendChild(customButton);
       }
     } else {
       console.warn("Google button element not found in DOM");
