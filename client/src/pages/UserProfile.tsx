@@ -55,7 +55,7 @@ export default function UserProfile() {
       });
       setSelectedServices(profileQuery.data.data.selectedServices || []);
     }
-  }, [profileQuery.data]);
+  }, [profileQuery.data?.data?.user?.id]); // Only re-run when user ID changes
 
   // Submit profile mutation
   const submitMutation = trpc.profile.submitProfile.useMutation({
