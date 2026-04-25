@@ -1329,3 +1329,11 @@
 - [x] Update useAuth hook to show confirmation before logout
 - [x] Integrate LogoutConfirmDialog into DashboardLayout
 - [x] All TypeScript errors resolved and dev server running
+
+
+## Phase 81: Implement Session Timeout Detection with Warning Dialog
+- [x] Create useSessionTimeout hook with configurable timeout duration
+- [x] Build SessionTimeoutWarning dialog component
+- [x] Integrate session timeout detection into App component
+- [x] Create unit tests for useSessionTimeout hook
+- [x] All TypeScript errors resolved and dev server running

@@ -5,6 +5,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { WeComWidgetSimple } from "./components/WeComWidgetSimple";
+import { useState, useCallback } from "react";
+import { useSessionTimeout } from "@/_core/hooks/useSessionTimeout";
+import { SessionTimeoutWarning } from "./components/SessionTimeoutWarning";
+import { useAuth } from "@/_core/hooks/useAuth";
 import Home from "./pages/Home";
 import Protection from "./pages/Protection";
 import Pensions from "./pages/Pensions";
@@ -80,16 +84,43 @@ function Router() {
 }
 
 function App() {
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const { handleLogout, isLoggingOut } = useAuth();
+
+  const handleSessionTimeout = useCallback(() => {
+    handleLogout();
+  }, [handleLogout]);
+
+  const handleWarning = useCallback((time: number) => {
+    setTimeRemaining(time);
+  }, []);
+
+  const { isWarningVisible, extendSession } = useSessionTimeout(
+    handleSessionTimeout,
+    handleWarning,
+    {
+      enabled: true,
+      timeoutDuration: 30 * 60 * 1000,
+      warningDuration: 2 * 60 * 1000,
+    }
+  );
+
   return (
     <ErrorBoundary>
       <LanguageProvider>
         <ThemeProvider
           defaultTheme="light"
-          // switchable
         >
           <TooltipProvider>
             <WeComWidgetSimple />
             <Router />
+            <SessionTimeoutWarning
+              open={isWarningVisible}
+              timeRemaining={timeRemaining}
+              onExtend={extendSession}
+              onLogout={handleSessionTimeout}
+              isLoggingOut={isLoggingOut}
+            />
           </TooltipProvider>
         </ThemeProvider>
       </LanguageProvider>
