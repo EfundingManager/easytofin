@@ -402,3 +402,78 @@ export const passwordResetTokens = mysqlTable("passwordResetTokens", {
 });
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
+
+/**
+ * Login attempts tracking for account lockout mechanism
+ * Tracks failed login attempts per phone/email to implement progressive lockout
+ */
+export const loginAttempts = mysqlTable("loginAttempts", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId"),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  attemptType: mysqlEnum("attemptType", ["otp", "password", "google"]).notNull(),
+  success: mysqlEnum("success", ["true", "false"]).notNull(),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  failureReason: varchar("failureReason", { length: 255 }), // e.g., "invalid_otp", "account_locked"
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type LoginAttempt = typeof loginAttempts.$inferSelect;
+export type InsertLoginAttempt = typeof loginAttempts.$inferInsert;
+
+/**
+ * Account lockout tracking
+ * Stores lockout status and expiration for accounts with too many failed attempts
+ */
+export const accountLockouts = mysqlTable("accountLockouts", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId"),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  failedAttempts: int("failedAttempts").default(0).notNull(),
+  lockedUntil: timestamp("lockedUntil").notNull(), // When the lockout expires
+  lockReason: varchar("lockReason", { length: 255 }).notNull(), // e.g., "max_failed_attempts"
+  unlockedBy: varchar("unlockedBy", { length: 64 }), // Who unlocked it (admin user ID or "auto")
+  unlockedAt: timestamp("unlockedAt"), // When it was unlocked
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AccountLockout = typeof accountLockouts.$inferSelect;
+export type InsertAccountLockout = typeof accountLockouts.$inferInsert;
+
+/**
+ * Security audit log for tracking all security-related events
+ * Includes login attempts, lockouts, password changes, 2FA toggles, etc.
+ */
+export const securityAuditLog = mysqlTable("securityAuditLog", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId"),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  eventType: mysqlEnum("eventType", [
+    "login_success",
+    "login_failed",
+    "account_locked",
+    "account_unlocked",
+    "password_changed",
+    "password_reset",
+    "2fa_enabled",
+    "2fa_disabled",
+    "device_added",
+    "device_removed",
+    "session_terminated",
+    "suspicious_activity"
+  ]).notNull(),
+  description: text("description"),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  severity: mysqlEnum("severity", ["low", "medium", "high", "critical"]).default("low").notNull(),
+  metadata: text("metadata"), // JSON object for additional context
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SecurityAuditLog = typeof securityAuditLog.$inferSelect;
+export type InsertSecurityAuditLog = typeof securityAuditLog.$inferInsert;
