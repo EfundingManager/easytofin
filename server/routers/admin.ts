@@ -1,7 +1,7 @@
 import { adminProcedure, managerProcedure, staffProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, clientDocuments } from "../../drizzle/schema";
-import { eq, desc, and, inArray } from "drizzle-orm";
+import { eq, desc, and, inArray, or, like } from "drizzle-orm";
 import { z } from "zod";
 import { getRateLimitViolations, whitelistIdentifier, resetRateLimit, getRateLimitStats } from "../rate-limit-logger";
 
@@ -777,5 +777,74 @@ export const adminRouter = router({
       role: ctx.user.role,
       loginMethod: ctx.user.loginMethod,
     };
+  }),
+  
+  /**
+   * Delete all test users and their related records
+   * Only super admins can perform this action
+   */
+  cleanupTestUsers: adminProcedure.mutation(async () => {
+    const db = await getDb();
+    if (!db) {
+      return { success: false, message: "Database connection failed", deletedCount: 0, timestamp: new Date().toISOString() };
+    }
+
+    try {
+      // Find all test users
+      const testUsers = await db
+        .select({ id: users.id, email: users.email, name: users.name })
+        .from(users)
+        .where(
+          or(
+            like(users.email, "%test%"),
+            like(users.email, "%verify%"),
+            like(users.email, "%otp%"),
+            like(users.email, "%demo%"),
+            like(users.email, "%example%")
+          )
+        );
+
+      if (testUsers.length === 0) {
+        return { success: true, message: "No test users found", deletedCount: 0, timestamp: new Date().toISOString() };
+      }
+
+      const userIds = testUsers.map(u => u.id);
+      
+      // Delete related records first (respecting foreign key constraints)
+      // Get phoneUserIds first since policyAssignments uses phoneUserId
+      const phoneUserRecords = await db
+        .select({ id: phoneUsers.id })
+        .from(phoneUsers)
+        .where(inArray(phoneUsers.userId, userIds));
+      const phoneUserIds = phoneUserRecords.map(p => p.id);
+      
+      if (phoneUserIds.length > 0) {
+        await db.delete(policyAssignments).where(inArray(policyAssignments.phoneUserId, phoneUserIds));
+        await db.delete(clientDocuments).where(inArray(clientDocuments.phoneUserId, phoneUserIds));
+      }
+      
+      await db.delete(userProducts).where(inArray(userProducts.userId, userIds));
+      await db.delete(factFindingForms).where(inArray(factFindingForms.userId, userIds));
+      await db.delete(phoneUsers).where(inArray(phoneUsers.userId, userIds));
+      
+      // Delete users
+      await db.delete(users).where(inArray(users.id, userIds));
+
+      return {
+        success: true,
+        message: `Successfully deleted ${testUsers.length} test users and their related records`,
+        deletedCount: testUsers.length,
+        deletedUsers: testUsers.map(u => ({ email: u.email, name: u.name })),
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Error cleaning up test users:", error);
+      return {
+        success: false,
+        message: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        deletedCount: 0,
+        timestamp: new Date().toISOString(),
+      };
+    }
   }),
 });
