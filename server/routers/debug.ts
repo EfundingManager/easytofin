@@ -83,9 +83,20 @@ export const debugRouter = router({
    * Returns the app_session_id cookie value (if present)
    */
   checkSessionCookie: publicProcedure.query(async ({ ctx }) => {
-    const cookies = ctx.req.cookies;
-    const sessionCookie = cookies["app_session_id"];
     const cookieHeader = ctx.req.headers.cookie || "";
+    
+    // Parse cookies from header manually
+    const cookies: Record<string, string> = {};
+    if (cookieHeader) {
+      cookieHeader.split(";").forEach((cookie) => {
+        const [name, value] = cookie.trim().split("=");
+        if (name && value) {
+          cookies[name] = value;
+        }
+      });
+    }
+    
+    const sessionCookie = cookies["app_session_id"];
 
     return {
       timestamp: new Date().toISOString(),
@@ -105,7 +116,20 @@ export const debugRouter = router({
    */
   verifySession: publicProcedure.query(async ({ ctx }) => {
     try {
-      const sessionCookie = ctx.req.cookies["app_session_id"];
+      const cookieHeader = ctx.req.headers.cookie || "";
+      
+      // Parse cookies from header manually
+      const cookies: Record<string, string> = {};
+      if (cookieHeader) {
+        cookieHeader.split(";").forEach((cookie) => {
+          const [name, value] = cookie.trim().split("=");
+          if (name && value) {
+            cookies[name] = value;
+          }
+        });
+      }
+      
+      const sessionCookie = cookies["app_session_id"];
       
       if (!sessionCookie) {
         return {
