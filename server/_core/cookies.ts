@@ -37,10 +37,14 @@ export function getSessionCookieOptions(
   // Extract hostname without port
   const hostname = rawHost.split(":")[0];
   
+  // Don't set domain for preview/manus domains - use host-only cookies
+  const isPreviewDomain = hostname.includes("manus.computer");
+  
   const shouldSetDomain =
     hostname &&
     !LOCAL_HOSTS.has(hostname) &&
     !isIpAddress(hostname) &&
+    !isPreviewDomain &&
     hostname !== "127.0.0.1" &&
     hostname !== "::1";
 
@@ -71,6 +75,7 @@ export function getSessionCookieOptions(
     xForwardedHost: forwardedHost,
     hostHeader: hostHeader,
     shouldSetDomain,
+    isPreviewDomain,
     rawHost,
   });
 
