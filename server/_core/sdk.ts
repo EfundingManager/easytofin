@@ -272,7 +272,15 @@ class SDKServer {
 
     // If user not in regular users table, check phoneUsers table (for Gmail/Email/Phone auth)
     if (!user) {
-      const phoneUser = await db.getPhoneUserByGoogleId(sessionUserId);
+      // Try to find by googleId first
+      let phoneUser = await db.getPhoneUserByGoogleId(sessionUserId);
+      
+      // If not found by googleId, the sessionUserId might be an email or other identifier
+      // Try to find by email
+      if (!phoneUser && sessionUserId.includes('@')) {
+        phoneUser = await db.getPhoneUserByEmail(sessionUserId);
+      }
+      
       if (phoneUser) {
         // Convert phoneUser to User type for consistency
         return {
@@ -281,7 +289,7 @@ class SDKServer {
           name: phoneUser.name,
           email: phoneUser.email,
           loginMethod: phoneUser.loginMethod,
-          role: phoneUser.role as 'user' | 'admin' | 'manager' | 'staff',
+          role: phoneUser.role as 'user' | 'admin' | 'manager' | 'staff' | 'super_admin',
           createdAt: phoneUser.createdAt,
           updatedAt: phoneUser.updatedAt,
           lastSignedIn: signedInAt,

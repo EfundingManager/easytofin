@@ -17,6 +17,7 @@ import { twoFactorAuthRouter } from "./routers/two-factor-auth";
 import { kycDocumentsRouter } from "./routers/kyc-documents";
 import { featureFlagsRouter } from "./routers/feature-flags";
 import { kycFormRouter } from "./routers/kyc-form";
+import { kycFormsRouter } from "./routers/kyc-forms";
 import { emailBlasterRouter } from "./routers/email-blaster";
 import { emailCampaignRouter } from "./routers/email-campaign";
 import { recipientUploadRouter } from "./routers/recipient-upload";
@@ -72,6 +73,7 @@ export const appRouter = router({
   kycDocuments: kycDocumentsRouter,
   featureFlags: featureFlagsRouter,
   kycForm: kycFormRouter,
+  kycForms: kycFormsRouter,
   emailBlaster: emailBlasterRouter,
   emailCampaign: emailCampaignRouter,
   recipientUpload: recipientUploadRouter,

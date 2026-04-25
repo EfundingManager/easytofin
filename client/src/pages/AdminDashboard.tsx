@@ -18,6 +18,11 @@ import { useLocation } from "wouter";
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
+  
+  // Debug logging
+  console.log('[AdminDashboard] User data:', user);
+  console.log('[AdminDashboard] User role:', user?.role);
+  console.log('[AdminDashboard] Loading:', loading);
   const [activeTab, setActiveTab] = useState<string>("overview");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [globalSearchQuery, setGlobalSearchQuery] = useState<string>("");
@@ -47,7 +52,8 @@ export default function AdminDashboard() {
   const customersQuery = trpc.workflow.getCustomers.useQuery({ page: 1, limit: 10 });
 
   // Redirect if not admin
-  if (!loading && (!user || user.role !== "admin")) {
+  console.log('[AdminDashboard] Access check - user:', !!user, 'role:', user?.role, 'isAdmin:', user?.role === 'admin');
+  if (!loading && (!user || (user.role !== "admin" && user.role !== "super_admin"))) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="w-full max-w-md">

@@ -1259,3 +1259,58 @@
 - [ ] Test Gmail button click and popup opening on PhoneAuth page
 - [ ] Verify role-based redirection after Gmail login
 - [ ] Fix admin dashboard access denied issue
+
+
+## Phase 78: Develop Five Fact-Finding Forms for Irish Insurance KYC
+
+### Database Schema & Backend
+- [ ] Review existing factFindingForms table schema
+- [ ] Create KYC-specific form data tables if needed (life_protection_kyc, pensions_kyc, etc.)
+- [ ] Create form_auto_fill procedure to retrieve previous form data
+- [ ] Create form_submission procedure to save form responses
+- [ ] Add form_edit procedure to update existing form data
+
+### Life Protection Fact-Finding Form
+- [ ] Build Life Protection fact-finding form component with Irish KYC fields
+- [ ] Include fields: personal details, financial situation, insurance needs, health history, beneficiaries
+- [ ] Implement auto-fill from previous submissions
+- [ ] Add edit functionality for existing data
+- [ ] Add form validation and error handling
+
+### Pensions Fact-Finding Form
+- [ ] Build Pensions fact-finding form component with Irish KYC fields
+- [ ] Include fields: employment history, pension contributions, retirement goals, investment preferences
+- [ ] Implement auto-fill from previous submissions
+- [ ] Add edit functionality for existing data
+- [ ] Add form validation and error handling
+
+### Health Insurance Fact-Finding Form
+- [ ] Build Health Insurance fact-finding form component with Irish KYC fields
+- [ ] Include fields: personal health status, coverage preferences, family members, existing policies
+- [ ] Implement auto-fill from previous submissions
+- [ ] Add edit functionality for existing data
+- [ ] Add form validation and error handling
+
+### General Insurance Fact-Finding Form
+- [ ] Build General Insurance fact-finding form component with Irish KYC fields
+- [ ] Include fields: property details, coverage needs, claims history, existing policies
+- [ ] Implement auto-fill from previous submissions
+- [ ] Add edit functionality for existing data
+- [ ] Add form validation and error handling
+
+### Investments Fact-Finding Form
+- [ ] Build Investments fact-finding form component with Irish KYC fields
+- [ ] Include fields: investment experience, risk tolerance, financial goals, investment timeline
+- [ ] Implement auto-fill from previous submissions
+- [ ] Add edit functionality for existing data
+- [ ] Add form validation and error handling
+
+### Integration & Testing
+- [ ] Create form submission endpoints
+- [ ] Implement form data validation
+- [ ] Add form navigation between different product types
+- [ ] Test all forms with auto-fill functionality
+- [ ] Verify edit functionality works correctly
+- [ ] Test form submission and data persistence
+- [ ] Write unit tests for form components
+- [ ] Create checkpoint and deploy
