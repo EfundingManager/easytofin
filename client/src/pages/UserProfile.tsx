@@ -32,42 +32,12 @@ export default function UserProfile() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    password: '',
-    confirmPassword: '',
-  });
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
-  const [passwordLoading, setPasswordLoading] = useState(false);
 
-  // Password strength requirements
-  const passwordRequirements = {
-    minLength: passwordData.password.length >= 8,
-    hasUppercase: /[A-Z]/.test(passwordData.password),
-    hasLowercase: /[a-z]/.test(passwordData.password),
-    hasNumber: /[0-9]/.test(passwordData.password),
-    hasSpecial: /[!@#$%^&*]/.test(passwordData.password),
-  };
-  const allRequirementsMet = Object.values(passwordRequirements).every(req => req);
-  const passwordsMatch = passwordData.password && passwordData.confirmPassword && passwordData.password === passwordData.confirmPassword;
 
   // Send verification email mutation
   const sendVerificationEmailMutation = trpc.emailVerification.sendVerificationEmail.useMutation();
   
-  // Set password mutation
-  const setPasswordMutation = trpc.passwordLogin.setPassword.useMutation({
-    onSuccess: () => {
-      setPasswordSuccess(true);
-      setPasswordData({ password: '', confirmPassword: '' });
-      setPasswordError(null);
-      setTimeout(() => setPasswordSuccess(false), 5000);
-    },
-    onError: (error) => {
-      setPasswordError(error.message || 'Failed to set password');
-    },
-  });
+
 
   // Fetch current profile
   const profileQuery = trpc.profile.getProfile.useQuery(undefined, {
@@ -346,157 +316,7 @@ export default function UserProfile() {
                 )}
               </div>
 
-              {/* Password Section */}
-              <div className="space-y-4 border-t pt-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Create Password</h3>
-                  <p className="text-sm text-muted-foreground">Set a password to enable password-based login in the future</p>
-                </div>
 
-                {passwordSuccess && (
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-200">
-                    <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <p className="text-sm text-green-800">Password set successfully!</p>
-                  </div>
-                )}
-
-                {passwordError && (
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200">
-                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                    <p className="text-sm text-red-800">{passwordError}</p>
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Enter a strong password"
-                      value={passwordData.password}
-                      onChange={(e) => {
-                        setPasswordData(prev => ({ ...prev, password: e.target.value }));
-                        setPasswordError(null);
-                      }}
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      placeholder="Confirm your password"
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => {
-                        setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }));
-                        setPasswordError(null);
-                      }}
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Password Requirements */}
-                {passwordData.password && (
-                  <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 space-y-2">
-                    <p className="text-sm font-medium text-gray-900">Password Requirements:</p>
-                    <div className="space-y-1 text-xs">
-                      <div className={`flex items-center gap-2 ${passwordRequirements.minLength ? 'text-green-700' : 'text-gray-600'}`}>
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordRequirements.minLength ? 'bg-green-200' : 'bg-gray-200'}`}>
-                          {passwordRequirements.minLength && <span className="text-green-700 font-bold">✓</span>}
-                        </div>
-                        At least 8 characters
-                      </div>
-                      <div className={`flex items-center gap-2 ${passwordRequirements.hasUppercase ? 'text-green-700' : 'text-gray-600'}`}>
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordRequirements.hasUppercase ? 'bg-green-200' : 'bg-gray-200'}`}>
-                          {passwordRequirements.hasUppercase && <span className="text-green-700 font-bold">✓</span>}
-                        </div>
-                        One uppercase letter (A-Z)
-                      </div>
-                      <div className={`flex items-center gap-2 ${passwordRequirements.hasLowercase ? 'text-green-700' : 'text-gray-600'}`}>
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordRequirements.hasLowercase ? 'bg-green-200' : 'bg-gray-200'}`}>
-                          {passwordRequirements.hasLowercase && <span className="text-green-700 font-bold">✓</span>}
-                        </div>
-                        One lowercase letter (a-z)
-                      </div>
-                      <div className={`flex items-center gap-2 ${passwordRequirements.hasNumber ? 'text-green-700' : 'text-gray-600'}`}>
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordRequirements.hasNumber ? 'bg-green-200' : 'bg-gray-200'}`}>
-                          {passwordRequirements.hasNumber && <span className="text-green-700 font-bold">✓</span>}
-                        </div>
-                        One number (0-9)
-                      </div>
-                      <div className={`flex items-center gap-2 ${passwordRequirements.hasSpecial ? 'text-green-700' : 'text-gray-600'}`}>
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordRequirements.hasSpecial ? 'bg-green-200' : 'bg-gray-200'}`}>
-                          {passwordRequirements.hasSpecial && <span className="text-green-700 font-bold">✓</span>}
-                        </div>
-                        One special character (!@#$%^&*)
-                      </div>
-                      {passwordsMatch && (
-                        <div className="flex items-center gap-2 text-green-700">
-                          <div className="w-4 h-4 rounded-full flex items-center justify-center bg-green-200">
-                            <span className="text-green-700 font-bold">✓</span>
-                          </div>
-                          Passwords match
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <Button
-                  type="button"
-                  onClick={async () => {
-                    if (!allRequirementsMet) {
-                      setPasswordError('Please meet all password requirements');
-                      return;
-                    }
-                    if (!passwordsMatch) {
-                      setPasswordError('Passwords do not match');
-                      return;
-                    }
-                    setPasswordLoading(true);
-                    try {
-                      await setPasswordMutation.mutateAsync({
-                        password: passwordData.password,
-                        confirmPassword: passwordData.confirmPassword,
-                      });
-                    } finally {
-                      setPasswordLoading(false);
-                    }
-                  }}
-                  disabled={!allRequirementsMet || !passwordsMatch || passwordLoading || setPasswordMutation.isPending}
-                  variant="outline"
-                  className="w-full"
-                >
-                  {passwordLoading || setPasswordMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Setting Password...
-                    </>
-                  ) : (
-                    'Set Password'
-                  )}
-                </Button>
-              </div>
 
               {/* Submit Button */}
               <div className="flex gap-3 pt-4 border-t">

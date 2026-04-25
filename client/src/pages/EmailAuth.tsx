@@ -12,11 +12,11 @@ import { RateLimitAlert } from "@/components/RateLimitAlert";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
-import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
+
 import { useCountdownTimer } from "@/hooks/useCountdownTimer";
 import { Clock } from "lucide-react";
 
-type AuthStep = "email" | "authMethod" | "otp" | "password" | "confirmation";
+type AuthStep = "email" | "authMethod" | "otp" | "confirmation";
 
 const EmailAuth = () => {
   const [, setLocation] = useLocation();
@@ -24,13 +24,12 @@ const EmailAuth = () => {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<AuthStep>("email");
-  const [selectedAuthMethod, setSelectedAuthMethod] = useState<"otp" | "password" | null>(null);
+  const [selectedAuthMethod, setSelectedAuthMethod] = useState<"otp" | null>(null);
   const [loading, setLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [password, setPassword] = useState("");
+
   const [isNewUser, setIsNewUser] = useState(false);
   const { isLimited, timeRemaining, formatTimeRemaining, setRateLimit } = useRateLimit();
   const otpResendTimer = useCountdownTimer(300); // 5-minute cooldown for OTP resend
@@ -46,7 +45,7 @@ const EmailAuth = () => {
       otpResendTimer.reset();
     },
   });
-  const loginWithPasswordMutation = trpc.passwordLogin.loginWithPassword.useMutation();
+
 
   // Note: We allow authenticated users to access this page so they can switch accounts if needed
 
@@ -224,32 +223,7 @@ const EmailAuth = () => {
     }
   };
 
-  const handlePasswordLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      toast.error("Please enter email and password");
-      return;
-    }
 
-    setLoading(true);
-    try {
-      const result = await loginWithPasswordMutation.mutateAsync({
-        phoneOrEmail: email,
-        password,
-        rememberMe,
-        rememberDevice,
-      });
-
-      if (result.success) {
-        toast.success("Login successful!");
-        window.location.href = result.redirectUrl;
-      }
-    } catch (error: any) {
-      toast.error(error.message || "Password login failed");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,7 +258,7 @@ const EmailAuth = () => {
     }
   };
 
-  const handleSelectAuthMethod = (method: "otp" | "password") => {
+  const handleSelectAuthMethod = (method: "otp") => {
     setSelectedAuthMethod(method);
     setStep(method);
   };
@@ -353,11 +327,7 @@ const EmailAuth = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <Navbar />
-      <ForgotPasswordModal
-        open={showForgotPassword}
-        onOpenChange={setShowForgotPassword}
-        onSuccess={() => setStep("email")}
-      />
+
       <div className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
@@ -367,14 +337,12 @@ const EmailAuth = () => {
                   {step === "email" && "Client Login"}
                   {step === "authMethod" && "Choose Sign-In Method"}
                   {step === "otp" && "Verify Email"}
-                  {step === "password" && "Enter Password"}
                   {step === "confirmation" && "Registration Confirmed"}
                 </CardTitle>
                 <CardDescription>
                   {step === "email" && "Enter your email to get started"}
                   {step === "authMethod" && "Select your preferred authentication method"}
                   {step === "otp" && "Enter the 6-digit code sent to your email"}
-                  {step === "password" && "Enter your password"}
                   {step === "confirmation" && "Your email has been verified"}
                 </CardDescription>
               </div>
@@ -384,7 +352,6 @@ const EmailAuth = () => {
                     setStep("email");
                     setSelectedAuthMethod(null);
                     setCode("");
-                    setPassword("");
                   }}
                   className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                 >
@@ -468,18 +435,6 @@ const EmailAuth = () => {
                   <span className="font-semibold text-slate-900">OTP Verification</span>
                   <span className="text-xs text-slate-600">
                     Use the 6-digit code sent to your email
-                  </span>
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handleSelectAuthMethod("password")}
-                  className="w-full h-auto py-3 flex flex-col items-start gap-1 hover:bg-slate-50"
-                >
-                  <span className="font-semibold text-slate-900">Password Login</span>
-                  <span className="text-xs text-slate-600">
-                    Use your password to sign in
                   </span>
                 </Button>
 
@@ -580,52 +535,7 @@ const EmailAuth = () => {
               </form>
             )}
 
-            {step === "password" && (
-              <form onSubmit={handlePasswordLogin} className="space-y-4">
-                <div className="bg-slate-50 p-3 rounded-lg">
-                  <p className="text-sm text-slate-600">
-                    Signing in as <strong>{email}</strong>
-                  </p>
-                </div>
 
-                <div>
-                  <label className="text-sm font-medium">Password</label>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading || loginWithPasswordMutation.isPending}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <RememberDeviceCheckbox checked={rememberDevice} onChange={setRememberDevice} />
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotPassword(true)}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={loading || !password || loginWithPasswordMutation.isPending}
-                >
-                  {loading || loginWithPasswordMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    "Sign In"
-                  )}
-                </Button>
-              </form>
-            )}
 
             {step === "confirmation" && (
               <div className="space-y-4 text-center">
