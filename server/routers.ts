@@ -24,6 +24,7 @@ import { recipientUploadRouter } from "./routers/recipient-upload";
 import { deviceRegistrationRouter } from "./routers/device-registration";
 import { passwordResetRouter } from "./routers/password-reset";
 import { passwordLoginRouter } from "./routers/password-login";
+import { pdfExportRouter } from "./routers/pdf-export";
 import * as db from "./db";
 
 export const appRouter = router({
@@ -78,6 +79,7 @@ export const appRouter = router({
   emailCampaign: emailCampaignRouter,
   recipientUpload: recipientUploadRouter,
   deviceRegistration: deviceRegistrationRouter,
+  pdfExport: pdfExportRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({

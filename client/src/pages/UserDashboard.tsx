@@ -10,6 +10,7 @@ import DocumentUpload from '@/components/DocumentUpload';
 import { ClientPoliciesWidget } from '@/components/ClientPoliciesWidget';
 import { PolicyRenewalReminder } from '@/components/PolicyRenewalReminder';
 import { useAuth } from '@/_core/hooks/useAuth';
+import { KYCPDFExportButton } from '@/components/KYCPDFExportButton';
 
 export default function UserDashboard() {
   const { user, loading, logout } = useAuth();
@@ -128,6 +129,12 @@ export default function UserDashboard() {
                         <Edit2 className="w-4 h-4" />
                         Edit Profile
                       </Button>
+                      <KYCPDFExportButton
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        showLabel={true}
+                      />
                     </div>
                   </>
                 ) : (
