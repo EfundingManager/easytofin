@@ -43,9 +43,9 @@ export function useAuth(options?: UseAuthOptions) {
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
       
-      // Redirect to login page
+      // Redirect to auth selection page
       if (typeof window !== "undefined") {
-        window.location.href = getLoginUrl();
+        window.location.href = "/auth-selection";
       }
     }
   }, [logoutMutation, utils]);
