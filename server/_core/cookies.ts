@@ -45,6 +45,15 @@ export function getSessionCookieOptions(
   // For localhost/development, use the actual protocol
   const secure = !LOCAL_HOSTS.has(hostname) && !isIpAddress(hostname) ? true : isSecure;
 
+  console.log("[Cookie Config]", {
+    hostname,
+    domain,
+    secure,
+    sameSite: "none",
+    protocol: req.protocol,
+    xForwardedProto: req.headers["x-forwarded-proto"],
+  });
+
   return {
     domain,
     httpOnly: true,

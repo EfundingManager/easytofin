@@ -260,9 +260,18 @@ class SDKServer {
     // Regular authentication flow
     const cookies = this.parseCookies(req.headers.cookie);
     const sessionCookie = cookies.get(COOKIE_NAME);
+    
+    console.log("[Auth] Authenticating request", {
+      hostname: req.hostname,
+      cookieHeader: req.headers.cookie ? "present" : "missing",
+      sessionCookie: sessionCookie ? "present" : "missing",
+      allCookies: Array.from(cookies.keys()),
+    });
+    
     const session = await this.verifySession(sessionCookie);
 
     if (!session) {
+      console.log("[Auth] Session verification failed for cookie", { sessionCookie: sessionCookie ? "present" : "missing" });
       throw ForbiddenError("Invalid session cookie");
     }
 
