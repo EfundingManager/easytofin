@@ -12,13 +12,13 @@ import { useRateLimit } from "@/_core/hooks/useRateLimit";
 import { RateLimitAlert } from "@/components/RateLimitAlert";
 import { ResendCodeButton } from "@/components/ResendCodeButton";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
-import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 
-type AuthStep = "phone" | "authMethod" | "otp" | "register" | "password";
+
+type AuthStep = "phone" | "authMethod" | "otp" | "register";
 
 export default function PhoneAuth() {
   const [step, setStep] = useState<AuthStep>("phone");
-  const [selectedAuthMethod, setSelectedAuthMethod] = useState<"otp" | "password" | null>(null);
+  const [selectedAuthMethod, setSelectedAuthMethod] = useState<"otp" | null>(null);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [name, setName] = useState("");
@@ -29,14 +29,13 @@ export default function PhoneAuth() {
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [password, setPassword] = useState("");
+
   const rateLimit = useRateLimit();
 
   const requestOtpMutation = trpc.phoneAuth.requestOtp.useMutation();
   const resendOtpMutation = trpc.phoneAuth.resendOtp.useMutation();
   const verifyOtpMutation = trpc.phoneAuth.verifyOtp.useMutation();
-  const loginWithPasswordMutation = trpc.passwordLogin.loginWithPassword.useMutation();
+
   const handleGoogleCallbackMutation = trpc.gmailAuth.handleGoogleCallback.useMutation();
 
   const handleGoogleSignIn = async (response: any) => {
@@ -266,36 +265,9 @@ export default function PhoneAuth() {
     }
   };
 
-  const handleSelectAuthMethod = (method: "otp" | "password") => {
+  const handleSelectAuthMethod = (method: "otp") => {
     setSelectedAuthMethod(method);
     setStep(method);
-  };
-
-  const handlePasswordLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!phone.trim() || !password.trim()) {
-      toast.error("Please enter phone and password");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const result = await loginWithPasswordMutation.mutateAsync({
-        phoneOrEmail: phone,
-        password,
-        rememberMe,
-        rememberDevice,
-      });
-
-      if (result.success) {
-        toast.success("Login successful!");
-        window.location.href = result.redirectUrl;
-      }
-    } catch (error: any) {
-      toast.error(error.message || "Password login failed");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -359,14 +331,12 @@ export default function PhoneAuth() {
                     {step === "phone" && "Sign In or Register"}
                     {step === "authMethod" && "Choose Sign-In Method"}
                     {step === "otp" && "Verify Your Phone"}
-                    {step === "password" && "Enter Password"}
                     {step === "register" && "Complete Registration"}
                   </CardTitle>
                   <CardDescription className="text-[oklch(0.52_0.015_240)]">
                     {step === "phone" && "Enter your phone number"}
                     {step === "authMethod" && `Signing in with ${phone}`}
                     {step === "otp" && "Enter the 6-digit code sent to your phone"}
-                    {step === "password" && "Enter your password"}
                     {step === "register" && "Complete your profile"}
                   </CardDescription>
                 </div>
@@ -376,7 +346,6 @@ export default function PhoneAuth() {
                       setStep("phone");
                       setSelectedAuthMethod(null);
                       setOtp("");
-                      setPassword("");
                     }}
                     className="p-2 hover:bg-[oklch(0.95_0.008_240)] rounded-lg transition-colors"
                   >
@@ -472,17 +441,7 @@ export default function PhoneAuth() {
                     </span>
                   </Button>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => handleSelectAuthMethod("password")}
-                    className="w-full h-auto py-3 flex flex-col items-start gap-1 border-[oklch(0.88_0.008_240)] hover:bg-[oklch(0.95_0.008_240)]"
-                  >
-                    <span className="font-semibold text-[oklch(0.25_0.06_155)]">Password Login</span>
-                    <span className="text-xs text-[oklch(0.52_0.015_240)]">
-                      Sign in with your password
-                    </span>
-                  </Button>
+
                 </div>
               )}
 
@@ -553,59 +512,11 @@ export default function PhoneAuth() {
                     isLoading={loading}
                     cooldownSeconds={60}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotPassword(true)}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-2 w-full text-center"
-                  >
-                    Forgot Password?
-                  </button>
+
                 </form>
               )}
 
-              {step === "password" && (
-                <form onSubmit={handlePasswordLogin} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[oklch(0.25_0.06_155)] mb-2">
-                      Password
-                    </label>
-                    <Input
-                      type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                      className="border-[oklch(0.88_0.008_240)]"
-                    />
-                  </div>
-                  <RememberDeviceCheckbox
-                    checked={rememberDevice}
-                    onChange={setRememberDevice}
-                    showTooltip={true}
-                  />
-                  <Button
-                    type="submit"
-                    disabled={loading || rateLimit.isLimited}
-                    className="w-full bg-[oklch(0.40_0.11_195)] hover:bg-[oklch(0.35_0.10_195)] text-white disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Logging in...
-                      </>
-                    ) : (
-                      "Login"
-                    )}
-                  </Button>
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotPassword(true)}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-2 w-full text-center"
-                  >
-                    Forgot Password?
-                  </button>
-                </form>
-              )}
+
             </CardContent>
           </Card>
 
@@ -618,10 +529,7 @@ export default function PhoneAuth() {
         </div>
       </div>
       <Footer />
-      <ForgotPasswordModal
-        open={showForgotPassword}
-        onOpenChange={setShowForgotPassword}
-      />
+
     </div>
   );
 }
