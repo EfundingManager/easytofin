@@ -28,24 +28,36 @@ export function useAuth(options?: UseAuthOptions) {
 
   const handleLogout = useCallback(async () => {
     try {
+      // Call logout endpoint to destroy server-side session
       await logoutMutation.mutateAsync();
     } catch (error: unknown) {
       if (
         error instanceof TRPCClientError &&
         error.data?.code === "UNAUTHORIZED"
       ) {
-        // Already logged out
+        // Already logged out, continue with cleanup
       } else {
         console.error("Logout error:", error);
       }
     } finally {
-      // Clear user data from cache
+      // Clear all frontend state and caches
+      // 1. Clear React Query cache completely
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
       
-      // Redirect to post-logout page to show quick re-login option
+      // 2. Clear all other queries to prevent stale data
+      await utils.invalidate();
+      
+      // 3. Clear localStorage (including quick re-login data)
+      localStorage.clear();
+      
+      // 4. Clear sessionStorage
+      sessionStorage.clear();
+      
+      // 5. Hard redirect to post-logout page with cache busting
       if (typeof window !== "undefined") {
-        window.location.href = "/post-logout";
+        // Use window.location.href for full page reload to clear all in-memory state
+        window.location.href = `/post-logout?t=${Date.now()}`;
       }
     }
   }, [logoutMutation, utils]);
@@ -55,8 +67,8 @@ export function useAuth(options?: UseAuthOptions) {
   }, []);
 
   const state = useMemo(() => {
-    // Store comprehensive user info for quick re-login
-    if (meQuery.data) {
+    // Store comprehensive user info for quick re-login (only when logged in)
+    if (meQuery.data && !logoutMutation.isPending) {
       const userInfo = {
         id: meQuery.data.id,
         name: meQuery.data.name,
