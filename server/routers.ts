@@ -26,6 +26,7 @@ import { passwordResetRouter } from "./routers/password-reset";
 import { passwordLoginRouter } from "./routers/password-login";
 import { pdfExportRouter } from "./routers/pdf-export";
 import { authLockoutRouter } from "./routers/auth-lockout";
+import { ipRateLimitRouter } from "./routers/ip-rate-limit";
 import * as db from "./db";
 
 export const appRouter = router({
@@ -82,8 +83,8 @@ export const appRouter = router({
   deviceRegistration: deviceRegistrationRouter,
   pdfExport: pdfExportRouter,
   authLockout: authLockoutRouter,
-
-  // TODO: add feature routers here, e.g.
+  ipRateLimit: ipRateLimitRouter,
+  // TODO: add feature routers here, e.g..
   // todo: router({
   //   list: protectedProcedure.query(({ ctx }) =>
   //     db.getUserTodos(ctx.user.id)

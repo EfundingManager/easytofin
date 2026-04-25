@@ -532,3 +532,107 @@ export const suspiciousActivityLockout = mysqlTable("suspiciousActivityLockout",
 
 export type SuspiciousActivityLockout = typeof suspiciousActivityLockout.$inferSelect;
 export type InsertSuspiciousActivityLockout = typeof suspiciousActivityLockout.$inferInsert;
+
+/**
+ * IP-based rate limiting for brute force prevention
+ * Tracks requests per IP address across all endpoints
+ */
+export const ipRateLimitLog = mysqlTable("ipRateLimitLog", {
+  id: int("id").autoincrement().primaryKey(),
+  ipAddress: varchar("ipAddress", { length: 45 }).notNull(), // IPv4 or IPv6
+  endpoint: varchar("endpoint", { length: 255 }).notNull(), // e.g., /api/trpc/auth.verifyOtp
+  requestCount: int("requestCount").default(1).notNull(),
+  violationType: mysqlEnum("violationType", [
+    "otp_verification",
+    "otp_request",
+    "login_attempt",
+    "password_reset",
+    "account_unlock_request",
+  ]).notNull(),
+  isBlocked: mysqlEnum("isBlocked", ["true", "false"]).default("false").notNull(),
+  blockedUntil: timestamp("blockedUntil"),
+  userAgent: text("userAgent"),
+  firstRequestAt: timestamp("firstRequestAt").defaultNow().notNull(),
+  lastRequestAt: timestamp("lastRequestAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IpRateLimitLog = typeof ipRateLimitLog.$inferSelect;
+export type InsertIpRateLimitLog = typeof ipRateLimitLog.$inferInsert;
+
+/**
+ * IP whitelist for trusted sources (corporate networks, partners, etc.)
+ */
+export const ipWhitelist = mysqlTable("ipWhitelist", {
+  id: int("id").autoincrement().primaryKey(),
+  ipAddress: varchar("ipAddress", { length: 45 }).notNull().unique(),
+  ipRange: varchar("ipRange", { length: 100 }), // CIDR notation for IP ranges
+  description: varchar("description", { length: 255 }),
+  reason: mysqlEnum("reason", [
+    "corporate_network",
+    "partner_integration",
+    "internal_testing",
+    "api_partner",
+    "other",
+  ]).notNull(),
+  addedBy: int("addedBy"),
+  expiresAt: timestamp("expiresAt"),
+  isActive: mysqlEnum("isActive", ["true", "false"]).default("true").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IpWhitelist = typeof ipWhitelist.$inferSelect;
+export type InsertIpWhitelist = typeof ipWhitelist.$inferInsert;
+
+/**
+ * IP blacklist for known attackers
+ */
+export const ipBlacklist = mysqlTable("ipBlacklist", {
+  id: int("id").autoincrement().primaryKey(),
+  ipAddress: varchar("ipAddress", { length: 45 }).notNull().unique(),
+  ipRange: varchar("ipRange", { length: 100 }), // CIDR notation for IP ranges
+  reason: mysqlEnum("reason", [
+    "brute_force_attack",
+    "credential_stuffing",
+    "account_takeover_attempt",
+    "ddos_attack",
+    "malware_distribution",
+    "spam",
+    "manual_block",
+    "other",
+  ]).notNull(),
+  severity: mysqlEnum("severity", ["low", "medium", "high", "critical"]).default("medium").notNull(),
+  blockType: mysqlEnum("blockType", ["temporary", "permanent"]).default("temporary").notNull(),
+  blockedUntil: timestamp("blockedUntil"),
+  addedBy: int("addedBy"),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IpBlacklist = typeof ipBlacklist.$inferSelect;
+export type InsertIpBlacklist = typeof ipBlacklist.$inferInsert;
+
+/**
+ * IP reputation tracking for monitoring suspicious patterns
+ */
+export const ipReputation = mysqlTable("ipReputation", {
+  id: int("id").autoincrement().primaryKey(),
+  ipAddress: varchar("ipAddress", { length: 45 }).notNull().unique(),
+  reputationScore: int("reputationScore").default(0).notNull(), // 0-100, lower is worse
+  failedLoginAttempts: int("failedLoginAttempts").default(0).notNull(),
+  successfulLogins: int("successfulLogins").default(0).notNull(),
+  suspiciousActivityCount: int("suspiciousActivityCount").default(0).notNull(),
+  lastSuspiciousActivity: timestamp("lastSuspiciousActivity"),
+  countries: text("countries"), // JSON array of countries this IP accessed from
+  devices: text("devices"), // JSON array of device fingerprints
+  isHighRisk: mysqlEnum("isHighRisk", ["true", "false"]).default("false").notNull(),
+  lastCheckedAt: timestamp("lastCheckedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IpReputation = typeof ipReputation.$inferSelect;
+export type InsertIpReputation = typeof ipReputation.$inferInsert;
