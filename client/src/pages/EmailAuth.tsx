@@ -242,8 +242,8 @@ const EmailAuth = () => {
     try {
       const result = await requestOtpMutation.mutateAsync({ email });
       setIsNewUser(result.isNewUser || false);
-      setStep("authMethod");
-      setSelectedAuthMethod(null);
+      setStep("otp");
+      setSelectedAuthMethod("otp");
       // Show dev code in development
       if (result.devCode) {
         console.log("[DEV] OTP Code:", result.devCode);

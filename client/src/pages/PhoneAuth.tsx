@@ -250,8 +250,8 @@ export default function PhoneAuth() {
       const result = await requestOtpMutation.mutateAsync({ phone });
       setDevCode(result.devCode || "");
       setIsNewUser(result.isNewUser || false);
-      setStep("authMethod");
-      setSelectedAuthMethod(null);
+      setStep("otp");
+      setSelectedAuthMethod("otp");
       toast.success("OTP sent to your phone!");
     } catch (error: any) {
       if (error.data?.code === "TOO_MANY_REQUESTS") {
