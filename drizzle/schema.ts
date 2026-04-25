@@ -477,3 +477,58 @@ export const securityAuditLog = mysqlTable("securityAuditLog", {
 
 export type SecurityAuditLog = typeof securityAuditLog.$inferSelect;
 export type InsertSecurityAuditLog = typeof securityAuditLog.$inferInsert;
+
+/**
+ * Session activity tracking for detecting suspicious login/logout patterns
+ * Used to detect account hijacking and session manipulation attacks
+ */
+export const sessionActivityLog = mysqlTable("sessionActivityLog", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId"),
+  userId: int("userId"),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  activityType: mysqlEnum("activityType", ["login", "logout", "session_created", "session_terminated"]).notNull(),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  sessionId: varchar("sessionId", { length: 255 }),
+  deviceFingerprint: varchar("deviceFingerprint", { length: 255 }),
+  location: text("location"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SessionActivityLog = typeof sessionActivityLog.$inferSelect;
+export type InsertSessionActivityLog = typeof sessionActivityLog.$inferInsert;
+
+/**
+ * Suspicious activity lockouts for login/logout pattern abuse
+ * Separate from failed OTP attempts - tracks session manipulation
+ */
+export const suspiciousActivityLockout = mysqlTable("suspiciousActivityLockout", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId"),
+  userId: int("userId"),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  lockoutReason: mysqlEnum("lockoutReason", [
+    "excessive_login_logout",
+    "rapid_location_change",
+    "unusual_access_pattern",
+    "concurrent_sessions",
+  ]).notNull(),
+  activityCount: int("activityCount").default(0).notNull(),
+  timeWindowSeconds: int("timeWindowSeconds").default(120).notNull(),
+  lockedAt: timestamp("lockedAt").defaultNow().notNull(),
+  unlocksAt: timestamp("unlocksAt").notNull(),
+  unlockReason: varchar("unlockReason", { length: 255 }),
+  unlockedAt: timestamp("unlockedAt"),
+  unlockedBy: varchar("unlockedBy", { length: 255 }),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  metadata: text("metadata"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SuspiciousActivityLockout = typeof suspiciousActivityLockout.$inferSelect;
+export type InsertSuspiciousActivityLockout = typeof suspiciousActivityLockout.$inferInsert;
