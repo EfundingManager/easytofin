@@ -43,9 +43,9 @@ export function useAuth(options?: UseAuthOptions) {
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
       
-      // Redirect to auth selection page
+      // Redirect to post-logout page to show quick re-login option
       if (typeof window !== "undefined") {
-        window.location.href = "/auth-selection";
+        window.location.href = "/post-logout";
       }
     }
   }, [logoutMutation, utils]);
@@ -55,10 +55,19 @@ export function useAuth(options?: UseAuthOptions) {
   }, []);
 
   const state = useMemo(() => {
-    localStorage.setItem(
-      "manus-runtime-user-info",
-      JSON.stringify(meQuery.data)
-    );
+    // Store comprehensive user info for quick re-login
+    if (meQuery.data) {
+      const userInfo = {
+        id: meQuery.data.id,
+        name: meQuery.data.name,
+        email: meQuery.data.email,
+        role: meQuery.data.role,
+      };
+      localStorage.setItem(
+        "manus-runtime-user-info",
+        JSON.stringify(userInfo)
+      );
+    }
     return {
       user: meQuery.data ?? null,
       loading: meQuery.isLoading || logoutMutation.isPending,

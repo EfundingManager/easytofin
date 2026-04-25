@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,16 +11,18 @@ import { RateLimitAlert } from "@/components/RateLimitAlert";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { RememberDeviceCheckbox } from "@/components/RememberDeviceCheckbox";
-
 import { useCountdownTimer } from "@/hooks/useCountdownTimer";
 import { Clock } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type AuthStep = "email" | "authMethod" | "otp" | "confirmation";
 
 const EmailAuth = () => {
   const [, setLocation] = useLocation();
   const { user, loading: authLoading } = useAuth();
-  const [email, setEmail] = useState("");
+  const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+  const urlEmail = urlParams.get('email') || '';
+  const [email, setEmail] = useState(urlEmail);
   const [code, setCode] = useState("");
   const [step, setStep] = useState<AuthStep>("email");
   const [selectedAuthMethod, setSelectedAuthMethod] = useState<"otp" | null>(null);
@@ -48,6 +49,13 @@ const EmailAuth = () => {
 
 
   // Note: We allow authenticated users to access this page so they can switch accounts if needed
+  
+  // Pre-fill email from URL parameter if provided
+  useEffect(() => {
+    if (urlEmail && !email) {
+      setEmail(urlEmail);
+    }
+  }, []);
 
   // Load Google Sign-In script
   useEffect(() => {
