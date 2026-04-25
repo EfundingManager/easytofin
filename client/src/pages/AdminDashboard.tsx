@@ -143,6 +143,11 @@ export default function AdminDashboard() {
                             <div
                               key={form.id}
                               className="p-2 border rounded hover:bg-accent cursor-pointer transition"
+                              onClick={() => {
+                                setLocation(`/admin/customers/${form.clientId}`);
+                                setGlobalSearchQuery("");
+                                setShowSearchResults(false);
+                              }}
                             >
                               <div className="flex items-center justify-between">
                                 <div>
@@ -171,6 +176,11 @@ export default function AdminDashboard() {
                             <div
                               key={client.id}
                               className="p-2 border rounded hover:bg-accent cursor-pointer transition"
+                              onClick={() => {
+                                setLocation(`/admin/customers/${client.id}`);
+                                setGlobalSearchQuery("");
+                                setShowSearchResults(false);
+                              }}
                             >
                               <div className="flex items-center justify-between">
                                 <div>
