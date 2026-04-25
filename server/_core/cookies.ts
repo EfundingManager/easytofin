@@ -39,11 +39,17 @@ export function getSessionCookieOptions(
         ? hostname
         : undefined;
 
+  const isSecure = isSecureRequest(req);
+  
+  // For production domains, always use secure: true
+  // For localhost/development, use the actual protocol
+  const secure = !LOCAL_HOSTS.has(hostname) && !isIpAddress(hostname) ? true : isSecure;
+
   return {
     domain,
     httpOnly: true,
     path: "/",
     sameSite: "none",
-    secure: isSecureRequest(req),
+    secure,
   };
 }
