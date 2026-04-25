@@ -38,6 +38,7 @@ import CustomerPortal from "./pages/CustomerPortal";
 import ClientLoginComingSoon from "./pages/ClientLoginComingSoon";
 import UserLanding from "./pages/UserLanding";
 import CustomerLanding from "./pages/CustomerLanding";
+import AccountLockoutManagement from "./pages/AccountLockoutManagement";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -74,6 +75,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/customers/:customerId" component={AdminCustomerDetail} />
+      <Route path="/admin/account-lockout-management" component={AccountLockoutManagement} />
       <Route path="/manager/dashboard" component={ManagerDashboard} />
       <Route path="/support/dashboard" component={SupportDashboard} />
       <Route path="/staff/dashboard" component={StaffDashboard} />

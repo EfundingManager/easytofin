@@ -261,8 +261,6 @@ export default function AdminDashboard() {
             <TabsTrigger value="customers">Customers</TabsTrigger>
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
             <TabsTrigger value="forms">Forms</TabsTrigger>
-            <TabsTrigger value="emailBlaster">Email Blaster</TabsTrigger>
-            <TabsTrigger value="emailCampaign">Email Campaigns</TabsTrigger>
             {/* Feature Flags tab disabled - table not yet migrated */}
             {/* <TabsTrigger value="featureFlags">Feature Flags</TabsTrigger> */}
             <TabsTrigger value="configuration">Configuration</TabsTrigger>
