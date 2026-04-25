@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLocation } from 'wouter';
 import { Loader2, LogOut, User, Mail, FileText, BarChart3, Clock, AlertCircle } from 'lucide-react';
+import { LogoutConfirmDialog } from '@/components/LogoutConfirmDialog';
 
 export default function CustomerLanding() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, logoutDialogOpen, setLogoutDialogOpen, handleLogout, isLoggingOut } = useAuth();
   const [, setLocation] = useLocation();
 
   if (loading) {
@@ -53,6 +54,14 @@ export default function CustomerLanding() {
             Logout
           </Button>
         </div>
+
+        {/* Logout Confirmation Dialog */}
+        <LogoutConfirmDialog
+          open={logoutDialogOpen}
+          onOpenChange={setLogoutDialogOpen}
+          onConfirm={handleLogout}
+          isLoading={isLoggingOut}
+        />
 
         {/* Customer Info Card */}
         <Card>

@@ -11,9 +11,10 @@ import { ClientPoliciesWidget } from '@/components/ClientPoliciesWidget';
 import { PolicyRenewalReminder } from '@/components/PolicyRenewalReminder';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { KYCPDFExportButton } from '@/components/KYCPDFExportButton';
+import { LogoutConfirmDialog } from '@/components/LogoutConfirmDialog';
 
 export default function UserDashboard() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, logoutDialogOpen, setLogoutDialogOpen, handleLogout, isLoggingOut } = useAuth();
   const [, setLocation] = useLocation();
 
   const profileQuery = trpc.profile.getProfile.useQuery();
@@ -71,6 +72,14 @@ export default function UserDashboard() {
             Logout
           </Button>
         </div>
+
+        {/* Logout Confirmation Dialog */}
+        <LogoutConfirmDialog
+          open={logoutDialogOpen}
+          onOpenChange={setLogoutDialogOpen}
+          onConfirm={handleLogout}
+          isLoading={isLoggingOut}
+        />
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
