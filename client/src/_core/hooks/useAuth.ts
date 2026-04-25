@@ -1,7 +1,8 @@
 import { getLoginUrl } from "@/const";
+import { useRouter } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { TRPCClientError } from "@trpc/client";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
@@ -12,6 +13,7 @@ export function useAuth(options?: UseAuthOptions) {
   const { redirectOnUnauthenticated = false, redirectPath = getLoginUrl() } =
     options ?? {};
   const utils = trpc.useUtils();
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
     retry: false,
@@ -24,7 +26,7 @@ export function useAuth(options?: UseAuthOptions) {
     },
   });
 
-  const logout = useCallback(async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await logoutMutation.mutateAsync();
     } catch (error: unknown) {
@@ -32,14 +34,25 @@ export function useAuth(options?: UseAuthOptions) {
         error instanceof TRPCClientError &&
         error.data?.code === "UNAUTHORIZED"
       ) {
-        return;
+        // Already logged out
+      } else {
+        console.error("Logout error:", error);
       }
-      throw error;
     } finally {
+      // Clear user data from cache
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
+      
+      // Redirect to login page
+      if (typeof window !== "undefined") {
+        window.location.href = getLoginUrl();
+      }
     }
   }, [logoutMutation, utils]);
+
+  const logout = useCallback(() => {
+    setLogoutDialogOpen(true);
+  }, []);
 
   const state = useMemo(() => {
     localStorage.setItem(
@@ -80,5 +93,9 @@ export function useAuth(options?: UseAuthOptions) {
     ...state,
     refresh: () => meQuery.refetch(),
     logout,
+    logoutDialogOpen,
+    setLogoutDialogOpen,
+    handleLogout,
+    isLoggingOut: logoutMutation.isPending,
   };
 }
