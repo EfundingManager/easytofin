@@ -5,9 +5,10 @@
  */
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown, Phone, Mail, Globe, LogIn } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, Mail, Globe, LogIn, LogOut } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663416267905/Dmr4obss8SQ94M9JEtE8y7/pasted_file_OvDeTG_QQ_1775074728487_0c61a8f9.png";
 
@@ -28,6 +29,7 @@ const getServices = (lang: 'en' | 'zh' | 'pl') => [
 
 export default function Navbar() {
   const { language, setLanguage } = useLanguage();
+  const { user, loading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
@@ -35,6 +37,16 @@ export default function Navbar() {
   const [location] = useLocation();
   const services = getServices(language);
   const currentLanguage = LANGUAGE_OPTIONS.find(l => l.code === language);
+
+  // Determine dashboard URL based on user role
+  const getDashboardUrl = () => {
+    if (!user) return "/auth-selection";
+    if (user.role === "admin" || user.role === "super_admin") return "/admin";
+    if (user.role === "manager") return "/manager/dashboard";
+    if (user.role === "staff") return "/staff/dashboard";
+    // Default user role
+    return "/user/dashboard";
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -175,10 +187,10 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Client Login Button */}
-            <Link href="/auth-selection" className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-base">
-              <LogIn size={18} />
-              {t(language, 'nav.clientLogin')}
+            {/* Client Login/Dashboard Button */}
+            <Link href={getDashboardUrl()} className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-base">
+              {user ? <LogOut size={18} /> : <LogIn size={18} />}
+              {loading ? "Loading..." : user ? "Client Dashboard" : t(language, 'nav.clientLogin')}
             </Link>
             <Link href="/contact" className="btn-gold text-base px-5 py-2.5">
               {t(language, 'nav.getQuote')}
@@ -220,10 +232,10 @@ export default function Navbar() {
               {t(language, 'nav.contact')}
             </Link>
             <div className="pt-2 space-y-2">
-              {/* Client Login Button */}
-              <Link href="/auth-selection" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-sm">
-                <LogIn size={16} />
-                {t(language, 'nav.clientLogin')}
+              {/* Client Login/Dashboard Button */}
+              <Link href={getDashboardUrl()} className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[oklch(0.40_0.10_195)] font-[Outfit] font-semibold hover:bg-[oklch(0.96_0.01_155)] transition-colors border border-[oklch(0.40_0.10_195)] text-sm">
+                {user ? <LogOut size={16} /> : <LogIn size={16} />}
+                {loading ? "Loading..." : user ? "Client Dashboard" : t(language, 'nav.clientLogin')}
               </Link>
               <Link href="/contact" className="btn-gold w-full justify-center text-sm">
                 {t(language, 'nav.getQuote')}
