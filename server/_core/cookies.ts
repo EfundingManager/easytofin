@@ -24,7 +24,19 @@ function isSecureRequest(req: Request) {
 export function getSessionCookieOptions(
   req: Request
 ): Pick<CookieOptions, "domain" | "httpOnly" | "path" | "sameSite" | "secure"> {
-  const hostname = req.hostname;
+  // Use x-forwarded-host header for public domain (behind proxy/gateway)
+  // Fall back to Host header, then req.hostname
+  const forwardedHost = req.headers["x-forwarded-host"];
+  const hostHeader = req.headers.host;
+  const rawHost = forwardedHost 
+    ? (Array.isArray(forwardedHost) ? forwardedHost[0] : forwardedHost)
+    : (hostHeader 
+        ? (Array.isArray(hostHeader) ? hostHeader[0] : hostHeader)
+        : req.hostname);
+  
+  // Extract hostname without port
+  const hostname = rawHost.split(":")[0];
+  
   const shouldSetDomain =
     hostname &&
     !LOCAL_HOSTS.has(hostname) &&
@@ -32,12 +44,10 @@ export function getSessionCookieOptions(
     hostname !== "127.0.0.1" &&
     hostname !== "::1";
 
-  const domain =
-    shouldSetDomain && !hostname.startsWith(".")
-      ? `.${hostname}`
-      : shouldSetDomain
-        ? hostname
-        : undefined;
+  // For production domains, use host-only cookie (no domain attribute)
+  // This ensures the cookie is bound to the exact domain the user is accessing
+  // Prevents domain mismatch issues when behind a gateway/proxy
+  const domain = undefined;
 
   const isSecure = isSecureRequest(req);
   
@@ -49,16 +59,17 @@ export function getSessionCookieOptions(
     hostname,
     domain,
     secure,
-    sameSite: "none",
+    sameSite: "lax",
     protocol: req.protocol,
-    xForwardedProto: req.headers["x-forwarded-proto"],
+    xForwardedHost: forwardedHost,
+    hostHeader: hostHeader,
   });
 
   return {
     domain,
     httpOnly: true,
     path: "/",
-    sameSite: "none",
+    sameSite: "lax",
     secure,
   };
 }
