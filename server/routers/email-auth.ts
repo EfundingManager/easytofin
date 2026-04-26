@@ -256,12 +256,13 @@ export const emailAuthRouter = router({
           maxAge: sessionDuration,
         } as any);
 
-        // Send confirmation email
+        // Send confirmation email only for new user registration
+        // Do NOT send confirmation email for existing users logging in
         const dashboardUrl = `${process.env.VITE_FRONTEND_URL || "https://easytofin.com"}/dashboard`;
-        await sendAccountConfirmationEmail(user.email || input.email, user.name || "User", dashboardUrl);
-
-        // Send welcome email if new user
         if (input.isNewUser) {
+          // Send account confirmation email for new registration only
+          await sendAccountConfirmationEmail(user.email || input.email, user.name || "User", dashboardUrl);
+          // Send welcome email for new user
           await sendWelcomeEmail(user.email || input.email, user.name || "User", dashboardUrl);
         }
 

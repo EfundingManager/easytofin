@@ -1426,3 +1426,13 @@
 - [ ] Document MFA recovery process
 - [ ] Document security architecture
 - [ ] Create admin guide for MFA management
+
+
+## Phase 85: Email Sending Behavior Update
+
+- [x] Modify phone-auth router to send confirmation email only on first-time registration
+- [x] Modify email-auth router to send confirmation email only on first-time registration
+- [x] Modify gmail-auth router (no changes needed - doesn't send confirmation emails)
+- [x] Confirmation email now only sent during new user registration
+- [x] Existing users logging in no longer receive confirmation emails
+- [x] OTP emails continue to be sent for all login attempts
