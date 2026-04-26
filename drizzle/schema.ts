@@ -614,3 +614,89 @@ export const ipReputation = mysqlTable("ipReputation", {
 
 export type IpReputation = typeof ipReputation.$inferSelect;
 export type InsertIpReputation = typeof ipReputation.$inferInsert;
+
+
+/**
+ * TOTP (Time-based One-Time Password) secrets for MFA
+ * Stores authenticator app secrets for users requiring MFA
+ */
+export const totpSecrets = mysqlTable("totpSecrets", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull(),
+  secret: varchar("secret", { length: 255 }).notNull(), // Base32 encoded TOTP secret
+  backupCodes: text("backupCodes").notNull(), // JSON array of backup codes
+  isEnabled: mysqlEnum("isEnabled", ["true", "false"]).default("false").notNull(),
+  enabledAt: timestamp("enabledAt"),
+  disabledAt: timestamp("disabledAt"),
+  lastUsedAt: timestamp("lastUsedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TotpSecret = typeof totpSecrets.$inferSelect;
+export type InsertTotpSecret = typeof totpSecrets.$inferInsert;
+
+/**
+ * TOTP verification attempts tracking
+ * Prevents brute force attacks on TOTP codes
+ */
+export const totpAttempts = mysqlTable("totpAttempts", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull(),
+  code: varchar("code", { length: 6 }).notNull(),
+  isValid: mysqlEnum("isValid", ["true", "false"]).notNull(),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type TotpAttempt = typeof totpAttempts.$inferSelect;
+export type InsertTotpAttempt = typeof totpAttempts.$inferInsert;
+
+/**
+ * IP-based login switch tracking
+ * Tracks successful login switches (different user accounts) per IP
+ * Used to limit account switching per IP to prevent account takeover
+ */
+export const ipLoginSwitches = mysqlTable("ipLoginSwitches", {
+  id: int("id").autoincrement().primaryKey(),
+  ipAddress: varchar("ipAddress", { length: 45 }).notNull(),
+  phoneUserId: int("phoneUserId").notNull(),
+  previousPhoneUserId: int("previousPhoneUserId"),
+  switchCount: int("switchCount").default(1).notNull(),
+  isBlocked: mysqlEnum("isBlocked", ["true", "false"]).default("false").notNull(),
+  blockedUntil: timestamp("blockedUntil"),
+  blockReason: varchar("blockReason", { length: 255 }),
+  windowStartAt: timestamp("windowStartAt").defaultNow().notNull(),
+  windowEndAt: timestamp("windowEndAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IpLoginSwitch = typeof ipLoginSwitches.$inferSelect;
+export type InsertIpLoginSwitch = typeof ipLoginSwitches.$inferInsert;
+
+/**
+ * Session tokens for tracking active sessions
+ * Prevents session fixation and token reuse attacks
+ */
+export const sessionTokens = mysqlTable("sessionTokens", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  tokenHash: varchar("tokenHash", { length: 255 }).notNull().unique(), // SHA256 hash of token
+  ipAddress: varchar("ipAddress", { length: 45 }).notNull(),
+  userAgent: text("userAgent"),
+  deviceFingerprint: varchar("deviceFingerprint", { length: 255 }),
+  isActive: mysqlEnum("isActive", ["true", "false"]).default("true").notNull(),
+  isRevoked: mysqlEnum("isRevoked", ["true", "false"]).default("false").notNull(),
+  revokedAt: timestamp("revokedAt"),
+  revokedReason: varchar("revokedReason", { length: 255 }),
+  expiresAt: timestamp("expiresAt").notNull(),
+  lastActivityAt: timestamp("lastActivityAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SessionToken = typeof sessionTokens.$inferSelect;
+export type InsertSessionToken = typeof sessionTokens.$inferInsert;

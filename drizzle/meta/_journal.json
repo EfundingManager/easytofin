@@ -155,6 +155,13 @@
       "when": 1777192527327,
       "tag": "0021_awesome_the_hunter",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1777193843262,
+      "tag": "0022_talented_cargill",
+      "breakpoints": true
     }
   ]
 }
