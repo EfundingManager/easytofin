@@ -1436,3 +1436,63 @@
 - [x] Confirmation email now only sent during new user registration
 - [x] Existing users logging in no longer receive confirmation emails
 - [x] OTP emails continue to be sent for all login attempts
+
+
+## Phase 86: Device-Based Login Continuation
+
+### Database Schema
+- [ ] Add trustedDevices table with device fingerprint, user ID, last used timestamp
+- [ ] Add deviceFingerprints table for tracking device history
+- [ ] Add deviceLoginSessions table for tracking recent logins per device
+
+### Device Fingerprinting Service
+- [ ] Create device fingerprinting service (browser + OS + user agent)
+- [ ] Implement secure device fingerprint hashing
+- [ ] Create device fingerprint validation logic
+
+### Auth Router Modifications
+- [ ] Modify phone-auth requestOtp to check for trusted device
+- [ ] Modify email-auth requestOtp to check for trusted device
+- [ ] Add endpoint to skip OTP for trusted devices
+- [ ] Add endpoint to verify trusted device login
+- [ ] Implement 1-hour window check for device-based login
+
+### Frontend UI
+- [ ] Create "Continue as [user]" login screen
+- [ ] Add one-click login button for trusted devices
+- [ ] Add "Login with different account" option
+- [ ] Show device trust confirmation dialog
+- [ ] Add "Trust this device" checkbox on OTP verification
+
+### Device Management
+- [ ] Create device management page in user profile
+- [ ] Show list of trusted devices
+- [ ] Add device removal functionality
+- [ ] Add "Logout from all devices" option
+- [ ] Show last login time per device
+
+### Security & Testing
+- [ ] Implement device fingerprint validation
+- [ ] Add IP address verification for device trust
+- [ ] Write tests for device fingerprinting
+- [ ] Write tests for device-based login flow
+- [ ] Test security edge cases (device spoofing, fingerprint collision)
+
+
+## Phase 86 - COMPLETED: Device-Based Login Continuation
+
+### Completed Components
+- [x] Database schema (trustedDevices, deviceVerificationTokens tables)
+- [x] Device fingerprinting service with SHA256 hashing
+- [x] Device-login backend service with 1-hour window verification
+- [x] Device-login tRPC router with 6 endpoints
+- [x] DeviceLoginFlow React component for "Continue as [user]" UI
+- [x] DeviceManagement component for user profile
+- [x] TrustDeviceCheckbox component for OTP verification
+
+### Remaining Integration Tasks
+- [ ] Integrate device-login into phone-auth requestOtp flow
+- [ ] Integrate device-login into email-auth requestOtp flow
+- [ ] Integrate device-login into gmail-auth flow
+- [ ] Add device fingerprinting to auth pages
+- [ ] Test end-to-end device-based login flow
