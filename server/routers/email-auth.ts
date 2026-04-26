@@ -251,10 +251,13 @@ export const emailAuthRouter = router({
         );
         
         const cookieOptions = getSessionCookieOptions(opts.req);
+        console.log("[Email Auth] Setting session cookie:", { COOKIE_NAME, sessionDuration });
+        console.log("[Email Auth] Cookie options:", cookieOptions);
         opts.res.cookie(COOKIE_NAME, sessionToken, {
           ...cookieOptions,
           maxAge: sessionDuration,
         } as any);
+        console.log("[Email Auth] Session cookie set successfully");
 
         // Send confirmation email only for new user registration
         // Do NOT send confirmation email for existing users logging in

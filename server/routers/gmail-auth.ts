@@ -4,8 +4,9 @@ import { createPhoneUser, getPhoneUserByEmail } from "../db";
 import { TRPCError } from "@trpc/server";
 import { sdk } from "../_core/sdk";
 import { router, publicProcedure } from "../_core/trpc";
-import { THIRTY_DAYS_MS, DEFAULT_SESSION_MS } from "@shared/const";
+import { THIRTY_DAYS_MS, DEFAULT_SESSION_MS, COOKIE_NAME, PENDING_2FA_COOKIE_NAME } from "@shared/const";
 import { roleRequires2FA, createPending2FAToken } from "../_core/twoFactor";
+import { getSessionCookieOptions } from "../_core/cookies";
 
 /**
  * Gmail OAuth Authentication Router
@@ -31,7 +32,7 @@ export const gmailAuthRouter = router({
         rememberMe: z.boolean().optional().default(false),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx: { req, res } }) => {
       try {
         // Check if user already exists by email
         let existingUser = await getPhoneUserByEmail(input.email);
@@ -85,6 +86,17 @@ export const gmailAuthRouter = router({
           name: input.name || input.email || "User",
           expiresInMs: sessionDuration,
         });
+
+        // Set session cookie on the server response
+        // This is CRITICAL: the cookie must be set on the response, not returned in the body
+        const cookieOptions = getSessionCookieOptions(req);
+        console.log("[Gmail Auth] Setting session cookie:", { COOKIE_NAME, sessionDuration });
+        console.log("[Gmail Auth] Cookie options:", cookieOptions);
+        res.cookie(COOKIE_NAME, sessionToken, {
+          ...cookieOptions,
+          maxAge: sessionDuration,
+        } as any);
+        console.log("[Gmail Auth] Session cookie set successfully");
 
         // Determine redirect URL based on role and clientStatus
         let redirectUrl = "/user/dashboard";
