@@ -18,7 +18,8 @@ export function useAuth(options?: UseAuthOptions) {
   const meQuery = trpc.auth.me.useQuery(undefined, {
     retry: false,
     refetchOnWindowFocus: false,
-    staleTime: 0, // Always refetch on component mount to get fresh user data
+    staleTime: 60 * 1000, // 60 seconds - prevents infinite refetch loop while keeping data relatively fresh
+    gcTime: 5 * 60 * 1000, // 5 minutes - cache garbage collection time
   });
 
   const logoutMutation = trpc.auth.logout.useMutation({
@@ -92,7 +93,12 @@ export function useAuth(options?: UseAuthOptions) {
     if (typeof window === "undefined") return;
     if (window.location.pathname === redirectPath) return;
 
-    window.location.href = redirectPath;
+    // Use setTimeout to prevent redirect race conditions
+    const timer = setTimeout(() => {
+      window.location.href = redirectPath;
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [
     redirectOnUnauthenticated,
     redirectPath,

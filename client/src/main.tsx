@@ -8,13 +8,15 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
-// Create QueryClient with proper defaults to prevent stale data across user sessions
+// Create QueryClient with proper defaults to prevent infinite refetch loops
+// staleTime: 0 was causing infinite refetches when combined with component re-renders
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Don't cache user-specific data - always refetch
-      staleTime: 0,
-      gcTime: 0, // Previously cacheTime - don't cache at all
+      // 60 seconds staleTime prevents excessive refetching while keeping data relatively fresh
+      staleTime: 60 * 1000,
+      // 5 minutes garbage collection time
+      gcTime: 5 * 60 * 1000,
       retry: 1,
       refetchOnWindowFocus: false,
     },
@@ -24,6 +26,9 @@ const queryClient = new QueryClient({
   },
 });
 
+// Debounce redirect to prevent multiple simultaneous redirects
+let redirectTimeout: NodeJS.Timeout | null = null;
+
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
   if (typeof window === "undefined") return;
@@ -32,10 +37,18 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
-  // Clear cache before redirecting to prevent stale data
-  console.log("[Auth] Unauthorized error detected, clearing cache and redirecting...");
-  queryClient.clear();
-  window.location.href = getLoginUrl();
+  // Prevent multiple redirects
+  if (window.location.pathname === '/auth-selection' || window.location.pathname === '/post-logout') {
+    return;
+  }
+
+  // Debounce the redirect to prevent rapid repeated redirects
+  if (redirectTimeout) clearTimeout(redirectTimeout);
+  redirectTimeout = setTimeout(() => {
+    console.log("[Auth] Unauthorized error detected, clearing cache and redirecting...");
+    queryClient.clear();
+    window.location.href = getLoginUrl();
+  }, 100);
 };
 
 queryClient.getQueryCache().subscribe(event => {
