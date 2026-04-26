@@ -1354,3 +1354,15 @@
 - [ ] Write Error Boundary component for session-related failures
 - [ ] Add toast notifications for session events
 - [ ] Deploy to live server and verify Access Denied error is fixed
+
+
+## Phase 83: Remove Password Login & reCAPTCHA
+- [x] Remove password-login.ts router file
+- [x] Remove password-reset.ts router file
+- [x] Remove db-password-reset.ts database helper file
+- [x] Remove ForgotPasswordModal.tsx component
+- [x] Remove passwordHash field from phoneUsers table in schema
+- [x] Remove passwordResetTokens table from schema
+- [x] Remove password login imports from server/routers.ts
+- [x] Verify no reCAPTCHA code exists in project
+- [x] Verify no remaining password login references

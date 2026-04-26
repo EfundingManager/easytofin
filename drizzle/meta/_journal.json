@@ -148,6 +148,13 @@
       "when": 1777084386504,
       "tag": "0020_ancient_bullseye",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1777192527327,
+      "tag": "0021_awesome_the_hunter",
+      "breakpoints": true
     }
   ]
 }

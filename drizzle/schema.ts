@@ -35,7 +35,7 @@ export const phoneUsers = mysqlTable("phoneUsers", {
   email: varchar("email", { length: 320 }),
   name: text("name"),
   address: text("address"),
-  passwordHash: text("passwordHash"),
+
   twoFactorEnabled: mysqlEnum("twoFactorEnabled", ["true", "false"]).default("false").notNull(),
   twoFactorSecret: text("twoFactorSecret"),
   verified: mysqlEnum("verified", ["true", "false"]).default("false").notNull(),
@@ -379,29 +379,7 @@ export type DeviceVerificationToken = typeof deviceVerificationTokens.$inferSele
 export type InsertDeviceVerificationToken = typeof deviceVerificationTokens.$inferInsert;
 
 
-/**
- * Password reset tokens for secure password recovery
- * Users request password reset via email or phone, receive OTP, then reset password
- */
-export const passwordResetTokens = mysqlTable("passwordResetTokens", {
-  id: int("id").autoincrement().primaryKey(),
-  phoneUserId: int("phoneUserId").notNull(),
-  token: varchar("token", { length: 255 }).notNull().unique(),
-  resetMethod: mysqlEnum("resetMethod", ["email", "phone"]).notNull(), // How user requested reset
-  email: varchar("email", { length: 320 }),
-  phone: varchar("phone", { length: 20 }),
-  otp: varchar("otp", { length: 6 }).notNull(), // 6-digit OTP
-  otpAttempts: int("otpAttempts").default(0).notNull(), // Track failed OTP attempts
-  maxOtpAttempts: int("maxOtpAttempts").default(3).notNull(), // Max failed attempts before token expires
-  otpVerified: mysqlEnum("otpVerified", ["true", "false"]).default("false").notNull(),
-  otpVerifiedAt: timestamp("otpVerifiedAt"),
-  passwordResetAt: timestamp("passwordResetAt"), // When password was actually reset
-  expiresAt: timestamp("expiresAt").notNull(), // Token expiration (typically 1 hour)
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
-export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
+
 
 /**
  * Login attempts tracking for account lockout mechanism

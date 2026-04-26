@@ -22,8 +22,7 @@ import { emailBlasterRouter } from "./routers/email-blaster";
 import { emailCampaignRouter } from "./routers/email-campaign";
 import { recipientUploadRouter } from "./routers/recipient-upload";
 import { deviceRegistrationRouter } from "./routers/device-registration";
-import { passwordResetRouter } from "./routers/password-reset";
-import { passwordLoginRouter } from "./routers/password-login";
+
 import { pdfExportRouter } from "./routers/pdf-export";
 import { authLockoutRouter } from "./routers/auth-lockout";
 import { ipRateLimitRouter } from "./routers/ip-rate-limit";
@@ -65,8 +64,7 @@ export const appRouter = router({
   phoneAuth: phoneAuthRouter,
   gmailAuth: gmailAuthRouter,
   emailAuth: emailAuthRouter,
-  passwordReset: passwordResetRouter,
-  passwordLogin: passwordLoginRouter,
+
   admin: adminRouter,
   workflow: workflowRouter,
   profile: profileRouter,
