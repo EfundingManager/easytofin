@@ -8,7 +8,21 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
-const queryClient = new QueryClient();
+// Create QueryClient with proper defaults to prevent stale data across user sessions
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Don't cache user-specific data - always refetch
+      staleTime: 0,
+      gcTime: 0, // Previously cacheTime - don't cache at all
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
@@ -18,6 +32,9 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
+  // Clear cache before redirecting to prevent stale data
+  console.log("[Auth] Unauthorized error detected, clearing cache and redirecting...");
+  queryClient.clear();
   window.location.href = getLoginUrl();
 };
 

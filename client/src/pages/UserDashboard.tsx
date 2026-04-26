@@ -163,11 +163,23 @@ export default function UserDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {profileData.selectedServices.map((service: string) => (
-                      <Badge key={service} variant="secondary" className="block w-full text-center py-2">
-                        {service.charAt(0).toUpperCase() + service.slice(1)}
-                      </Badge>
-                    ))}
+                    {profileData?.selectedServices && Array.isArray(profileData.selectedServices) ? (
+                      profileData.selectedServices.length > 0 ? (
+                        profileData.selectedServices.map((service: string, index: number) => (
+                          <Badge 
+                            key={`user-${user?.id}-service-${index}-${service}`} 
+                            variant="secondary" 
+                            className="block w-full text-center py-2"
+                          >
+                            {service.charAt(0).toUpperCase() + service.slice(1)}
+                          </Badge>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No services selected</p>
+                      )
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Loading services...</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>

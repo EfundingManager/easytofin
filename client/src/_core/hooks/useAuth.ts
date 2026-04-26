@@ -18,10 +18,12 @@ export function useAuth(options?: UseAuthOptions) {
   const meQuery = trpc.auth.me.useQuery(undefined, {
     retry: false,
     refetchOnWindowFocus: false,
+    staleTime: 0, // Always refetch on component mount to get fresh user data
   });
 
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
+      // Immediately clear auth data on success
       utils.auth.me.setData(undefined, null);
     },
   });
@@ -37,26 +39,25 @@ export function useAuth(options?: UseAuthOptions) {
       ) {
         // Already logged out, continue with cleanup
       } else {
-        console.error("Logout error:", error);
+        console.error("[Auth] Logout error:", error);
       }
     } finally {
-      // Clear all frontend state and caches
-      // 1. Clear React Query cache completely
-      utils.auth.me.setData(undefined, null);
-      await utils.auth.me.invalidate();
+      // CRITICAL: Complete cache clearing to prevent stale data
+      console.log("[Auth] Starting complete cache cleanup...");
       
-      // 2. Clear all other queries to prevent stale data
+      // 1. Clear auth data
+      utils.auth.me.setData(undefined, null);
+      
+      // 2. Invalidate all queries
       await utils.invalidate();
       
-      // 3. Clear localStorage (including quick re-login data)
+      // 3. Clear all browser storage to remove stale user data
       localStorage.clear();
-      
-      // 4. Clear sessionStorage
       sessionStorage.clear();
       
-      // 5. Hard redirect to post-logout page with cache busting
+      // 4. Hard redirect to post-logout page with cache busting timestamp
       if (typeof window !== "undefined") {
-        // Use window.location.href for full page reload to clear all in-memory state
+        console.log("[Auth] Redirecting to post-logout page...");
         window.location.href = `/post-logout?t=${Date.now()}`;
       }
     }
@@ -66,20 +67,10 @@ export function useAuth(options?: UseAuthOptions) {
     setLogoutDialogOpen(true);
   }, []);
 
+  // FIXED: Do NOT store user data in localStorage
+  // This causes stale data to persist across sessions
+  // Only use useMemo to compute state from query data
   const state = useMemo(() => {
-    // Store comprehensive user info for quick re-login (only when logged in)
-    if (meQuery.data && !logoutMutation.isPending) {
-      const userInfo = {
-        id: meQuery.data.id,
-        name: meQuery.data.name,
-        email: meQuery.data.email,
-        role: meQuery.data.role,
-      };
-      localStorage.setItem(
-        "manus-runtime-user-info",
-        JSON.stringify(userInfo)
-      );
-    }
     return {
       user: meQuery.data ?? null,
       loading: meQuery.isLoading || logoutMutation.isPending,
@@ -101,7 +92,7 @@ export function useAuth(options?: UseAuthOptions) {
     if (typeof window === "undefined") return;
     if (window.location.pathname === redirectPath) return;
 
-    window.location.href = redirectPath
+    window.location.href = redirectPath;
   }, [
     redirectOnUnauthenticated,
     redirectPath,
