@@ -5,6 +5,8 @@ import { parse as parseCookieHeader } from "cookie";
 import type { Request } from "express";
 import { SignJWT, jwtVerify } from "jose";
 import type { User } from "../../drizzle/schema";
+import { phoneUsers } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
 import * as db from "../db";
 import { ENV } from "./env";
 import type {
@@ -281,13 +283,32 @@ class SDKServer {
 
     // If user not in regular users table, check phoneUsers table (for Gmail/Email/Phone auth)
     if (!user) {
-      // Try to find by googleId first
-      let phoneUser = await db.getPhoneUserByGoogleId(sessionUserId);
+      let phoneUser: any = null;
       
-      // If not found by googleId, the sessionUserId might be an email or other identifier
-      // Try to find by email
+      // Try multiple lookup strategies for phoneUsers
+      // 1. Try by googleId
+      phoneUser = await db.getPhoneUserByGoogleId(sessionUserId);
+      
+      // 2. Try by email if sessionUserId looks like an email
       if (!phoneUser && sessionUserId.includes('@')) {
         phoneUser = await db.getPhoneUserByEmail(sessionUserId);
+      }
+      
+      // 3. Try by phone if sessionUserId looks like a phone number
+      if (!phoneUser && /^[+\d\s\-()]+$/.test(sessionUserId)) {
+        const db_instance = await db.getDb();
+        if (db_instance) {
+          const result = await db_instance.select().from(phoneUsers).where(eq(phoneUsers.phone, sessionUserId)).limit(1);
+          phoneUser = result.length > 0 ? result[0] : null;
+        }
+      }
+      
+      // 4. Try by ID if sessionUserId starts with 'phone-'
+      if (!phoneUser && sessionUserId.startsWith('phone-')) {
+        const userId = parseInt(sessionUserId.replace('phone-', ''), 10);
+        if (!isNaN(userId)) {
+          phoneUser = await db.getPhoneUserById(userId);
+        }
       }
       
       if (phoneUser) {
