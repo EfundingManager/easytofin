@@ -278,32 +278,8 @@ export const emailAuthRouter = router({
           redirectUrl = '/user/dashboard';
         } else {
           // Existing users: redirect based on role
-          if (userRole === 'admin' || userRole === 'super_admin') {
-            // Admin and super admin require SMS 2FA
-            requiresSMS2FA = true;
-            redirectUrl = '/2fa';
-            // Create 2FA session token for admin users
-            twoFASessionToken = await sdk.createSessionToken(
-              openId,
-              { expiresInMs: 15 * 60 * 1000, name: user.name || 'Admin' } // 15 min expiry for 2FA
-            );
-            opts.res.cookie(PENDING_2FA_COOKIE_NAME, twoFASessionToken, {
-              ...cookieOptions,
-              maxAge: 15 * 60 * 1000,
-            } as any);
-          } else if (userRole === 'manager' || userRole === 'staff') {
-            // Manager and staff require SMS 2FA
-            requiresSMS2FA = true;
-            redirectUrl = '/2fa';
-            // Create 2FA session token for manager/staff users
-            twoFASessionToken = await sdk.createSessionToken(
-              openId,
-              { expiresInMs: 15 * 60 * 1000, name: user.name || 'Staff' } // 15 min expiry for 2FA
-            );
-            opts.res.cookie(PENDING_2FA_COOKIE_NAME, twoFASessionToken, {
-              ...cookieOptions,
-              maxAge: 15 * 60 * 1000,
-            } as any);
+          if (false) {
+            // 2FA disabled
           } else {
             // Regular users go to role-based dashboard
             redirectUrl = user.clientStatus === 'customer' 

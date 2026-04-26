@@ -16,7 +16,8 @@ import { ENV } from "./env";
 const PENDING_TOKEN_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 
 /** Roles that must complete phone 2FA before receiving a full session */
-export const ROLES_REQUIRING_2FA = new Set<string>(["admin", "manager", "staff"]);
+// CAPTCHA/2FA removal: Emptying the set to disable enforcement for all roles.
+export const ROLES_REQUIRING_2FA = new Set<string>([]);
 
 export function roleRequires2FA(role: string): boolean {
   return ROLES_REQUIRING_2FA.has(role);

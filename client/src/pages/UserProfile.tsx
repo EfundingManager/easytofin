@@ -181,7 +181,7 @@ export default function UserProfile() {
             <div className="bg-white p-3 rounded-lg border border-green-200">
               <p className="text-sm font-medium text-gray-900">Selected Services: {selectedServices.length}</p>
               <p className="text-xs text-gray-600 mt-1">
-                {selectedServices.map(s => SERVICES.find(srv => srv.id === s)?.label).join(', ')}
+                {selectedServices.map(s => SERVICES.find(srv => srv.id === s)?.label || s).join(', ')}
               </p>
             </div>
             <div className="bg-amber-50 p-3 rounded-lg border border-amber-200">
