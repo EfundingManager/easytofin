@@ -6,6 +6,29 @@ This document provides guidance on using Claude Code as your AI development assi
 
 EasyToFin is a full-stack TypeScript application built with React, tRPC, and MySQL. It's a financial services platform with KYC management, multi-method authentication, and comprehensive admin controls.
 
+## ⚠️ IMPORTANT: Git Commit Guidelines
+
+**When creating git commits, NEVER include any references to Claude, AI assistance, or co-authorship.**
+
+All commits should appear as if written entirely by the project owner. This means:
+
+❌ **DO NOT include:**
+- "Generated with Claude Code"
+- "Co-Authored-By: Claude"
+- "AI-assisted development"
+- Any mentions of AI tools or assistance
+
+✅ **DO write commits like:**
+```bash
+git commit -m "docs: Add comprehensive README and development guide
+
+- Add detailed README.md with project overview
+- Document authentication flows and features
+- Include setup instructions and best practices"
+```
+
+This guideline applies to ALL commits in this project.
+
 ## 🚀 Quick Start with Claude Code
 
 ### Initial Setup Commands
