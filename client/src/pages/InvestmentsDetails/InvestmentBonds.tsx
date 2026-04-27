@@ -2,18 +2,37 @@ import { Link } from "wouter";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { getDetailPageTranslation } from "@/lib/allDetailTranslations";
 
 export default function InvestmentBonds() {
+  const { language } = useLanguage();
+  const translation = getDetailPageTranslation('investmentBonds', language as 'en' | 'zh' | 'pl');
+
+  const sectionTitles = {
+    overview: language === 'en' ? 'Overview' : language === 'zh' ? '概述' : 'Przegląd',
+    coverage: language === 'en' ? 'Coverage Details' : language === 'zh' ? '保障详情' : 'Szczegóły ubezpieczenia',
+    keyAspects: language === 'en' ? 'Key Aspects' : language === 'zh' ? '主要方面' : 'Główne aspekty',
+    taxBenefits: language === 'en' ? 'Tax Benefits' : language === 'zh' ? '税收优惠' : 'Korzyści podatkowe',
+    features: language === 'en' ? 'Key Features' : language === 'zh' ? '主要特性' : 'Główne cechy',
+    exclusions: language === 'en' ? 'Key Exclusions' : language === 'zh' ? '主要排除项' : 'Główne wyłączenia',
+    premiumInfo: language === 'en' ? 'Premium Information' : language === 'zh' ? '保费信息' : 'Informacje o składce',
+    regulatory: language === 'en' ? 'Important Information' : language === 'zh' ? '重要信息' : 'Ważne informacje',
+    cta: language === 'en' ? 'Get a Quote' : language === 'zh' ? '获取报价' : 'Uzyskaj wycenę',
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      {/* Back Button */}
+      {/* Back Button & Language Switcher */}
       <div className="bg-gray-50 py-4 border-b">
-        <div className="container">
-          <Link href="/investments" className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-semibold text-sm">
-            <ArrowLeft size={16} /> Back
+        <div className="container flex justify-between items-center">
+          <Link href="/services/investments" className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-semibold text-sm">
+            <ArrowLeft size={16} /> {language === 'en' ? 'Back' : language === 'zh' ? '返回' : 'Wróć'}
           </Link>
+          <LanguageSwitcher />
         </div>
       </div>
 
@@ -21,130 +40,122 @@ export default function InvestmentBonds() {
       <section className="py-16 bg-white">
         <div className="container max-w-3xl">
           {/* Title */}
-          <h1 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-8">Investment Bonds</h1>
+          <h1 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-8">
+            {translation?.title || 'InvestmentBonds'}
+          </h1>
 
           {/* Overview */}
           <div className="mb-10">
-            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Overview</h2>
+            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">{sectionTitles.overview}</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Our Investment Bonds are tax-efficient investment vehicles that allow you to invest a lump sum in a diversified portfolio of funds. Ideal for individuals with capital to invest who want flexibility, professional management, and tax advantages.
-            </p>
-            <p className="text-gray-700 leading-relaxed">
-              Investment bonds offer a single investment wrapper with access to multiple funds, tax-deferred growth, and the flexibility to withdraw, transfer, or adjust your investments as needed.
+              {translation?.overview || 'Overview content'}
             </p>
           </div>
 
-          {/* Bond Features */}
-          <div className="mb-10">
-            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Bond Features</h2>
-            <div className="space-y-4">
-              <div className="border-l-4 border-teal-600 pl-4">
-                <h3 className="font-semibold text-gray-900 mb-1">Lump Sum Investment</h3>
-                <p className="text-gray-700 text-sm">Invest a single amount from €5,000 upwards. Your capital is invested across your chosen fund portfolio immediately.</p>
-              </div>
-              <div className="border-l-4 border-teal-600 pl-4">
-                <h3 className="font-semibold text-gray-900 mb-1">Multiple Fund Access</h3>
-                <p className="text-gray-700 text-sm">Access to hundreds of investment funds across different asset classes, sectors, and geographies within a single bond.</p>
-              </div>
-              <div className="border-l-4 border-teal-600 pl-4">
-                <h3 className="font-semibold text-gray-900 mb-1">Tax-Deferred Growth</h3>
-                <p className="text-gray-700 text-sm">No tax on investment growth while held within the bond. Tax only due on encashment or full maturity, providing tax-efficient growth.</p>
-              </div>
-              <div className="border-l-4 border-teal-600 pl-4">
-                <h3 className="font-semibold text-gray-900 mb-1">Flexible Access</h3>
-                <p className="text-gray-700 text-sm">Withdraw funds at any time without penalty. Partial withdrawals available, allowing you to access capital as needed.</p>
-              </div>
-              <div className="border-l-4 border-teal-600 pl-4">
-                <h3 className="font-semibold text-gray-900 mb-1">Rebalancing Options</h3>
-                <p className="text-gray-700 text-sm">Switch between funds within the bond without tax consequences. Rebalance your portfolio to maintain your desired asset allocation.</p>
+          {/* Coverage/Key Aspects */}
+          {translation?.sections?.coverage && (
+            <div className="mb-10">
+              <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">{sectionTitles.coverage}</h2>
+              <div className="space-y-4">
+                {translation.sections.coverage.map((item: any, idx: number) => (
+                  <div key={idx} className="border-l-4 border-teal-600 pl-4">
+                    <h3 className="font-semibold text-gray-900 mb-1">{item.heading}</h3>
+                    <p className="text-gray-700 text-sm">{item.content}</p>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
+
+          {/* Key Aspects */}
+          {translation?.sections?.keyAspects && (
+            <div className="mb-10">
+              <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">{sectionTitles.keyAspects}</h2>
+              <div className="space-y-4">
+                {translation.sections.keyAspects.map((item: any, idx: number) => (
+                  <div key={idx} className="border-l-4 border-teal-600 pl-4">
+                    <h3 className="font-semibold text-gray-900 mb-1">{item.heading}</h3>
+                    <p className="text-gray-700 text-sm">{item.content}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Tax Benefits */}
-          <div className="mb-10">
-            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Tax Benefits</h2>
-            <div className="bg-teal-50 p-6 rounded-lg space-y-4">
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Tax-Deferred Growth</h3>
-                <p className="text-gray-700 text-sm">
-                  Investment growth within the bond is not subject to income tax or capital gains tax annually. Tax is only due when you encash or the bond matures.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Gross Fund Access</h3>
-                <p className="text-gray-700 text-sm">
-                  Invest in funds on a gross basis without withholding tax on dividends. This allows for compounding of dividend income without annual tax drag.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Encashment Flexibility</h3>
-                <p className="text-gray-700 text-sm">
-                  Manage your tax liability by choosing when to encash. Spread withdrawals across multiple tax years to optimize your tax position.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Estate Planning</h3>
-                <p className="text-gray-700 text-sm">
-                  Bonds can be written in trust for estate planning purposes, providing flexibility for succession planning and inheritance tax management.
-                </p>
+          {translation?.sections?.taxBenefits && (
+            <div className="mb-10">
+              <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">{sectionTitles.taxBenefits}</h2>
+              <div className="bg-teal-50 p-6 rounded-lg space-y-4">
+                {translation.sections.taxBenefits.map((item: any, idx: number) => (
+                  <div key={idx}>
+                    <h3 className="font-semibold text-gray-900 mb-2">{item.heading}</h3>
+                    <p className="text-gray-700 text-sm">{item.content}</p>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Investment Options */}
-          <div className="mb-10">
-            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Investment Options</h2>
-            <div className="space-y-3">
-              <div className="border border-gray-200 rounded p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Equity Funds</h3>
-                <p className="text-gray-700 text-sm">Stock market focused funds offering growth potential. Includes domestic, international, and emerging market options.</p>
-              </div>
-              <div className="border border-gray-200 rounded p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Fixed Income Funds</h3>
-                <p className="text-gray-700 text-sm">Bond and fixed-income securities providing stable income. Lower volatility with predictable cash flows.</p>
-              </div>
-              <div className="border border-gray-200 rounded p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Balanced Funds</h3>
-                <p className="text-gray-700 text-sm">Mixed portfolios combining stocks and bonds. Provides diversification and moderate risk-return profiles.</p>
-              </div>
-              <div className="border border-gray-200 rounded p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Alternative Investments</h3>
-                <p className="text-gray-700 text-sm">Commodities, property, and hedge funds for portfolio diversification beyond traditional stocks and bonds.</p>
+          {/* Key Features */}
+          {translation?.sections?.features && (
+            <div className="mb-10">
+              <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">{sectionTitles.features}</h2>
+              <ul className="space-y-2 text-gray-700 text-sm">
+                {translation.sections.features.map((feature: string, idx: number) => (
+                  <li key={idx}>• {feature}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Key Exclusions */}
+          {translation?.sections?.exclusions && (
+            <div className="mb-10">
+              <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">{sectionTitles.exclusions}</h2>
+              <div className="bg-red-50 p-6 rounded-lg">
+                <ul className="space-y-2 text-gray-700 text-sm">
+                  {translation.sections.exclusions.map((exclusion: string, idx: number) => (
+                    <li key={idx}>• {exclusion}</li>
+                  ))}
+                </ul>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Who Should Consider It */}
-          <div className="mb-10">
-            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Who Should Consider It</h2>
-            <ul className="space-y-2 text-gray-700 text-sm">
-              <li>• Individuals with lump sums to invest (€5,000+)</li>
-              <li>• Those seeking tax-efficient investment vehicles</li>
-              <li>• People wanting professional fund management</li>
-              <li>• Investors requiring flexibility and access to capital</li>
-              <li>• Those planning for retirement or long-term wealth accumulation</li>
-            </ul>
-          </div>
+          {/* Premium Information */}
+          {translation?.sections?.premiumInfo && (
+            <div className="mb-10">
+              <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">{sectionTitles.premiumInfo}</h2>
+              <div className="bg-teal-50 p-6 rounded-lg space-y-4">
+                {translation.sections.premiumInfo.map((item: any, idx: number) => (
+                  <div key={idx}>
+                    <h3 className="font-semibold text-gray-900 mb-2">{item.heading}</h3>
+                    <p className="text-gray-700 text-sm">{item.content}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Regulatory Compliance */}
           <div className="mb-10 bg-gray-50 p-4 rounded-lg">
-            <h2 className="font-[Outfit] font-600 text-sm text-gray-900 mb-2">Important Information</h2>
+            <h2 className="font-[Outfit] font-600 text-sm text-gray-900 mb-2">{sectionTitles.regulatory}</h2>
             <p className="text-gray-700 text-xs">
-              This product is regulated by the Central Bank of Ireland. All investment bonds comply with Irish investment regulations and consumer protection requirements. A full product information document (IPID) is available upon request. Past performance is not indicative of future results. Investment returns are not guaranteed and capital can fluctuate. Tax treatment depends on individual circumstances.
+              {translation?.regulatory || 'This product is regulated by the Central Bank of Ireland.'}
             </p>
           </div>
 
           {/* CTA */}
           <div className="bg-teal-50 rounded-lg p-6 text-center">
             <h3 className="font-[Outfit] font-600 text-lg text-gray-900 mb-2">
-              Invest in a Bond
+              {translation?.cta?.title || sectionTitles.cta}
             </h3>
             <p className="text-gray-700 text-sm mb-4">
-              Speak with our investment advisors to find the right investment bond strategy for your needs.
+              {translation?.cta?.description || 'Contact our expert advisors for more information.'}
             </p>
             <Link href="/contact" className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-2 rounded font-semibold text-sm hover:bg-teal-700 transition-colors">
-              Contact Us <ArrowRight size={16} />
+              {translation?.cta?.button || 'Contact Us'} <ArrowRight size={16} />
             </Link>
           </div>
         </div>

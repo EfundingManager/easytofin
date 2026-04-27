@@ -1605,13 +1605,13 @@
 ## Phase 58: Translate All Detail Pages to Chinese and Polish
 - [x] Create comprehensive allDetailTranslations.ts with all 28 pages (English, Chinese, Polish)
 - [x] Include all coverage details, exclusions, tax benefits, and regulatory info
-- [ ] Create DetailPageTemplate component using translations
-- [ ] Refactor all Protection detail pages to use template
-- [ ] Refactor all Pensions detail pages to use template
-- [ ] Refactor all Health Insurance detail pages to use template
-- [ ] Refactor all General Insurance detail pages to use template
-- [ ] Refactor all Investments detail pages to use template
-- [ ] Test language switching on all detail pages
+- [x] Create DetailPageTemplate component using translations
+- [x] Refactor all Protection detail pages to use template
+- [x] Refactor all Pensions detail pages to use template
+- [x] Refactor all Health Insurance detail pages to use template
+- [x] Refactor all General Insurance detail pages to use template
+- [x] Refactor all Investments detail pages to use template
+- [x] Test language switching on all detail pages
 
 ## Phase 59: Add Language Switching to Detail Pages
 - [x] Create LanguageSwitcher component
