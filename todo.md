@@ -1612,3 +1612,10 @@
 - [ ] Refactor all General Insurance detail pages to use template
 - [ ] Refactor all Investments detail pages to use template
 - [ ] Test language switching on all detail pages
+
+## Phase 59: Add Language Switching to Detail Pages
+- [x] Create LanguageSwitcher component
+- [x] Update Life Assurance detail page with language switching
+- [x] Update all remaining 27 detail pages with language switching
+- [x] Test language switching on all detail pages
+- [x] Verify translations display correctly in all languages

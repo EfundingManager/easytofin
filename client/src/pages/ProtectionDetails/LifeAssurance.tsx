@@ -2,18 +2,24 @@ import { Link } from "wouter";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { getDetailPageTranslation } from "@/lib/allDetailTranslations";
 
 export default function LifeAssurance() {
+  const { language } = useLanguage();
+  const translation = getDetailPageTranslation('lifeAssurance', language as 'en' | 'zh' | 'pl');
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      {/* Back Button */}
+      {/* Back Button & Language Switcher */}
       <div className="bg-gray-50 py-4 border-b">
-        <div className="container">
-          <Link href="/protection" className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-semibold text-sm">
-            <ArrowLeft size={16} /> Back
+        <div className="container flex justify-between items-center">
+          <Link href="/services/protection" className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-semibold text-sm">
+            <ArrowLeft size={16} /> {language === 'en' ? 'Back' : language === 'zh' ? '返回' : 'Wróć'}
           </Link>
+          <LanguageSwitcher />
         </div>
       </div>
 
@@ -21,13 +27,13 @@ export default function LifeAssurance() {
       <section className="py-16 bg-white">
         <div className="container max-w-3xl">
           {/* Title */}
-          <h1 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-8">Life Assurance</h1>
+          <h1 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-8">{translation?.title || 'Life Assurance'}</h1>
 
           {/* Overview */}
           <div className="mb-10">
-            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Overview</h2>
+            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">{language === 'en' ? 'Overview' : language === 'zh' ? '概述' : 'Przegląd'}</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Life Assurance provides financial protection for your family in the event of your death. It ensures that your loved ones are financially secure and can maintain their standard of living, pay off debts, and cover essential expenses.
+              {translation?.overview || 'Life Assurance provides financial protection for your family in the event of your death. It ensures that your loved ones are financially secure and can maintain their standard of living, pay off debts, and cover essential expenses.'}
             </p>
             <p className="text-gray-700 leading-relaxed">
               Whether you have dependents, a mortgage, or other financial obligations, life assurance is a crucial part of responsible financial planning.
