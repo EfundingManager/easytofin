@@ -151,11 +151,34 @@ export default function Home() {
             </div>
           </div>
         </div>
+       </section>
+
+      {/* Services */}
+      <section className="py-20 bg-[oklch(0.97_0.003_240)]">
+        <div className="container">
+          <div className="text-center mb-14">
+            <span className="section-tag">{t(language, 'home.ourServices')}</span>
+            <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mt-3">
+              {t(language, 'home.whatWeOffer')}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((service, i) => (
+              <Link key={i} href={service.href} className="group">
+                <div className="bg-white rounded-2xl p-6 border border-[oklch(0.88_0.008_240)] hover:shadow-lg transition-shadow h-full">
+                  <div className="text-[oklch(0.40_0.11_195)] mb-4">{service.icon}</div>
+                  <h3 className="font-[Outfit] font-700 text-[oklch(0.18_0.015_240)] mb-2">
+                    {service.title}
+                  </h3>
+                  <div className="text-sm text-[oklch(0.52_0.015_240)] font-inter leading-relaxed">
+                    {service.desc}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
-
-
-
-
 
       {/* Why Choose Us */}
       <section className="py-20 bg-white">
