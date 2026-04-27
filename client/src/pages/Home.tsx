@@ -158,9 +158,6 @@ export default function Home() {
         <div className="container">
           <div className="text-center mb-14">
             <span className="section-tag">{t(language, 'home.ourServices')}</span>
-            <h2 className="font-[Outfit] font-800 text-3xl text-[oklch(0.18_0.015_240)] mt-3">
-              {t(language, 'home.whatWeOffer')}
-            </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service, i) => (
