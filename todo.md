@@ -1619,3 +1619,12 @@
 - [x] Update all remaining 27 detail pages with language switching
 - [x] Test language switching on all detail pages
 - [x] Verify translations display correctly in all languages
+
+## Phase 60: Fix Service Page Translations
+- [x] Create translations for service page product cards (Protection, Pensions, Health Insurance, General Insurance, Investments)
+- [x] Update Protection service page to display translated product titles and descriptions
+- [x] Update Pensions service page to display translated product titles and descriptions
+- [x] Update Health Insurance service page to display translated product titles and descriptions
+- [x] Update General Insurance service page to display translated product titles and descriptions
+- [x] Update Investments service page to display translated product titles and descriptions
+- [x] Test language switching on all service pages
