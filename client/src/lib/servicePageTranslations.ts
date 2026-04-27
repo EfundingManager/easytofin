@@ -184,7 +184,7 @@ export const servicePageTranslations = {
       {
         title: "Corporate Health Insurance",
         description: "Group health insurance solutions for businesses. Enhance employee benefits, improve retention, and demonstrate commitment to staff wellbeing.",
-        href: "/services/health-insurance/corporate",
+        href: "/services/health-insurance/group",
       },
     ],
     zh: [
@@ -201,7 +201,7 @@ export const servicePageTranslations = {
       {
         title: "企业健康保险",
         description: "为企业提供团体健康保险解决方案。增强员工福利，提高留任率，并展示对员工福祉的承诺。",
-        href: "/services/health-insurance/corporate",
+        href: "/services/health-insurance/group",
       },
     ],
     pl: [
@@ -218,7 +218,7 @@ export const servicePageTranslations = {
       {
         title: "Ubezpieczenie Zdrowotne Dla Firm",
         description: "Rozwiązania grupowego ubezpieczenia zdrowotnego dla firm. Wzmocnij świadczenia pracownicze, popraw retencję i wykaż zaangażowanie w dobrostan pracowników.",
-        href: "/services/health-insurance/corporate",
+        href: "/services/health-insurance/group",
       },
     ],
   },

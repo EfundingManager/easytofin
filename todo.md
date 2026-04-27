@@ -1628,3 +1628,7 @@
 - [x] Update General Insurance service page to display translated product titles and descriptions
 - [x] Update Investments service page to display translated product titles and descriptions
 - [x] Test language switching on all service pages
+
+## Phase 61: Fix Broken Links
+- [x] Fix Corporate Health Insurance "Learn more" link (404 error) - Changed href from /services/health-insurance/corporate to /services/health-insurance/group
+- [x] Verify all service detail page links are working correctly
