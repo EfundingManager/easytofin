@@ -34,6 +34,25 @@ export default function SeriousIllness() {
             </p>
           </div>
 
+          {/* How It Works */}
+          <div className="mb-10">
+            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">How It Works</h2>
+            <div className="space-y-4">
+              <div className="border-l-4 border-teal-600 pl-4">
+                <h3 className="font-semibold text-gray-900 mb-1">Diagnosis</h3>
+                <p className="text-gray-700 text-sm">Upon diagnosis of a covered condition, you submit a claim with medical evidence to your insurer.</p>
+              </div>
+              <div className="border-l-4 border-teal-600 pl-4">
+                <h3 className="font-semibold text-gray-900 mb-1">Claim Assessment</h3>
+                <p className="text-gray-700 text-sm">Your claim is reviewed to confirm the condition meets the policy definition. This typically takes 2-4 weeks.</p>
+              </div>
+              <div className="border-l-4 border-teal-600 pl-4">
+                <h3 className="font-semibold text-gray-900 mb-1">Lump Sum Payment</h3>
+                <p className="text-gray-700 text-sm">Once approved, the full lump sum is paid tax-free directly to you. You can use it for any purpose.</p>
+              </div>
+            </div>
+          </div>
+
           {/* Covered Conditions */}
           <div className="mb-10">
             <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Covered Conditions</h2>
@@ -51,9 +70,9 @@ export default function SeriousIllness() {
             </div>
           </div>
 
-          {/* Key Benefits */}
+          {/* Key Features */}
           <div className="mb-10">
-            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Key Benefits</h2>
+            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Key Features</h2>
             <ul className="space-y-2 text-gray-700 text-sm">
               <li>• Tax-free lump sum payment upon diagnosis</li>
               <li>• Financial security during recovery</li>
