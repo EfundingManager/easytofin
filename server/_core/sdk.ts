@@ -284,38 +284,49 @@ class SDKServer {
     // If user not in regular users table, check phoneUsers table (for Gmail/Email/Phone auth)
     if (!user) {
       let phoneUser: any = null;
-      
+
+      console.log("[Auth] User not found in users table, checking phoneUsers with sessionUserId:", sessionUserId);
+
       // Try multiple lookup strategies for phoneUsers
       // 1. Try by googleId
       phoneUser = await db.getPhoneUserByGoogleId(sessionUserId);
-      
+      if (phoneUser) {
+        console.log("[Auth] Found user by googleId");
+      }
+
       // 2. Try by email if sessionUserId looks like an email
       if (!phoneUser && sessionUserId.includes('@')) {
         phoneUser = await db.getPhoneUserByEmail(sessionUserId);
+        if (phoneUser) {
+          console.log("[Auth] Found user by email");
+        }
       }
-      
+
       // 3. Try by phone if sessionUserId looks like a phone number
       if (!phoneUser && /^[+\d\s\-()]+$/.test(sessionUserId)) {
-        const db_instance = await db.getDb();
-        if (db_instance) {
-          const result = await db_instance.select().from(phoneUsers).where(eq(phoneUsers.phone, sessionUserId)).limit(1);
-          phoneUser = result.length > 0 ? result[0] : null;
+        phoneUser = await db.getPhoneUserByPhone(sessionUserId);
+        if (phoneUser) {
+          console.log("[Auth] Found user by phone");
         }
       }
-      
-      // 4. Try by ID if sessionUserId starts with 'phone-'
-      if (!phoneUser && sessionUserId.startsWith('phone-')) {
-        const userId = parseInt(sessionUserId.replace('phone-', ''), 10);
+
+      // 4. Try by ID if sessionUserId starts with 'phone-' or 'email-'
+      if (!phoneUser && (sessionUserId.startsWith('phone-') || sessionUserId.startsWith('email-'))) {
+        const userId = parseInt(sessionUserId.replace(/^(phone-|email-)/, ''), 10);
         if (!isNaN(userId)) {
           phoneUser = await db.getPhoneUserById(userId);
+          if (phoneUser) {
+            console.log("[Auth] Found user by ID extraction:", userId);
+          }
         }
       }
-      
+
       if (phoneUser) {
+        console.log("[Auth] Successfully found phoneUser:", { id: phoneUser.id, email: phoneUser.email, phone: phoneUser.phone });
         // Convert phoneUser to User type for consistency
         return {
           id: phoneUser.id,
-          openId: phoneUser.googleId || phoneUser.email || sessionUserId,
+          openId: phoneUser.googleId || phoneUser.email || phoneUser.phone || sessionUserId,
           name: phoneUser.name,
           email: phoneUser.email,
           loginMethod: phoneUser.loginMethod,
@@ -325,6 +336,8 @@ class SDKServer {
           lastSignedIn: signedInAt,
         } as any;
       }
+
+      console.log("[Auth] PhoneUser not found after all lookup strategies");
     }
 
     // If still not found, try to sync from OAuth server
