@@ -1,4 +1,3 @@
-import { BarChart3 } from "lucide-react";
 import ServicePage from "@/components/ServicePage";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
@@ -39,31 +38,9 @@ export default function Investments() {
     },
   ];
 
-  const whyPoints = t(language, 'investments.whyInvestmentsPoints');
-  const introductionContent = t(language, 'investments.introductionContent');
-  const introductionSubtitle = t(language, 'investments.introductionSubtitle');
-
   return (
     <ServicePage
-      title={t(language, 'services.investments')}
-      tagline={t(language, 'investments.tagline')}
-      heroDescription={t(language, 'investments.heroDesc')}
-      icon={<BarChart3 size={28} />}
       subServices={subServices}
-      introductionSection={{
-        title: 'Why Choose EasyToFin?',
-        subtitle: typeof introductionSubtitle === 'string' ? introductionSubtitle : '',
-        paragraphs: Array.isArray(introductionContent) ? introductionContent : [],
-      }}
-      whySection={{
-        title: t(language, 'investments.whyInvestments'),
-        points: Array.isArray(whyPoints) ? whyPoints : [],
-      }}
-      relatedServices={[
-        { label: t(language, 'services.pensions'), href: "/pensions" },
-        { label: t(language, 'services.protection'), href: "/protection" },
-
-      ]}
     />
   );
 }
