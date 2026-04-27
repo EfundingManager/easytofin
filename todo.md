@@ -1566,3 +1566,9 @@
 - [x] Add Learn more links to Health Insurance detail pages
 - [x] Add Learn more links to Investment detail pages
 - [x] Test Learn more navigation on all service pages
+
+## Phase 54: Additional Investment Detail Pages
+- [x] Create Education Saving Plans detail page (basic explanation, how it works, goals)
+- [x] Create Structured Products detail page (basic explanation, how it works, goals)
+- [x] Add routes to App.tsx for new investment detail pages
+- [x] Update Investments.tsx to link to new detail pages

@@ -63,6 +63,8 @@ import SavingsPlans from "./pages/InvestmentsDetails/SavingsPlans";
 import InvestmentBonds from "./pages/InvestmentsDetails/InvestmentBonds";
 import PortfolioManagement from "./pages/InvestmentsDetails/PortfolioManagement";
 import StocksShares from "./pages/InvestmentsDetails/StocksShares";
+import EducationSavingPlans from "./pages/InvestmentsDetails/EducationSavingPlans";
+import StructuredProducts from "./pages/InvestmentsDetails/StructuredProducts";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -111,6 +113,8 @@ function Router() {
       <Route path="/investments/bonds" component={InvestmentBonds} />
       <Route path="/investments/portfolio-management" component={PortfolioManagement} />
       <Route path="/investments/stocks-shares" component={StocksShares} />
+      <Route path="/investments/education-plans" component={EducationSavingPlans} />
+      <Route path="/investments/structured-products" component={StructuredProducts} />
 
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />

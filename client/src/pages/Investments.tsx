@@ -30,12 +30,12 @@ export default function Investments() {
     {
       title: t(language, 'investments.education'),
       description: t(language, 'investments.educationDesc'),
-      href: '/investments/savings-plans',
+      href: '/investments/education-plans',
     },
     {
       title: t(language, 'investments.structured'),
       description: t(language, 'investments.structuredDesc'),
-      href: '/investments/bonds',
+      href: '/investments/structured-products',
     },
   ];
 
