@@ -41,6 +41,11 @@ import CustomerLanding from "./pages/CustomerLanding";
 import AccountLockoutManagement from "./pages/AccountLockoutManagement";
 import EmailBlasterPage from "./pages/EmailBlasterPage";
 import PostLogout from "./pages/PostLogout";
+import LifeAssurance from "./pages/ProtectionDetails/LifeAssurance";
+import SeriousIllness from "./pages/ProtectionDetails/SeriousIllness";
+import IncomeProtection from "./pages/ProtectionDetails/IncomeProtection";
+import AccidentSickness from "./pages/ProtectionDetails/AccidentSickness";
+import PersonalAccident from "./pages/ProtectionDetails/PersonalAccident";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -62,6 +67,11 @@ function Router() {
       <Route path="/user-portal" component={UserPortal} />
       <Route path="/customer-portal" component={CustomerPortal} />
       <Route path="/protection" component={Protection} />
+      <Route path="/protection/life-assurance" component={LifeAssurance} />
+      <Route path="/protection/serious-illness" component={SeriousIllness} />
+      <Route path="/protection/income-protection" component={IncomeProtection} />
+      <Route path="/protection/accident-sickness" component={AccidentSickness} />
+      <Route path="/protection/personal-accident" component={PersonalAccident} />
       <Route path="/pensions" component={Pensions} />
       <Route path="/health-insurance" component={HealthInsurance} />
       <Route path="/general-insurance" component={GeneralInsurance} />
