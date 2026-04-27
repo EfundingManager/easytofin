@@ -51,6 +51,9 @@ import AVCsDetail from "./pages/PensionsDetails/AVCsDetail";
 import OccupationalDetail from "./pages/PensionsDetails/OccupationalDetail";
 import ExecutiveDetail from "./pages/PensionsDetails/ExecutiveDetail";
 import ARFDetail from "./pages/PensionsDetails/ARFDetail";
+import IndividualHealth from "./pages/HealthInsuranceDetails/IndividualHealth";
+import FamilyHealth from "./pages/HealthInsuranceDetails/FamilyHealth";
+import CorporateHealth from "./pages/HealthInsuranceDetails/CorporateHealth";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -84,6 +87,9 @@ function Router() {
       <Route path="/pensions/executive" component={ExecutiveDetail} />
       <Route path="/pensions/arf" component={ARFDetail} />
       <Route path="/health-insurance" component={HealthInsurance} />
+      <Route path="/health-insurance/individual" component={IndividualHealth} />
+      <Route path="/health-insurance/family" component={FamilyHealth} />
+      <Route path="/health-insurance/group" component={CorporateHealth} />
       <Route path="/general-insurance" component={GeneralInsurance} />
 
       <Route path="/investments" component={Investments} />
