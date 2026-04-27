@@ -1,134 +1,78 @@
 import { Link } from "wouter";
-import { Shield, Heart, Briefcase, AlertCircle, Users, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 const PROTECTION_PRODUCTS = [
   {
     id: "life-assurance",
-    icon: Shield,
     title: "Life Assurance",
-    description: "Comprehensive life insurance coverage to protect your family's financial future",
+    description: "A lump sum paid to your family in the event of your death, ensuring they can maintain their standard of living and meet financial obligations such as bills and other commitments.",
     href: "/protection/life-assurance",
-    color: "from-blue-500 to-blue-600",
-    features: ["Family protection", "Mortgage cover", "Income replacement"],
   },
   {
     id: "serious-illness",
-    icon: Heart,
     title: "Specified Serious Illness Cover",
-    description: "Protection against critical illnesses with lump sum payouts",
+    description: "A tax-free lump sum paid on diagnosis of a specified serious illness such as cancer, heart attack or stroke. Gives you financial breathing room to focus on recovery.",
     href: "/protection/serious-illness",
-    color: "from-red-500 to-red-600",
-    features: ["Critical illness protection", "Lump sum payment", "Peace of mind"],
   },
   {
     id: "income-protection",
-    icon: Briefcase,
     title: "Income Protection",
-    description: "Replace your income if you're unable to work due to illness or injury",
+    description: "Replaces a portion of your income if you are unable to work due to illness or injury. Provides long-term financial security when you need it most.",
     href: "/protection/income-protection",
-    color: "from-green-500 to-green-600",
-    features: ["Income replacement", "Long-term security", "Flexible terms"],
   },
   {
     id: "accident-sickness",
-    icon: AlertCircle,
     title: "Accident & Sickness Cover",
-    description: "Short-term protection for accidents and sickness-related absences",
+    description: "Short-term income replacement cover that pays a weekly benefit if you are unable to work due to an accident or sickness. Ideal for self-employed individuals.",
     href: "/protection/accident-sickness",
-    color: "from-yellow-500 to-yellow-600",
-    features: ["Accident coverage", "Sickness protection", "Quick payouts"],
   },
   {
     id: "personal-accident",
-    icon: Users,
     title: "Personal Accident Plan",
-    description: "Comprehensive accident coverage for you and your family",
+    description: "Provides cash benefits and lump sum payments in the event of accidental injury, fractures or hospitalisation. Complements your existing health insurance.",
     href: "/protection/personal-accident",
-    color: "from-purple-500 to-purple-600",
-    features: ["Personal protection", "Family coverage", "Accident benefits"],
   },
 ];
 
 export default function Protection() {
-  const { language } = useLanguage();
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative py-16 bg-gradient-to-r from-blue-50 to-blue-100">
+      <section className="py-16 bg-white border-b">
         <div className="container">
-          <h1 className="font-[Outfit] font-800 text-4xl md:text-5xl text-blue-900 mb-4">
-            Protection Products
+          <h1 className="font-[Outfit] font-700 text-4xl text-gray-900 mb-2">
+            What We Offer
           </h1>
-          <p className="text-lg text-blue-800 max-w-2xl">
-            Comprehensive protection solutions to safeguard your family's financial future. Choose from our range of life insurance and protection products tailored to your needs.
-          </p>
         </div>
       </section>
 
       {/* Products Grid */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PROTECTION_PRODUCTS.map((product) => {
-              const IconComponent = product.icon;
-              return (
-                <Link key={product.id} href={product.href}>
-                  <div className="group h-full bg-white rounded-2xl border-2 border-gray-200 p-8 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer">
-                    {/* Icon */}
-                    <div className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${product.color} text-white mb-4 group-hover:scale-110 transition-transform`}>
-                      <IconComponent size={32} />
-                    </div>
+            {PROTECTION_PRODUCTS.map((product) => (
+              <div key={product.id} className="border-2 border-gray-200 rounded-lg p-6 hover:border-teal-600 transition-colors">
+                {/* Title with underline */}
+                <h3 className="font-[Outfit] font-600 text-lg text-gray-900 mb-3 pb-3 border-b-4 border-teal-600 inline-block">
+                  {product.title}
+                </h3>
 
-                    {/* Title */}
-                    <h3 className="font-[Outfit] font-700 text-xl text-gray-900 mb-2">
-                      {product.title}
-                    </h3>
+                {/* Description */}
+                <p className="text-gray-700 text-sm leading-relaxed mb-6">
+                  {product.description}
+                </p>
 
-                    {/* Description */}
-                    <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                      {product.description}
-                    </p>
-
-                    {/* Features */}
-                    <ul className="space-y-2 mb-6">
-                      {product.features.map((feature, i) => (
-                        <li key={i} className="flex items-center gap-2 text-sm text-gray-700">
-                          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* CTA */}
-                    <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition-all">
-                      Learn More <ArrowRight size={16} />
-                    </div>
-                  </div>
+                {/* Learn More Link */}
+                <Link href={product.href} className="inline-flex items-center gap-2 text-teal-600 font-semibold text-sm hover:gap-3 transition-all">
+                  Learn more <ArrowRight size={16} />
                 </Link>
-              );
-            })}
+              </div>
+            ))}
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-700">
-        <div className="container text-center">
-          <h2 className="font-[Outfit] font-800 text-3xl text-white mb-4">
-            Not sure which protection is right for you?
-          </h2>
-          <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
-            Our expert advisors can help you find the perfect protection solution for your needs.
-          </p>
-          <Link href="/contact" className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
-            Get Expert Advice <ArrowRight size={18} />
-          </Link>
         </div>
       </section>
 

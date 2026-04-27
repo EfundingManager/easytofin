@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ArrowLeft, ArrowRight, Check, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -11,207 +11,95 @@ export default function PersonalAccident() {
       {/* Back Button */}
       <div className="bg-gray-50 py-4 border-b">
         <div className="container">
-          <Link href="/protection" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold">
-            <ArrowLeft size={18} /> Back to Protection
+          <Link href="/protection" className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-semibold text-sm">
+            <ArrowLeft size={16} /> Back
           </Link>
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-r from-purple-50 to-purple-100">
-        <div className="container">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="p-3 bg-purple-600 text-white rounded-lg">
-              <Users size={32} />
-            </div>
-            <div>
-              <h1 className="font-[Outfit] font-800 text-4xl md:text-5xl text-purple-900 mb-2">
-                Personal Accident Plan
-              </h1>
-              <p className="text-lg text-purple-800">
-                Comprehensive accident coverage for you and your family
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Main Content */}
-      <section className="py-20 bg-white">
-        <div className="container max-w-4xl">
+      <section className="py-16 bg-white">
+        <div className="container max-w-3xl">
+          {/* Title */}
+          <h1 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-8">Personal Accident Plan</h1>
+
           {/* Overview */}
-          <div className="mb-16">
-            <h2 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-4">Overview</h2>
-            <p className="text-gray-700 text-lg leading-relaxed mb-4">
-              A Personal Accident Plan provides comprehensive protection against accidental injuries for you and your family members. It covers medical expenses, disability benefits, and financial assistance following accidents, whether at home, work, or during leisure activities.
+          <div className="mb-10">
+            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Overview</h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              Personal Accident Plan provides cash benefits and lump sum payments in the event of accidental injury, fractures, or hospitalisation. It complements your existing health insurance by offering financial support during recovery.
             </p>
-            <p className="text-gray-700 text-lg leading-relaxed">
-              This plan complements your other insurance by providing specific accident-related benefits and ensuring your family is protected against unexpected accidents.
+            <p className="text-gray-700 leading-relaxed">
+              This cover is ideal for active individuals and families who want additional financial protection against the unexpected costs of accidents.
             </p>
           </div>
 
           {/* Coverage Types */}
-          <div className="mb-16">
-            <h2 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-8">Coverage Types</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                { title: "Death Benefit", desc: "Lump sum paid to beneficiaries if death results from accident" },
-                { title: "Permanent Disability", desc: "Compensation for permanent loss of limbs or sight" },
-                { title: "Temporary Disability", desc: "Weekly income replacement during recovery" },
-                { title: "Medical Expenses", desc: "Reimbursement for accident-related medical treatment" },
-                { title: "Hospital Benefit", desc: "Daily allowance for hospitalization" },
-                { title: "Rehabilitation", desc: "Support for physical therapy and recovery" },
-              ].map((coverage, i) => (
-                <div key={i} className="flex gap-4 p-4 bg-purple-50 rounded-lg">
-                  <Check className="text-purple-600 shrink-0 mt-1" size={24} />
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">{coverage.title}</h3>
-                    <p className="text-gray-700 text-sm">{coverage.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Family Coverage */}
-          <div className="mb-16">
-            <h2 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-8">Family Coverage</h2>
-            <p className="text-gray-700 mb-6">
-              Personal Accident Plans can be extended to cover your entire family:
-            </p>
+          <div className="mb-10">
+            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">What's Covered</h2>
             <div className="space-y-4">
-              {[
-                { member: "Spouse", coverage: "Full coverage under the plan" },
-                { member: "Children", coverage: "Coverage up to age 18 or 25 if in full-time education" },
-                { member: "Dependents", coverage: "Extended family members living with you" },
-                { member: "Domestic Help", coverage: "Optional coverage for household staff" },
-              ].map((item, i) => (
-                <div key={i} className="border-l-4 border-purple-600 pl-6 pb-4">
-                  <h3 className="font-semibold text-gray-900">{item.member}</h3>
-                  <p className="text-gray-700">{item.coverage}</p>
-                </div>
-              ))}
+              <div className="border-l-4 border-teal-600 pl-4">
+                <h3 className="font-semibold text-gray-900 mb-1">Accidental Injury</h3>
+                <p className="text-gray-700 text-sm">Cash payments for injuries sustained from accidents, including fractures, dislocations, and lacerations.</p>
+              </div>
+              <div className="border-l-4 border-teal-600 pl-4">
+                <h3 className="font-semibold text-gray-900 mb-1">Hospitalisation</h3>
+                <p className="text-gray-700 text-sm">Daily allowance for hospital stays resulting from accidental injury, helping cover additional costs.</p>
+              </div>
+              <div className="border-l-4 border-teal-600 pl-4">
+                <h3 className="font-semibold text-gray-900 mb-1">Permanent Disability</h3>
+                <p className="text-gray-700 text-sm">Lump sum payment if an accident results in permanent disability or loss of limb.</p>
+              </div>
+              <div className="border-l-4 border-teal-600 pl-4">
+                <h3 className="font-semibold text-gray-900 mb-1">Death Benefit</h3>
+                <p className="text-gray-700 text-sm">Lump sum paid to beneficiaries if death results from an accidental injury.</p>
+              </div>
             </div>
           </div>
 
-          {/* What's Covered */}
-          <div className="mb-16">
-            <h2 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-8">What's Covered</h2>
-            <div className="space-y-3 text-gray-700">
-              <p className="flex gap-3">
-                <span className="text-purple-600 font-bold">✓</span>
-                <span>Accidents at home, work, or during leisure activities</span>
-              </p>
-              <p className="flex gap-3">
-                <span className="text-purple-600 font-bold">✓</span>
-                <span>Road accidents and motor vehicle incidents</span>
-              </p>
-              <p className="flex gap-3">
-                <span className="text-purple-600 font-bold">✓</span>
-                <span>Sports and recreational activities</span>
-              </p>
-              <p className="flex gap-3">
-                <span className="text-purple-600 font-bold">✓</span>
-                <span>Travel-related accidents (worldwide coverage available)</span>
-              </p>
-              <p className="flex gap-3">
-                <span className="text-purple-600 font-bold">✓</span>
-                <span>Emergency medical treatment</span>
-              </p>
-              <p className="flex gap-3">
-                <span className="text-purple-600 font-bold">✓</span>
-                <span>Rehabilitation and recovery support</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Exclusions */}
-          <div className="mb-16">
-            <h2 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-8">Common Exclusions</h2>
-            <div className="space-y-3 text-gray-700">
-              <p className="flex gap-3">
-                <span className="text-red-600 font-bold">✗</span>
-                <span>Accidents while under the influence of alcohol or drugs</span>
-              </p>
-              <p className="flex gap-3">
-                <span className="text-red-600 font-bold">✗</span>
-                <span>Professional sports or hazardous activities (unless declared)</span>
-              </p>
-              <p className="flex gap-3">
-                <span className="text-red-600 font-bold">✗</span>
-                <span>Accidents resulting from illegal activities</span>
-              </p>
-              <p className="flex gap-3">
-                <span className="text-red-600 font-bold">✗</span>
-                <span>Pre-existing medical conditions (unless specifically covered)</span>
-              </p>
-              <p className="flex gap-3">
-                <span className="text-red-600 font-bold">✗</span>
-                <span>Accidents occurring in countries with travel warnings</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Who Needs It */}
-          <div className="mb-16">
-            <h2 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-4">Who Needs This Plan?</h2>
-            <ul className="space-y-3 text-gray-700">
-              <li className="flex gap-3">
-                <span className="text-purple-600 font-bold">•</span>
-                <span>Families with active lifestyles and outdoor activities</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-purple-600 font-bold">•</span>
-                <span>Parents wanting to protect their children</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-purple-600 font-bold">•</span>
-                <span>Individuals engaged in sports or recreational activities</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-purple-600 font-bold">•</span>
-                <span>Frequent travelers</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-purple-600 font-bold">•</span>
-                <span>Anyone wanting comprehensive accident protection</span>
-              </li>
+          {/* Key Features */}
+          <div className="mb-10">
+            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Key Features</h2>
+            <ul className="space-y-2 text-gray-700 text-sm">
+              <li>• Cash benefits for accidental injuries</li>
+              <li>• Daily hospitalisation allowance</li>
+              <li>• Lump sum for permanent disability</li>
+              <li>• Death benefit for beneficiaries</li>
+              <li>• Complements existing health insurance</li>
+              <li>• Affordable premiums for comprehensive cover</li>
             </ul>
           </div>
 
-          {/* Benefit Examples */}
-          <div className="mb-16">
-            <h2 className="font-[Outfit] font-700 text-3xl text-gray-900 mb-8">Benefit Examples</h2>
-            <div className="space-y-4">
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Loss of Limb</h4>
-                <p className="text-gray-700">€50,000 - €100,000 depending on which limb</p>
-              </div>
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Loss of Sight</h4>
-                <p className="text-gray-700">€50,000 - €100,000 depending on one or both eyes</p>
-              </div>
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Accidental Death</h4>
-                <p className="text-gray-700">€100,000 - €500,000 lump sum to beneficiaries</p>
-              </div>
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Temporary Disability</h4>
-                <p className="text-gray-700">€100 - €500 per week during recovery</p>
-              </div>
-            </div>
+          {/* Who Needs It */}
+          <div className="mb-10">
+            <h2 className="font-[Outfit] font-600 text-xl text-gray-900 mb-4">Who Needs It</h2>
+            <ul className="space-y-2 text-gray-700 text-sm">
+              <li>• Active individuals and sports enthusiasts</li>
+              <li>• Families wanting additional accident protection</li>
+              <li>• Manual workers at higher risk of accidents</li>
+              <li>• Anyone wanting to complement health insurance</li>
+              <li>• Those seeking financial protection against unexpected costs</li>
+            </ul>
+          </div>
+
+          {/* Regulatory Compliance */}
+          <div className="mb-10 bg-gray-50 p-4 rounded-lg">
+            <h2 className="font-[Outfit] font-600 text-sm text-gray-900 mb-2">Important Information</h2>
+            <p className="text-gray-700 text-xs">
+              This product is regulated by the Central Bank of Ireland. All policies comply with Irish insurance regulations and consumer protection requirements. A full product information document (IPID) is available upon request.
+            </p>
           </div>
 
           {/* CTA */}
-          <div className="bg-purple-50 rounded-xl p-8 text-center">
-            <h3 className="font-[Outfit] font-700 text-2xl text-gray-900 mb-4">
-              Protect Your Family Against Accidents
+          <div className="bg-teal-50 rounded-lg p-6 text-center">
+            <h3 className="font-[Outfit] font-600 text-lg text-gray-900 mb-2">
+              Get a Quote
             </h3>
-            <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
-              Get a personalized quote for personal accident cover that protects you and your family.
+            <p className="text-gray-700 text-sm mb-4">
+              Speak with our expert advisors to find the right coverage for your needs.
             </p>
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
-              Get Your Quote <ArrowRight size={18} />
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-2 rounded font-semibold text-sm hover:bg-teal-700 transition-colors">
+              Contact Us <ArrowRight size={16} />
             </Link>
           </div>
         </div>
