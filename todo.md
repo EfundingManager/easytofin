@@ -1588,3 +1588,27 @@
 - [x] Update all internal links to use new service URLs
 - [x] Update navigation menu links
 - [x] Test all service page navigation
+
+## Phase 57: Translate Product Detail Pages to Chinese and Polish
+- [ ] Add Chinese translations for all Protection detail pages
+- [ ] Add Polish translations for all Protection detail pages
+- [ ] Add Chinese translations for all Pensions detail pages
+- [ ] Add Polish translations for all Pensions detail pages
+- [ ] Add Chinese translations for all Health Insurance detail pages
+- [ ] Add Polish translations for all Health Insurance detail pages
+- [ ] Add Chinese translations for all General Insurance detail pages
+- [ ] Add Polish translations for all General Insurance detail pages
+- [ ] Add Chinese translations for all Investments detail pages
+- [ ] Add Polish translations for all Investments detail pages
+- [ ] Test all detail pages with language switcher
+
+## Phase 58: Translate All Detail Pages to Chinese and Polish
+- [x] Create comprehensive allDetailTranslations.ts with all 28 pages (English, Chinese, Polish)
+- [x] Include all coverage details, exclusions, tax benefits, and regulatory info
+- [ ] Create DetailPageTemplate component using translations
+- [ ] Refactor all Protection detail pages to use template
+- [ ] Refactor all Pensions detail pages to use template
+- [ ] Refactor all Health Insurance detail pages to use template
+- [ ] Refactor all General Insurance detail pages to use template
+- [ ] Refactor all Investments detail pages to use template
+- [ ] Test language switching on all detail pages
