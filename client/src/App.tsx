@@ -46,6 +46,11 @@ import SeriousIllness from "./pages/ProtectionDetails/SeriousIllness";
 import IncomeProtection from "./pages/ProtectionDetails/IncomeProtection";
 import AccidentSickness from "./pages/ProtectionDetails/AccidentSickness";
 import PersonalAccident from "./pages/ProtectionDetails/PersonalAccident";
+import PRSADetail from "./pages/PensionsDetails/PRSADetail";
+import AVCsDetail from "./pages/PensionsDetails/AVCsDetail";
+import OccupationalDetail from "./pages/PensionsDetails/OccupationalDetail";
+import ExecutiveDetail from "./pages/PensionsDetails/ExecutiveDetail";
+import ARFDetail from "./pages/PensionsDetails/ARFDetail";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -73,6 +78,11 @@ function Router() {
       <Route path="/protection/accident-sickness" component={AccidentSickness} />
       <Route path="/protection/personal-accident" component={PersonalAccident} />
       <Route path="/pensions" component={Pensions} />
+      <Route path="/pensions/prsa" component={PRSADetail} />
+      <Route path="/pensions/avcs" component={AVCsDetail} />
+      <Route path="/pensions/occupational" component={OccupationalDetail} />
+      <Route path="/pensions/executive" component={ExecutiveDetail} />
+      <Route path="/pensions/arf" component={ARFDetail} />
       <Route path="/health-insurance" component={HealthInsurance} />
       <Route path="/general-insurance" component={GeneralInsurance} />
 
