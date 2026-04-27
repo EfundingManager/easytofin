@@ -1559,3 +1559,10 @@
 - [x] Create Stocks & Shares detail page (trading, investment options, risk management)
 - [x] Add routes to App.tsx for investment detail pages
 - [x] Test navigation to all investment detail pages
+
+## Phase 53: Learn More Links on Service Pages
+- [x] Update ServicePage component to support href property in subServices
+- [x] Add Learn more links to General Insurance detail pages
+- [x] Add Learn more links to Health Insurance detail pages
+- [x] Add Learn more links to Investment detail pages
+- [x] Test Learn more navigation on all service pages
