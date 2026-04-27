@@ -85,36 +85,36 @@ function Router() {
       <Route path="/customer/:customerId" component={CustomerPortal} />
       <Route path="/user-portal" component={UserPortal} />
       <Route path="/customer-portal" component={CustomerPortal} />
-      <Route path="/protection" component={Protection} />
-      <Route path="/protection/life-assurance" component={LifeAssurance} />
-      <Route path="/protection/serious-illness" component={SeriousIllness} />
-      <Route path="/protection/income-protection" component={IncomeProtection} />
-      <Route path="/protection/accident-sickness" component={AccidentSickness} />
-      <Route path="/protection/personal-accident" component={PersonalAccident} />
-      <Route path="/pensions" component={Pensions} />
-      <Route path="/pensions/prsa" component={PRSADetail} />
-      <Route path="/pensions/avcs" component={AVCsDetail} />
-      <Route path="/pensions/occupational" component={OccupationalDetail} />
-      <Route path="/pensions/executive" component={ExecutiveDetail} />
-      <Route path="/pensions/arf" component={ARFDetail} />
-      <Route path="/health-insurance" component={HealthInsurance} />
-      <Route path="/health-insurance/individual" component={IndividualHealth} />
-      <Route path="/health-insurance/family" component={FamilyHealth} />
-      <Route path="/health-insurance/group" component={CorporateHealth} />
-      <Route path="/general-insurance" component={GeneralInsurance} />
-      <Route path="/general-insurance/home" component={HomeInsurance} />
-      <Route path="/general-insurance/motor" component={MotorInsurance} />
-      <Route path="/general-insurance/business" component={BusinessInsurance} />
-      <Route path="/general-insurance/landlord" component={LandlordInsurance} />
-      <Route path="/general-insurance/liability" component={LiabilityInsurance} />
+      <Route path="/services/protection" component={Protection} />
+      <Route path="/services/protection/life-assurance" component={LifeAssurance} />
+      <Route path="/services/protection/serious-illness" component={SeriousIllness} />
+      <Route path="/services/protection/income-protection" component={IncomeProtection} />
+      <Route path="/services/protection/accident-sickness" component={AccidentSickness} />
+      <Route path="/services/protection/personal-accident" component={PersonalAccident} />
+      <Route path="/services/pensions" component={Pensions} />
+      <Route path="/services/pensions/prsa" component={PRSADetail} />
+      <Route path="/services/pensions/avcs" component={AVCsDetail} />
+      <Route path="/services/pensions/occupational" component={OccupationalDetail} />
+      <Route path="/services/pensions/executive" component={ExecutiveDetail} />
+      <Route path="/services/pensions/arf" component={ARFDetail} />
+      <Route path="/services/health-insurance" component={HealthInsurance} />
+      <Route path="/services/health-insurance/individual" component={IndividualHealth} />
+      <Route path="/services/health-insurance/family" component={FamilyHealth} />
+      <Route path="/services/health-insurance/group" component={CorporateHealth} />
+      <Route path="/services/general-insurance" component={GeneralInsurance} />
+      <Route path="/services/general-insurance/home" component={HomeInsurance} />
+      <Route path="/services/general-insurance/motor" component={MotorInsurance} />
+      <Route path="/services/general-insurance/business" component={BusinessInsurance} />
+      <Route path="/services/general-insurance/landlord" component={LandlordInsurance} />
+      <Route path="/services/general-insurance/liability" component={LiabilityInsurance} />
 
-      <Route path="/investments" component={Investments} />
-      <Route path="/investments/savings-plans" component={SavingsPlans} />
-      <Route path="/investments/bonds" component={InvestmentBonds} />
-      <Route path="/investments/portfolio-management" component={PortfolioManagement} />
-      <Route path="/investments/stocks-shares" component={StocksShares} />
-      <Route path="/investments/education-plans" component={EducationSavingPlans} />
-      <Route path="/investments/structured-products" component={StructuredProducts} />
+      <Route path="/services/investments" component={Investments} />
+      <Route path="/services/investments/savings-plans" component={SavingsPlans} />
+      <Route path="/services/investments/bonds" component={InvestmentBonds} />
+      <Route path="/services/investments/portfolio-management" component={PortfolioManagement} />
+      <Route path="/services/investments/stocks-shares" component={StocksShares} />
+      <Route path="/services/investments/education-plans" component={EducationSavingPlans} />
+      <Route path="/services/investments/structured-products" component={StructuredProducts} />
 
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />

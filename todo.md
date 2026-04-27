@@ -1578,3 +1578,13 @@
 - [x] Remove hero section, introduction section, and "Why Choose EasyToFin?" from ServicePage
 - [x] Keep "Learn more" links on product cards
 - [x] Test all five service pages (Protection, Pensions, Health Insurance, General Insurance, Investments)
+
+## Phase 56: Update Service URLs to /services/ Prefix
+- [x] Update Protection route to /services/protection
+- [x] Update Pensions route to /services/pensions
+- [x] Update Health Insurance route to /services/health-insurance
+- [x] Update General Insurance route to /services/general-insurance
+- [x] Update Investments route to /services/investments
+- [x] Update all internal links to use new service URLs
+- [x] Update navigation menu links
+- [x] Test all service page navigation

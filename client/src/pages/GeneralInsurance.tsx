@@ -9,28 +9,28 @@ export default function GeneralInsurance() {
     {
       title: t(language, 'generalInsurance.home'),
       description: t(language, 'generalInsurance.homeDesc'),
-      href: '/general-insurance/home',
+      href: '/services/general-insurance/home',
     },
     {
       title: t(language, 'generalInsurance.motor'),
       description: t(language, 'generalInsurance.motorDesc'),
-      href: '/general-insurance/motor',
+      href: '/services/general-insurance/motor',
     },
     {
       title: t(language, 'generalInsurance.business'),
       description: t(language, 'generalInsurance.businessDesc'),
-      href: '/general-insurance/business',
+      href: '/services/general-insurance/business',
     },
     {
       title: t(language, 'generalInsurance.landlord'),
       description: t(language, 'generalInsurance.landlordDesc'),
-      href: '/general-insurance/landlord',
+      href: '/services/general-insurance/landlord',
     },
 
     {
       title: t(language, 'generalInsurance.liability'),
       description: t(language, 'generalInsurance.liabilityDesc'),
-      href: '/general-insurance/liability',
+      href: '/services/general-insurance/liability',
     },
   ];
 

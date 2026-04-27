@@ -19,12 +19,12 @@ const LANGUAGE_OPTIONS = [
 ];
 
 const getServices = (lang: 'en' | 'zh' | 'pl') => [
-  { label: t(lang, 'services.protection'), href: "/protection", desc: t(lang, 'serviceDesc.protection') },
-  { label: t(lang, 'services.pensions'), href: "/pensions", desc: t(lang, 'serviceDesc.pensions') },
-  { label: t(lang, 'services.healthInsurance'), href: "/health-insurance", desc: t(lang, 'serviceDesc.healthInsurance') },
-  { label: t(lang, 'services.generalInsurance'), href: "/general-insurance", desc: t(lang, 'serviceDesc.generalInsurance') },
+  { label: t(lang, 'services.protection'), href: "/services/protection", desc: t(lang, 'serviceDesc.protection') },
+  { label: t(lang, 'services.pensions'), href: "/services/pensions", desc: t(lang, 'serviceDesc.pensions') },
+  { label: t(lang, 'services.healthInsurance'), href: "/services/health-insurance", desc: t(lang, 'serviceDesc.healthInsurance') },
+  { label: t(lang, 'services.generalInsurance'), href: "/services/general-insurance", desc: t(lang, 'serviceDesc.generalInsurance') },
 
-  { label: t(lang, 'services.investments'), href: "/investments", desc: t(lang, 'serviceDesc.investments') },
+  { label: t(lang, 'services.investments'), href: "/services/investments", desc: t(lang, 'serviceDesc.investments') },
 ];
 
 export default function Navbar() {
