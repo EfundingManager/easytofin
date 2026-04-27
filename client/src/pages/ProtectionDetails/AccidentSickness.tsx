@@ -11,7 +11,7 @@ export default function AccidentSickness() {
       {/* Back Button */}
       <div className="bg-gray-50 py-4 border-b">
         <div className="container">
-          <Link href="/protection" className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-semibold text-sm">
+          <Link href="/services/protection" className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-semibold text-sm">
             <ArrowLeft size={16} /> Back
           </Link>
         </div>

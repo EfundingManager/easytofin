@@ -1632,3 +1632,12 @@
 ## Phase 61: Fix Broken Links
 - [x] Fix Corporate Health Insurance "Learn more" link (404 error) - Changed href from /services/health-insurance/corporate to /services/health-insurance/group
 - [x] Verify all service detail page links are working correctly
+
+## Phase 62: Fix Broken Detail Page Back-Links
+- [x] Fix AccidentSickness back-link from /protection to /services/protection
+- [x] Fix PersonalAccident back-link from /protection to /services/protection
+- [x] Fix WorkplacePensions back-link from /pensions to /services/pensions
+- [x] Fix PersonalPensions back-link from /pensions to /services/pensions
+- [x] Fix ARF back-link from /pensions to /services/pensions
+- [x] Fix PRSA back-link from /pensions to /services/pensions
+- [x] Test all detail page back-links
