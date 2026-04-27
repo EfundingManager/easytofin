@@ -59,6 +59,10 @@ import MotorInsurance from "./pages/GeneralInsuranceDetails/MotorInsurance";
 import BusinessInsurance from "./pages/GeneralInsuranceDetails/BusinessInsurance";
 import LandlordInsurance from "./pages/GeneralInsuranceDetails/LandlordInsurance";
 import LiabilityInsurance from "./pages/GeneralInsuranceDetails/LiabilityInsurance";
+import SavingsPlans from "./pages/InvestmentsDetails/SavingsPlans";
+import InvestmentBonds from "./pages/InvestmentsDetails/InvestmentBonds";
+import PortfolioManagement from "./pages/InvestmentsDetails/PortfolioManagement";
+import StocksShares from "./pages/InvestmentsDetails/StocksShares";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -103,6 +107,11 @@ function Router() {
       <Route path="/general-insurance/liability" component={LiabilityInsurance} />
 
       <Route path="/investments" component={Investments} />
+      <Route path="/investments/savings-plans" component={SavingsPlans} />
+      <Route path="/investments/bonds" component={InvestmentBonds} />
+      <Route path="/investments/portfolio-management" component={PortfolioManagement} />
+      <Route path="/investments/stocks-shares" component={StocksShares} />
+
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />

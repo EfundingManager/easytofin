@@ -1551,3 +1551,11 @@
 - [x] Create Liability Insurance detail page (coverage, exclusions, premiums)
 - [x] Add routes to App.tsx for general insurance detail pages
 - [x] Test navigation to all general insurance detail pages
+
+## Phase 52: Investment Detail Pages
+- [x] Create Savings Plans detail page (investment options, risk profiles, returns)
+- [x] Create Investment Bonds detail page (features, tax benefits, risk profiles)
+- [x] Create Portfolio Management detail page (services, strategies, advisory)
+- [x] Create Stocks & Shares detail page (trading, investment options, risk management)
+- [x] Add routes to App.tsx for investment detail pages
+- [x] Test navigation to all investment detail pages
