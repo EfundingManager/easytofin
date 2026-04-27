@@ -1542,3 +1542,12 @@
 - [x] Create Corporate Health Insurance detail page (coverage, exclusions, premiums)
 - [x] Add routes to App.tsx for health insurance detail pages
 - [x] Test navigation to all health insurance detail pages
+
+## Phase 51: General Insurance Detail Pages
+- [x] Create Home Insurance detail page (coverage, exclusions, premiums)
+- [x] Create Motor Insurance detail page (coverage, exclusions, premiums)
+- [x] Create Business Insurance detail page (coverage, exclusions, premiums)
+- [x] Create Landlord Insurance detail page (coverage, exclusions, premiums)
+- [x] Create Liability Insurance detail page (coverage, exclusions, premiums)
+- [x] Add routes to App.tsx for general insurance detail pages
+- [x] Test navigation to all general insurance detail pages

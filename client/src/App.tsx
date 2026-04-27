@@ -54,6 +54,11 @@ import ARFDetail from "./pages/PensionsDetails/ARFDetail";
 import IndividualHealth from "./pages/HealthInsuranceDetails/IndividualHealth";
 import FamilyHealth from "./pages/HealthInsuranceDetails/FamilyHealth";
 import CorporateHealth from "./pages/HealthInsuranceDetails/CorporateHealth";
+import HomeInsurance from "./pages/GeneralInsuranceDetails/HomeInsurance";
+import MotorInsurance from "./pages/GeneralInsuranceDetails/MotorInsurance";
+import BusinessInsurance from "./pages/GeneralInsuranceDetails/BusinessInsurance";
+import LandlordInsurance from "./pages/GeneralInsuranceDetails/LandlordInsurance";
+import LiabilityInsurance from "./pages/GeneralInsuranceDetails/LiabilityInsurance";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -91,6 +96,11 @@ function Router() {
       <Route path="/health-insurance/family" component={FamilyHealth} />
       <Route path="/health-insurance/group" component={CorporateHealth} />
       <Route path="/general-insurance" component={GeneralInsurance} />
+      <Route path="/general-insurance/home" component={HomeInsurance} />
+      <Route path="/general-insurance/motor" component={MotorInsurance} />
+      <Route path="/general-insurance/business" component={BusinessInsurance} />
+      <Route path="/general-insurance/landlord" component={LandlordInsurance} />
+      <Route path="/general-insurance/liability" component={LiabilityInsurance} />
 
       <Route path="/investments" component={Investments} />
       <Route path="/about" component={About} />
