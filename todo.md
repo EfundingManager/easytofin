@@ -1719,3 +1719,11 @@
 - [x] Add role-based access control for edit/delete (Admin can edit/delete Staff, Support, User)
 - [x] Write vitest tests for edit/delete functionality
 - [x] Verify all functionality works correctly
+
+## Phase 77: Add Customer and User Roles to Dropdown
+- [x] Update User Management component to include Customer and User roles in all role dropdowns
+- [x] Update database schema to add customer role to users and phoneUsers tables
+- [x] Update backend role validation to support Customer and User role assignments
+- [x] Update role filter dropdown to include Customer and User options
+- [x] Test role assignment and filtering for all roles
+- [x] Verify access control still works correctly

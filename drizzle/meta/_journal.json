@@ -169,6 +169,13 @@
       "when": 1777415220198,
       "tag": "0023_wide_shaman",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1777416859415,
+      "tag": "0024_bizarre_hulk",
+      "breakpoints": true
     }
   ]
 }

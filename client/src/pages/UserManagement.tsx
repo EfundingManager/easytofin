@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
-type UserRole = "super_admin" | "admin" | "staff" | "support";
+type UserRole = "super_admin" | "admin" | "staff" | "support" | "customer" | "user";
 
 export default function UserManagement() {
   const { user, loading } = useAuth();
@@ -179,6 +179,8 @@ export default function UserManagement() {
                         <>
                           <SelectItem value="staff">Staff</SelectItem>
                           <SelectItem value="support">Support</SelectItem>
+                          <SelectItem value="customer">Customer</SelectItem>
+                          <SelectItem value="user">User</SelectItem>
                         </>
                       )}
                       {isSuperAdmin && (
@@ -187,6 +189,8 @@ export default function UserManagement() {
                           <SelectItem value="admin">Admin</SelectItem>
                           <SelectItem value="staff">Staff</SelectItem>
                           <SelectItem value="support">Support</SelectItem>
+                          <SelectItem value="customer">Customer</SelectItem>
+                          <SelectItem value="user">User</SelectItem>
                         </>
                       )}
                     </SelectContent>
@@ -226,6 +230,8 @@ export default function UserManagement() {
             <SelectItem value="admin">Admin</SelectItem>
             <SelectItem value="staff">Staff</SelectItem>
             <SelectItem value="support">Support</SelectItem>
+            <SelectItem value="customer">Customer</SelectItem>
+            <SelectItem value="user">User</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -322,6 +328,8 @@ export default function UserManagement() {
                                               <>
                                                 <SelectItem value="staff">Staff</SelectItem>
                                                 <SelectItem value="support">Support</SelectItem>
+                                                <SelectItem value="customer">Customer</SelectItem>
+                                                <SelectItem value="user">User</SelectItem>
                                               </>
                                             )}
                                             {isSuperAdmin && (
@@ -330,6 +338,8 @@ export default function UserManagement() {
                                                 <SelectItem value="admin">Admin</SelectItem>
                                                 <SelectItem value="staff">Staff</SelectItem>
                                                 <SelectItem value="support">Support</SelectItem>
+                                                <SelectItem value="customer">Customer</SelectItem>
+                                                <SelectItem value="user">User</SelectItem>
                                               </>
                                             )}
                                           </SelectContent>

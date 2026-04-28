@@ -854,7 +854,7 @@ export const adminRouter = router({
   getUsers: adminProcedure
     .input(
       z.object({
-        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin"]).optional(),
+        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin", "customer"]).optional(),
         search: z.string().optional(),
       })
     )
@@ -899,7 +899,7 @@ export const adminRouter = router({
     .input(
       z.object({
         email: z.string().email(),
-        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin"]),
+        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin", "customer"]),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -951,7 +951,7 @@ export const adminRouter = router({
     .input(
       z.object({
         id: z.number().int().positive(),
-        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin"]),
+        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin", "customer"]),
       })
     )
     .mutation(async ({ input, ctx }) => {
