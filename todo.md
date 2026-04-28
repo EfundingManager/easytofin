@@ -1654,3 +1654,7 @@
 - [x] Update Health Insurance link from /health-insurance to /services/health-insurance
 - [x] Update General Insurance link from /general-insurance to /services/general-insurance
 - [x] Update Investments link from /investments to /services/investments
+
+## Phase 65: Update Chinese Translations
+- [x] Replace "独立公正的建议" with "客户至上"
+- [x] Replace "我们为您工作，而不是为保险公司。我们的建议始终以您的最佳利益为出发点。" with "我们精诚为您服务，而非为保险公司服务。我们的每一个建议，都始终以您的利益为最高准则。"
