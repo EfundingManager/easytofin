@@ -550,7 +550,7 @@ export const translations = {
     testimonials: {
       sarah: 'EasyToFin让人寵保险的整个购买过程变得异常简单。他们以我们负担得起的价格，帮我们找到了一份非常优质的保单。',
       james: '从始至终的优质服务。养老金咨询清晰、诚实且真正有帮助。强烈推荐。',
-      aoife: '我们的抵押贷款保障很快就解决了，没有任何麻烦。团队专业且反应迅速。',
+      aoife: '我们的按揭保障保险很快就搬定了，快捷又省心。团队专业，回复也非常及时。',
     },
     // Protection page
     protection: {

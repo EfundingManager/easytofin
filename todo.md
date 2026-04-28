@@ -1669,3 +1669,6 @@
 
 ## Phase 68: Update Sarah's Testimonial
 - [x] Replace Sarah's testimonial with improved Chinese wording
+
+## Phase 69: Update Aoife's Testimonial
+- [x] Replace Aoife's testimonial with improved Chinese wording
