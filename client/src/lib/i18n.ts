@@ -525,8 +525,8 @@ export const translations = {
     },
     // Why points
     why: {
-      integrity: '诚信',
-      integrityDesc: '我们始终以您的最佳利益行动。我们的建议诚实、透明，没有利益冲突。',
+      integrity: '诚信为本',
+      integrityDesc: '我们始终以您的利益为先。建议真实、透明，无任何利益冲突。',
       clientFocus: '客户至上',
       clientFocusDesc: '您是我们所做一切的中心。我们倾听、理解并根据您的独特情况定制建议。',
       expertise: '专业知识',

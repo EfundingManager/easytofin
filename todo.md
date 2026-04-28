@@ -1675,3 +1675,7 @@
 
 ## Phase 70: Update Chinese Translation for Financial Advice
 - [x] Replace "我们相信良好的财务建议不应该是仅供富人享受的奢侈品。" with "我们相信，优质的财务建议不应该是少数人的特权。" in both story2 and p2 sections
+
+## Phase 71: Update Chinese Integrity Translations
+- [x] Replace "诚信" with "诚信为本"
+- [x] Replace "我们始终以您的最佳利益行动。我们的建议诚实、透明，没有利益冲突。" with "我们始终以您的利益为先。建议真实、透明，无任何利益冲突。"
