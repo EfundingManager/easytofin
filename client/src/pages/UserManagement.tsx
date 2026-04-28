@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Search, Edit2, Trash2, Plus, UserCheck } from "lucide-react";
+import { AlertCircle, Search, Edit2, Trash2, Plus, UserCheck, ArrowLeft } from "lucide-react";
+import { useLocation } from "wouter";
 import {
   Dialog,
   DialogContent,
@@ -27,12 +28,14 @@ type UserRole = "super_admin" | "admin" | "staff" | "support";
 
 export default function UserManagement() {
   const { user, loading } = useAuth();
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState<UserRole | "all">("all");
   const [editingUser, setEditingUser] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserRole, setNewUserRole] = useState<UserRole>("staff");
+  const [deleteConfirmUser, setDeleteConfirmUser] = useState<any>(null);
 
   // Fetch users
   const usersQuery = trpc.admin.getUsers.useQuery({
@@ -124,11 +127,22 @@ export default function UserManagement() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage team members and their roles
-          </p>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation("/admin")}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
+            <p className="text-muted-foreground mt-2">
+              Manage team members and their roles
+            </p>
+          </div>
         </div>
         {(isAdmin || isSuperAdmin) && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -337,14 +351,51 @@ export default function UserManagement() {
                                   )}
                                 </DialogContent>
                               </Dialog>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => deleteUserMutation.mutate({ id: u.id })}
-                                disabled={deleteUserMutation.isPending}
-                              >
-                                <Trash2 className="h-4 w-4 text-red-500" />
-                              </Button>
+                              <Dialog open={deleteConfirmUser?.id === u.id} onOpenChange={(open) => !open && setDeleteConfirmUser(null)}>
+                                <DialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setDeleteConfirmUser(u)}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogHeader>
+                                    <DialogTitle>Delete User</DialogTitle>
+                                    <DialogDescription>
+                                      Are you sure you want to delete this user? This action cannot be undone.
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  {deleteConfirmUser && (
+                                    <div className="space-y-4">
+                                      <div className="bg-muted p-3 rounded">
+                                        <p className="text-sm"><strong>Email:</strong> {deleteConfirmUser.email}</p>
+                                        <p className="text-sm"><strong>Role:</strong> {deleteConfirmUser.role.replace("_", " ")}</p>
+                                      </div>
+                                      <div className="flex gap-3 justify-end">
+                                        <Button
+                                          variant="outline"
+                                          onClick={() => setDeleteConfirmUser(null)}
+                                        >
+                                          Cancel
+                                        </Button>
+                                        <Button
+                                          variant="destructive"
+                                          onClick={() => {
+                                            deleteUserMutation.mutate({ id: deleteConfirmUser.id });
+                                            setDeleteConfirmUser(null);
+                                          }}
+                                          disabled={deleteUserMutation.isPending}
+                                        >
+                                          {deleteUserMutation.isPending ? "Deleting..." : "Delete"}
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </DialogContent>
+                              </Dialog>
                             </>
                           )}
                         </div>

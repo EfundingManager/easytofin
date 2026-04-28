@@ -1710,3 +1710,12 @@
 - [x] Verify project compiles without errors
 - [x] Fix 404 error by adding route to App.tsx and importing UserManagement component
 - [x] Verify User Management page loads successfully with user list
+
+## Phase 76: Add Back Button and Edit/Delete User Functionality
+- [x] Add back button to User Management page to return to admin dashboard
+- [x] Implement inline edit functionality for user roles
+- [x] Implement delete user functionality with confirmation dialog
+- [x] Update backend procedures to support edit and delete operations
+- [x] Add role-based access control for edit/delete (Admin can edit/delete Staff, Support, User)
+- [x] Write vitest tests for edit/delete functionality
+- [x] Verify all functionality works correctly
