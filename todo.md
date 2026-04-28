@@ -1658,3 +1658,7 @@
 ## Phase 65: Update Chinese Translations
 - [x] Replace "独立公正的建议" with "客户至上"
 - [x] Replace "我们为您工作，而不是为保险公司。我们的建议始终以您的最佳利益为出发点。" with "我们精诚为您服务，而非为保险公司服务。我们的每一个建议，都始终以您的利益为最高准则。"
+
+## Phase 66: Update More Chinese Translations
+- [x] Replace "量身定制的解决方案" with "方案量身定制"
+- [x] Replace "没有两个客户是相同的。我们建立适合您独特情况和目标的计划。" with "每位客户都独一无二。我们将根据您的具体处境与目标，打造专属您的规划。"
