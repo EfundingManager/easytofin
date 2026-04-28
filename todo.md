@@ -1686,3 +1686,7 @@
 ## Phase 73: Update Chinese Expertise Translation
 - [x] Replace "专业知识" with "专业精湛"
 - [x] Replace "我们的团队拥有最高的专业资格，并随时了解最新的财务法规和产品。" with "团队持最高专业资质，时刻紧跟最新法规与产品动态。"
+
+## Phase 74: Update Chinese Partnership Translation
+- [x] Replace "长期合作伙伴关系" with "长期合作"
+- [x] Replace "我们建立长期关系，随着您的生活变化审查您的财务计划，确保它始终为您的目标服务。" with "我们建立长久关系，随您人生阶段的变化持续调整您的财务方案，确保它始终为您的目标服务。"
