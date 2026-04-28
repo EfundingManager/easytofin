@@ -1682,3 +1682,7 @@
 
 ## Phase 72: Update Chinese Client Focus Translation
 - [x] Replace "您是我们所做一切的中心。我们倾听、理解并根据您的独特情况定制建议。" with "您是我们一切工作的核心。倾听、理解、量身定制 。我们将以此为准则，为您提供"一人一策"的个性化方案。"
+
+## Phase 73: Update Chinese Expertise Translation
+- [x] Replace "专业知识" with "专业精湛"
+- [x] Replace "我们的团队拥有最高的专业资格，并随时了解最新的财务法规和产品。" with "团队持最高专业资质，时刻紧跟最新法规与产品动态。"
