@@ -1641,3 +1641,9 @@
 - [x] Fix ARF back-link from /pensions to /services/pensions
 - [x] Fix PRSA back-link from /pensions to /services/pensions
 - [x] Test all detail page back-links
+
+## Phase 63: Update WeCom Customer Contact
+- [x] Add WeCom customer contact link above QR code
+- [x] Link to https://work.weixin.qq.com/kfid/kfc791e65adfaf43aac
+- [x] Update WeComWidgetSimple.tsx with new WeCom link
+- [x] Update all WeCom references to use new kfid

@@ -111,7 +111,7 @@ function removeWeComWidget() {
  */
 function openWeComChat() {
   // WeCom API link with kfid for customer service routing
-  const wecomChatUrl = 'https://work.weixin.qq.com/kfid/kfc17931e7a2589a51a';
+  const wecomChatUrl = 'https://work.weixin.qq.com/kfid/kfc791e65adfaf43aac';
 
   console.log('Opening WeCom chat window with kfid');
 
@@ -141,7 +141,7 @@ function openWeComChat() {
  */
 function openWeComFallback() {
   // Use WeCom's official API link with kfid as fallback
-  const fallbackUrl = 'https://work.weixin.qq.com/kfid/kfc17931e7a2589a51a';
+  const fallbackUrl = 'https://work.weixin.qq.com/kfid/kfc791e65adfaf43aac';
   
   console.log('Using WeCom fallback URL:', fallbackUrl);
   
@@ -150,6 +150,6 @@ function openWeComFallback() {
   } catch (error) {
     console.error('Error opening WeCom fallback:', error);
     // Last resort: Show alert with WeCom info
-    alert('Please visit https://work.weixin.qq.com/kfid/kfc17931e7a2589a51a to contact us via WeCom');
+    alert('Please visit https://work.weixin.qq.com/kfid/kfc791e65adfaf43aac to contact us via WeCom');
   }
 }
