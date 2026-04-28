@@ -1662,3 +1662,7 @@
 ## Phase 66: Update More Chinese Translations
 - [x] Replace "量身定制的解决方案" with "方案量身定制"
 - [x] Replace "没有两个客户是相同的。我们建立适合您独特情况和目标的计划。" with "每位客户都独一无二。我们将根据您的具体处境与目标，打造专属您的规划。"
+
+## Phase 67: Update Ongoing Support Chinese Translations
+- [x] Replace "持续支持" with "长期陪伴支持"
+- [x] Replace "我们在这里长期服务——随着您的生活变化审查您的保障。" with "我们着眼长远。 随着您人生阶段的变迁，持续为您检视并优化保障。"

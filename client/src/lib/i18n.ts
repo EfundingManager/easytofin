@@ -543,8 +543,8 @@ export const translations = {
       tailoredDesc: '每位客户都独一无二。我们将根据您的具体处境与目标，打造专属您的规划。',
       wholeMarket: '全市场获取',
       wholeMarketDesc: '我们比较爱尔兰领先提供商的产品，为您找到最佳价值。',
-      ongoingSupport: '持续支持',
-      ongoingSupportDesc: '我们在这里长期服务——随着您的生活变化审查您的保障。',
+      ongoingSupport: '长期陰伴支持',
+      ongoingSupportDesc: '我们着眉长远。 随着您人生阶段的变迁，持续为您检视并优化保障。',
     },
     // Testimonials
     testimonials: {
