@@ -1690,3 +1690,21 @@
 ## Phase 74: Update Chinese Partnership Translation
 - [x] Replace "长期合作伙伴关系" with "长期合作"
 - [x] Replace "我们建立长期关系，随着您的生活变化审查您的财务计划，确保它始终为您的目标服务。" with "我们建立长久关系，随您人生阶段的变化持续调整您的财务方案，确保它始终为您的目标服务。"
+
+## Phase 75: Add User Management to Admin Dashboard
+- [ ] Update database schema to add user roles (Super Admin, Admin, Staff, Support)
+- [ ] Create User Management backend procedures for CRUD operations
+- [ ] Build User Management UI component with role-based access control
+- [ ] Add User Management navigation item under Email Blaster in left sidebar
+- [ ] Implement admin write access to Admin, Staff, Support profiles
+- [ ] Write vitest tests for User Management functionality
+- [ ] Save checkpoint with User Management feature
+
+## Phase 75: Add User Management feature to admin dashboard
+- [x] Update database schema to add "support" role to users and phoneUsers tables
+- [x] Create User Management backend procedures (getUsers, createUser, updateUser, deleteUser)
+- [x] Implement role-based access control for Admin and Super Admin
+- [x] Create User Management frontend component with list, create, edit, delete functionality
+- [x] Add User Management navigation to left sidebar under Email Blaster
+- [x] Write vitest tests for User Management procedures
+- [x] Verify project compiles without errors

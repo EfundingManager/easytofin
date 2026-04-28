@@ -1,0 +1,2 @@
+ALTER TABLE `phoneUsers` MODIFY COLUMN `role` enum('user','admin','manager','staff','support','super_admin') NOT NULL DEFAULT 'user';--> statement-breakpoint
+ALTER TABLE `users` MODIFY COLUMN `role` enum('user','admin','manager','staff','support','super_admin') NOT NULL DEFAULT 'user';

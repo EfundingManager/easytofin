@@ -847,4 +847,181 @@ export const adminRouter = router({
       };
     }
   }),
+
+  /**
+   * Get all users with optional role and search filters
+   */
+  getUsers: adminProcedure
+    .input(
+      z.object({
+        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin"]).optional(),
+        search: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return [];
+
+      try {
+        let results: any = await db
+          .select({
+            id: phoneUsers.id,
+            name: phoneUsers.name,
+            email: phoneUsers.email,
+            role: phoneUsers.role,
+            createdAt: phoneUsers.createdAt,
+          })
+          .from(phoneUsers);
+
+        if (input.role) {
+          results = results.filter((u: any) => u.role === input.role);
+        }
+
+        if (input.search) {
+          const searchLower = input.search.toLowerCase();
+          results = results.filter((user: any) =>
+            user.name?.toLowerCase().includes(searchLower) ||
+            user.email?.toLowerCase().includes(searchLower)
+          );
+        }
+
+        return results;
+      } catch (error) {
+        console.error("[Admin] Failed to get users:", error);
+        return [];
+      }
+    }),
+
+  /**
+   * Create a new user with specified role
+   */
+  createUser: adminProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin"]),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      if (ctx.user.role === "admin") {
+        if (input.role !== "staff" && input.role !== "support") {
+          throw new Error("Admins can only create Staff and Support users");
+        }
+      } else if (ctx.user.role !== "super_admin") {
+        throw new Error("Insufficient permissions");
+      }
+
+      try {
+        const existing = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.email, input.email))
+          .then((res: any) => res[0]);
+
+        if (existing) {
+          throw new Error("User with this email already exists");
+        }
+
+        await db.insert(phoneUsers).values({
+          email: input.email,
+          role: input.role as any,
+          name: input.email.split("@")[0],
+          verified: "false",
+          emailVerified: "false",
+          clientStatus: "assigned",
+          kycStatus: "pending",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        return { success: true, message: "User created" };
+      } catch (error: any) {
+        console.error("[Admin] Failed to create user:", error);
+        throw new Error(error.message || "Failed to create user");
+      }
+    }),
+
+  /**
+   * Update a user's role
+   */
+  updateUser: adminProcedure
+    .input(
+      z.object({
+        id: z.number().int().positive(),
+        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin"]),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      if (ctx.user.role === "admin") {
+        if (input.role !== "staff" && input.role !== "support") {
+          throw new Error("Admins can only update Staff and Support users");
+        }
+      } else if (ctx.user.role !== "super_admin") {
+        throw new Error("Insufficient permissions");
+      }
+
+      try {
+        const user = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.id, input.id))
+          .then((res: any) => res[0]);
+
+        if (!user) throw new Error("User not found");
+
+        if (ctx.user.role === "admin" && (user.role === "admin" || user.role === "super_admin")) {
+          throw new Error("You cannot update Admin or Super Admin users");
+        }
+
+        await db
+          .update(phoneUsers)
+          .set({ role: input.role as any, updatedAt: new Date() })
+          .where(eq(phoneUsers.id, input.id));
+
+        return { success: true, message: "User updated" };
+      } catch (error: any) {
+        console.error("[Admin] Failed to update user:", error);
+        throw new Error(error.message || "Failed to update user");
+      }
+    }),
+
+  /**
+   * Delete a user
+   */
+  deleteUser: adminProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      try {
+        const user = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.id, input.id))
+          .then((res: any) => res[0]);
+
+        if (!user) throw new Error("User not found");
+
+        if (ctx.user.role === "admin") {
+          if (user.role !== "staff" && user.role !== "support") {
+            throw new Error("You cannot delete Admin or Super Admin users");
+          }
+        } else if (ctx.user.role !== "super_admin") {
+          throw new Error("Insufficient permissions");
+        }
+
+        await db.delete(phoneUsers).where(eq(phoneUsers.id, input.id));
+        return { success: true, message: "User deleted" };
+      } catch (error: any) {
+        console.error("[Admin] Failed to delete user:", error);
+        throw new Error(error.message || "Failed to delete user");
+      }
+    }),
 });

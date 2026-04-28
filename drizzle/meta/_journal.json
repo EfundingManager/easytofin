@@ -162,6 +162,13 @@
       "when": 1777193843262,
       "tag": "0022_talented_cargill",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1777415220198,
+      "tag": "0023_wide_shaman",
+      "breakpoints": true
     }
   ]
 }
