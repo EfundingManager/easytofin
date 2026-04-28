@@ -1666,3 +1666,6 @@
 ## Phase 67: Update Ongoing Support Chinese Translations
 - [x] Replace "持续支持" with "长期陪伴支持"
 - [x] Replace "我们在这里长期服务——随着您的生活变化审查您的保障。" with "我们着眼长远。 随着您人生阶段的变迁，持续为您检视并优化保障。"
+
+## Phase 68: Update Sarah's Testimonial
+- [x] Replace Sarah's testimonial with improved Chinese wording
