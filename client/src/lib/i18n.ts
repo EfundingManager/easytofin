@@ -528,7 +528,7 @@ export const translations = {
       integrity: '诚信为本',
       integrityDesc: '我们始终以您的利益为先。建议真实、透明，无任何利益冲突。',
       clientFocus: '客户至上',
-      clientFocusDesc: '您是我们所做一切的中心。我们倾听、理解并根据您的独特情况定制建议。',
+      clientFocusDesc: '您是我们一切工作的核心。倾听、理解、量身定制 。我们将以此为准则，为您提供“一人一策”的个性化方案。',
       expertise: '专业知识',
       expertiseDesc: '我们的团队拥有最高的专业资格，并随时了解最新的财务法规和产品。',
       partnership: '长期合作伙伴关系',

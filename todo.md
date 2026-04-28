@@ -1679,3 +1679,6 @@
 ## Phase 71: Update Chinese Integrity Translations
 - [x] Replace "诚信" with "诚信为本"
 - [x] Replace "我们始终以您的最佳利益行动。我们的建议诚实、透明，没有利益冲突。" with "我们始终以您的利益为先。建议真实、透明，无任何利益冲突。"
+
+## Phase 72: Update Chinese Client Focus Translation
+- [x] Replace "您是我们所做一切的中心。我们倾听、理解并根据您的独特情况定制建议。" with "您是我们一切工作的核心。倾听、理解、量身定制 。我们将以此为准则，为您提供"一人一策"的个性化方案。"
