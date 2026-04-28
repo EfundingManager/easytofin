@@ -1672,3 +1672,6 @@
 
 ## Phase 69: Update Aoife's Testimonial
 - [x] Replace Aoife's testimonial with improved Chinese wording
+
+## Phase 70: Update Chinese Translation for Financial Advice
+- [x] Replace "我们相信良好的财务建议不应该是仅供富人享受的奢侈品。" with "我们相信，优质的财务建议不应该是少数人的特权。" in both story2 and p2 sections
