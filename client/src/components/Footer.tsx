@@ -8,12 +8,11 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n";
 
 const getServices = (lang: 'en' | 'zh' | 'pl') => [
-  { label: t(lang, 'services.protection'), href: "/protection" },
-  { label: t(lang, 'services.pensions'), href: "/pensions" },
-  { label: t(lang, 'services.healthInsurance'), href: "/health-insurance" },
-  { label: t(lang, 'services.generalInsurance'), href: "/general-insurance" },
-
-  { label: t(lang, 'services.investments'), href: "/investments" },
+  { label: t(lang, 'services.protection'), href: "/services/protection" },
+  { label: t(lang, 'services.pensions'), href: "/services/pensions" },
+  { label: t(lang, 'services.healthInsurance'), href: "/services/health-insurance" },
+  { label: t(lang, 'services.generalInsurance'), href: "/services/general-insurance" },
+  { label: t(lang, 'services.investments'), href: "/services/investments" },
 ];
 
 const getCompany = (lang: 'en' | 'zh' | 'pl') => [

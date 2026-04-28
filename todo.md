@@ -1647,3 +1647,10 @@
 - [x] Link to https://work.weixin.qq.com/kfid/kfc791e65adfaf43aac
 - [x] Update WeComWidgetSimple.tsx with new WeCom link
 - [x] Update all WeCom references to use new kfid
+
+## Phase 64: Fix Footer Service Links
+- [x] Update Protection link from /protection to /services/protection
+- [x] Update Pensions link from /pensions to /services/pensions
+- [x] Update Health Insurance link from /health-insurance to /services/health-insurance
+- [x] Update General Insurance link from /general-insurance to /services/general-insurance
+- [x] Update Investments link from /investments to /services/investments
