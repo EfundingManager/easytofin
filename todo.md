@@ -1760,3 +1760,5 @@
 - [x] Verify cookie domain logic with unit tests - PASSED all 6 tests
 - [x] Fix createPhoneUser database insertion - FIXED: googleId, name, loginMethod now stored correctly
 - [x] Verify auth.me returns authenticated user - CONFIRMED: Session authentication working
+- [x] Add automatic googleId update for existing users - FIXED: Existing users updated on next Google login
+- [x] Create backfill migration script - CREATED: server/migrations/backfill-google-ids.mjs

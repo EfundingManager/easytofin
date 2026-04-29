@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as db from "../db";
-import { createPhoneUser, getPhoneUserByEmail } from "../db";
+import { createPhoneUser, getPhoneUserByEmail, updatePhoneUser, getPhoneUserById } from "../db";
 import { TRPCError } from "@trpc/server";
 import { sdk } from "../_core/sdk";
 import { router, publicProcedure } from "../_core/trpc";
@@ -50,6 +50,32 @@ export const gmailAuthRouter = router({
             loginMethod: "google",
           });
           isNewRegistration = true;
+        } else {
+          // Update existing user with Google profile data (fixes users who logged in before the fix)
+          // This ensures googleId, name, loginMethod, and picture are populated for existing users
+          if (!existingUser.googleId || existingUser.loginMethod !== "google") {
+            console.log("[Gmail Auth] Updating existing user with Google profile data:", { userId: existingUser.id, email: existingUser.email });
+            await updatePhoneUser(existingUser.id, {
+              googleId: input.googleId,
+              name: input.name || existingUser.name,
+              picture: input.picture || existingUser.picture,
+              emailVerified: "true",
+              loginMethod: "google",
+            });
+            // Refresh the user object with updated data
+            const refreshedUser = await getPhoneUserById(existingUser.id);
+            if (refreshedUser) {
+              existingUser = refreshedUser;
+            }
+          }
+        }
+
+        // TypeScript type guard: existingUser is guaranteed to be defined here
+        if (!existingUser) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create or retrieve user",
+          });
         }
 
         const userRole = existingUser.role ?? "user";
