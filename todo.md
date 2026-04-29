@@ -1758,3 +1758,5 @@
 - [x] Add Google Sign-In button to AuthSelection page - ADDED
 - [x] Fix VITE_APP_URL environment variable - FIXED: Set to https://www.easytofin.com
 - [x] Verify cookie domain logic with unit tests - PASSED all 6 tests
+- [x] Fix createPhoneUser database insertion - FIXED: googleId, name, loginMethod now stored correctly
+- [x] Verify auth.me returns authenticated user - CONFIRMED: Session authentication working

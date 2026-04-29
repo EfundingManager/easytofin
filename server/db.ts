@@ -97,8 +97,32 @@ export async function createPhoneUser(data: InsertPhoneUser): Promise<PhoneUser>
   }
 
   try {
+    // Build the values object with all provided fields
+    const insertData: any = {
+      email: data.email,
+      name: data.name,
+      phone: data.phone,
+      address: data.address,
+      picture: data.picture,
+      loginMethod: data.loginMethod,
+      googleId: data.googleId,
+      emailVerified: data.emailVerified,
+      role: data.role || 'user',
+      twoFactorEnabled: data.twoFactorEnabled || 'false',
+      verified: data.verified || 'false',
+      clientStatus: data.clientStatus || 'queue',
+      kycStatus: data.kycStatus || 'pending',
+    };
+    
+    // Filter out undefined values to avoid overwriting existing data
+    const filteredData = Object.fromEntries(
+      Object.entries(insertData).filter(([_, v]) => v !== undefined && v !== null)
+    );
+    
+    console.log("[Phone Auth] Creating phone user with data:", { ...filteredData, googleId: filteredData.googleId ? '***' : undefined });
+    
     // Use upsert pattern: insert or update if phone already exists
-    await db.insert(phoneUsers).values(data).onDuplicateKeyUpdate({
+    await db.insert(phoneUsers).values(filteredData).onDuplicateKeyUpdate({
       set: {
         email: data.email,
         name: data.name,
