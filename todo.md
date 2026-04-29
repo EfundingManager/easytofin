@@ -1756,3 +1756,5 @@
 - [x] Debug authenticateRequest to see why session verification fails - Added detailed logging
 - [x] Add trust proxy configuration to Express - FIXED
 - [x] Add Google Sign-In button to AuthSelection page - ADDED
+- [x] Fix VITE_APP_URL environment variable - FIXED: Set to https://www.easytofin.com
+- [x] Verify cookie domain logic with unit tests - PASSED all 6 tests
