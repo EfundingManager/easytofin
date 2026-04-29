@@ -1745,3 +1745,14 @@
 - [x] Verified auth.me procedure returns correct user data after OAuth
 - [x] Verified role-based redirection works correctly after login
 - [x] Users like 'alexlin202@gmail.com' can now access their dashboards
+
+
+## Debugging: Session Cookie Transmission Issue
+- [x] Check if session cookie is being set in OAuth callback response - CONFIRMED
+- [x] Verify cookie is being transmitted in subsequent requests to /api/trpc - CONFIRMED on preview domain
+- [x] Check browser console for cookie errors or warnings - No errors found
+- [x] Verify cookie domain and path settings - FIXED: Improved domain handling for custom domains
+- [x] Check if credentials: 'include' is set in fetch requests - CONFIRMED in tRPC client
+- [x] Debug authenticateRequest to see why session verification fails - Added detailed logging
+- [x] Add trust proxy configuration to Express - FIXED
+- [x] Add Google Sign-In button to AuthSelection page - ADDED

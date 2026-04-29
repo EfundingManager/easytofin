@@ -37,23 +37,20 @@ export function getSessionCookieOptions(
   // Extract hostname without port
   const hostname = rawHost.split(":")[0];
   
-  // Don't set domain for preview/manus domains - use host-only cookies
+  // For custom domains (easytofin.com, www.easytofin.com), set domain to allow sharing
+  // For preview/manus domains, use host-only cookies
+  // For localhost/IP, use host-only cookie
   const isPreviewDomain = hostname.includes("manus.computer");
   
-  const shouldSetDomain =
+  let domain: string | undefined = undefined;
+  
+  // Only set domain for production custom domains (not preview, not localhost)
+  if (
     hostname &&
     !LOCAL_HOSTS.has(hostname) &&
     !isIpAddress(hostname) &&
-    !isPreviewDomain &&
-    hostname !== "127.0.0.1" &&
-    hostname !== "::1";
-
-  // For production domains, set domain to allow sharing between www and non-www
-  // This ensures cookies work across domain variants (www.easytofin.com and easytofin.com)
-  // For localhost/IP, use host-only cookie (domain: undefined)
-  let domain: string | undefined = undefined;
-  
-  if (shouldSetDomain && hostname) {
+    !isPreviewDomain
+  ) {
     // Remove 'www.' prefix if present to create a domain that works for both variants
     const baseDomain = hostname.startsWith('www.') ? hostname.slice(4) : hostname;
     // Set domain with leading dot to match all subdomains
@@ -74,7 +71,6 @@ export function getSessionCookieOptions(
     protocol: req.protocol,
     xForwardedHost: forwardedHost,
     hostHeader: hostHeader,
-    shouldSetDomain,
     isPreviewDomain,
     rawHost,
   });

@@ -265,7 +265,12 @@ class SDKServer {
     
     console.log("[Auth] Authenticating request", {
       hostname: req.hostname,
+      protocol: req.protocol,
+      secure: req.secure,
+      xForwardedProto: req.headers['x-forwarded-proto'],
+      xForwardedHost: req.headers['x-forwarded-host'],
       cookieHeader: req.headers.cookie ? "present" : "missing",
+      cookieHeaderValue: req.headers.cookie ? req.headers.cookie.substring(0, 100) : "none",
       sessionCookie: sessionCookie ? "present" : "missing",
       allCookies: Array.from(cookies.keys()),
     });

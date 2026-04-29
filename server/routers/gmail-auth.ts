@@ -91,12 +91,20 @@ export const gmailAuthRouter = router({
         // This is CRITICAL: the cookie must be set on the response, not returned in the body
         const cookieOptions = getSessionCookieOptions(req);
         console.log("[Gmail Auth] Setting session cookie:", { COOKIE_NAME, sessionDuration });
+        console.log("[Gmail Auth] Request details:", {
+          protocol: req.protocol,
+          hostname: req.hostname,
+          secure: req.secure,
+          xForwardedProto: req.headers['x-forwarded-proto'],
+          xForwardedHost: req.headers['x-forwarded-host'],
+        });
         console.log("[Gmail Auth] Cookie options:", cookieOptions);
         res.cookie(COOKIE_NAME, sessionToken, {
           ...cookieOptions,
           maxAge: sessionDuration,
         } as any);
         console.log("[Gmail Auth] Session cookie set successfully");
+        console.log("[Gmail Auth] Response headers after cookie set:", res.getHeaders());
 
         // Determine redirect URL based on role and clientStatus
         let redirectUrl = "/user/dashboard";
