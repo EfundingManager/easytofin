@@ -1762,3 +1762,4 @@
 - [x] Verify auth.me returns authenticated user - CONFIRMED: Session authentication working
 - [x] Add automatic googleId update for existing users - FIXED: Existing users updated on next Google login
 - [x] Create backfill migration script - CREATED: server/migrations/backfill-google-ids.mjs
+- [x] Execute backfill migration - COMPLETED: 653 users with googleId, 263 without (will be auto-updated on next login)

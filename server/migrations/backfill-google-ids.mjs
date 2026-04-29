@@ -35,7 +35,7 @@ async function main() {
       user: url.username,
       password: url.password,
       database: url.pathname.slice(1),
-      ssl: 'Amazon RDS' in url.hostname ? { rejectUnauthorized: false } : false,
+      ssl: url.hostname.includes('tidbcloud') ? { rejectUnauthorized: false } : false,
     };
 
     connection = await mysql.createConnection(config);
