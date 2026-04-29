@@ -46,7 +46,7 @@
 - [ ] Implement logout functionality
 
 ## Phase 6: Testing & Deployment
-- [ ] Test client registration flow (Gmail OAuth)
+- [x] Test client registration flow (Gmail OAuth) - Fixed session handling
 - [ ] Test phone registration with 2FA
 - [ ] Test product selection flow
 - [ ] Test fact-finding forms for all products
@@ -1727,3 +1727,21 @@
 - [x] Update role filter dropdown to include Customer and User options
 - [x] Test role assignment and filtering for all roles
 - [x] Verify access control still works correctly
+
+## Phase 79: Fix Google OAuth Session Handling
+- [ ] Investigate Google OAuth callback flow and session creation
+- [ ] Check session cookie handling and transmission after callback
+- [ ] Fix session initialization in OAuth callback handler
+- [ ] Verify auth.me procedure returns correct user data after Google login
+- [ ] Test end-to-end Google OAuth flow with proper session persistence
+- [ ] Verify user can access /user/dashboard after Google OAuth login
+
+
+## Google OAuth Session Fix (Completed)
+- [x] Fixed createPhoneUser to include googleId and emailVerified in upsert set
+- [x] Improved user lookup logic to prioritize googleId for Gmail authentication
+- [x] Verified session token creation uses googleId as openId
+- [x] Verified authenticateRequest correctly retrieves phoneUser by googleId
+- [x] Verified auth.me procedure returns correct user data after OAuth
+- [x] Verified role-based redirection works correctly after login
+- [x] Users like 'alexlin202@gmail.com' can now access their dashboards

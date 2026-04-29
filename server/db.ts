@@ -105,8 +105,18 @@ export async function createPhoneUser(data: InsertPhoneUser): Promise<PhoneUser>
         address: data.address,
         picture: data.picture,
         loginMethod: data.loginMethod,
+        googleId: data.googleId,
+        emailVerified: data.emailVerified,
       }
     });
+    
+    // Retrieve the user by googleId first (most reliable for Gmail auth)
+    if (data.googleId) {
+      const user = await getPhoneUserByGoogleId(data.googleId);
+      if (user) {
+        return user;
+      }
+    }
     
     // Retrieve the user by phone number or email
     if (data.phone) {
