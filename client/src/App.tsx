@@ -33,6 +33,8 @@ import VerifyEmail from "./pages/VerifyEmail";
 import FactFindingForm from "./pages/FactFindingForm";
 import UserDashboard from "./pages/UserDashboard";
 import TwoFactorAuth from "./pages/TwoFactorAuth";
+import TOTPSetup from "./pages/TOTPSetup";
+import TOTPVerify from "./pages/TOTPVerify";
 import UserPortal from "./pages/UserPortal";
 import CustomerPortal from "./pages/CustomerPortal";
 import ClientLoginComingSoon from "./pages/ClientLoginComingSoon";
@@ -124,6 +126,8 @@ function Router() {
       <Route path="/terms-of-business" component={TermsOfBusiness} />
       <Route path="/terms" component={TermsOfBusiness} />
       <Route path="/2fa" component={TwoFactorAuth} />
+      <Route path="/totp-setup" component={TOTPSetup} />
+      <Route path="/totp-verify" component={TOTPVerify} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/customers/:customerId" component={AdminCustomerDetail} />
