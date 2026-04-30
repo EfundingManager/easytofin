@@ -296,6 +296,13 @@ export default function PhoneAuth() {
         // Session cookie is automatically set by the server
         // No need to store in localStorage
 
+        // Check if 2FA is required (for admin/manager/staff)
+        if (result.requiresSMS2FA && result.twoFASessionToken) {
+          console.log("[PhoneAuth] 2FA required, redirecting to 2FA page");
+          window.location.href = `/2fa?token=${encodeURIComponent(result.twoFASessionToken)}`;
+          return;
+        }
+
         if (result.isNewRegistration) {
           // Redirect new users to profile completion page
           window.location.href = "/profile";
