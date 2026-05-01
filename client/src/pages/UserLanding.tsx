@@ -13,6 +13,7 @@ const SERVICES = [
     description: 'Life assurance and protection coverage',
     color: 'bg-blue-50 border-blue-200',
     iconColor: 'text-blue-600',
+    href: 'https://www.easytofin.com/services/protection',
   },
   {
     id: 'pensions',
@@ -21,6 +22,7 @@ const SERVICES = [
     description: 'Retirement planning and pension schemes',
     color: 'bg-green-50 border-green-200',
     iconColor: 'text-green-600',
+    href: 'https://www.easytofin.com/services/pensions',
   },
   {
     id: 'healthInsurance',
@@ -29,6 +31,7 @@ const SERVICES = [
     description: 'Private medical insurance',
     color: 'bg-red-50 border-red-200',
     iconColor: 'text-red-600',
+    href: 'https://www.easytofin.com/services/health-insurance',
   },
   {
     id: 'generalInsurance',
@@ -37,6 +40,7 @@ const SERVICES = [
     description: 'Home, motor, and business insurance',
     color: 'bg-purple-50 border-purple-200',
     iconColor: 'text-purple-600',
+    href: 'https://www.easytofin.com/services/general-insurance',
   },
   {
     id: 'investments',
@@ -45,6 +49,7 @@ const SERVICES = [
     description: 'Savings and investment solutions',
     color: 'bg-amber-50 border-amber-200',
     iconColor: 'text-amber-600',
+    href: 'https://www.easytofin.com/services/investments',
   },
 ];
 
@@ -145,9 +150,11 @@ export default function UserLanding() {
                   <CardDescription>{service.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full" onClick={() => setLocation(`/service/${service.id}`)}>
-                    Learn More
-                  </Button>
+                  <a href={service.href} target="_blank" rel="noopener noreferrer" className="block">
+                    <Button variant="outline" className="w-full">
+                      Learn More
+                    </Button>
+                  </a>
                 </CardContent>
               </Card>
             ))}
