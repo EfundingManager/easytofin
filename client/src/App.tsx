@@ -67,6 +67,8 @@ import PortfolioManagement from "./pages/InvestmentsDetails/PortfolioManagement"
 import StocksShares from "./pages/InvestmentsDetails/StocksShares";
 import EducationSavingPlans from "./pages/InvestmentsDetails/EducationSavingPlans";
 import StructuredProducts from "./pages/InvestmentsDetails/StructuredProducts";
+import TOTPSetupFlow from "./pages/TOTPSetupFlow";
+import TOTPVerify from "./pages/TOTPVerify";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -125,6 +127,8 @@ function Router() {
       <Route path="/terms-of-business" component={TermsOfBusiness} />
       <Route path="/terms" component={TermsOfBusiness} />
       <Route path="/2fa" component={TwoFactorAuth} />
+      <Route path="/totp/setup" component={TOTPSetupFlow} />
+      <Route path="/totp/verify" component={TOTPVerify} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/customers/:customerId" component={AdminCustomerDetail} />

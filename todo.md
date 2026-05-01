@@ -1838,6 +1838,16 @@
 - [x] Create TOTP reset confirmation
 - [x] Add error handling & retry logic
 
+### Frontend - TOTP Redirect Logic - PHASE 5 COMPLETE
+- [x] Create TOTPSetupFlow.tsx page for first-time TOTP setup
+- [x] Create TOTPVerify.tsx page for TOTP verification during login
+- [x] Create TOTPRedirect.tsx component for automatic redirect logic
+- [x] Add TOTP routes to App.tsx (/totp/setup and /totp/verify)
+- [x] Add getTotpStatus query to admin router for frontend status checks
+- [x] Implement role-based redirect logic (privileged roles only)
+- [x] Add QR code scanning and manual entry support
+- [x] Add backup code display and download functionality
+
 ### Testing & Security - PHASE 7 TODO
 - [x] Write tests for role assignment logic
 - [x] Write tests for TOTP generation & verification

@@ -915,4 +915,39 @@ export const adminRouter = router({
         throw new Error(error.message || "Failed to reset TOTP 2FA");
       }
     }),
+  /**
+   * Get TOTP status for a user (for frontend redirect logic)
+   */
+  getTotpStatus: adminProcedure
+    .input(z.object({ phoneUserId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+      try {
+        const totpSecret = await db.query.totpSecrets.findFirst({
+          where: eq(totpSecrets.phoneUserId, input.phoneUserId),
+        });
+
+        const firstLoginTracking = await db.query.firstLoginTracking.findFirst({
+          where: eq(firstLoginTracking.phoneUserId, input.phoneUserId),
+        });
+
+        return {
+          totpEnabled: totpSecret?.isEnabled === "true",
+          totpSetupCompleted: !!totpSecret,
+          isFirstLogin: firstLoginTracking?.hasCompletedFirstLogin !== "true",
+          requiresTOTP: firstLoginTracking?.requiresTOTP2FA === "true",
+        };
+      } catch (error: any) {
+        console.error("[TOTP] Error getting TOTP status:", error);
+        // Return default status if query fails
+        return {
+          totpEnabled: false,
+          totpSetupCompleted: false,
+          isFirstLogin: false,
+          requiresTOTP: false,
+        };
+      }
+    }),
+
 });
