@@ -1815,13 +1815,13 @@
 - [x] Create setupTOTP2FA procedure (first login flow)
 - [x] Write comprehensive TOTP tests (12 tests passing)
 
-### Backend - Authentication Flow - PHASE 4 TODO
-- [ ] Update authenticateRequest to check user roles
-- [ ] Add privileged role detection logic
-- [ ] Implement TOTP 2FA requirement check
-- [ ] Create TOTP verification middleware
-- [ ] Add failed TOTP attempt logging
-- [ ] Create role-based redirect logic
+### Backend - Authentication Flow - PHASE 4 COMPLETE
+- [x] Update authenticateRequest to check user roles
+- [x] Add privileged role detection logic
+- [x] Implement TOTP 2FA requirement check
+- [x] Create TOTP verification middleware
+- [x] Add failed TOTP attempt logging
+- [x] Create role-based redirect logic
 
 ### Frontend - User Management UI - PHASE 5 COMPLETE
 - [x] Create UserManagement.tsx page

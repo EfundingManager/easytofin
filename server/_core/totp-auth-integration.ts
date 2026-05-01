@@ -102,9 +102,27 @@ export async function logTOTPAttempt(
   if (!db) return;
 
   try {
+    // Validate eventType is one of the allowed enum values
+    const validEventTypes = [
+      "disabled",
+      "setup_initiated",
+      "setup_completed",
+      "verification_success",
+      "verification_failed",
+      "backup_code_used",
+      "backup_code_failed",
+      "reset_initiated",
+      "reset_completed",
+    ];
+
+    if (!validEventTypes.includes(eventType)) {
+      console.warn(`[TOTP] Invalid event type: ${eventType}`);
+      return;
+    }
+
     await db.insert(totp2faAuditLog).values({
       phoneUserId,
-      eventType,
+      eventType: eventType as any,
       code: code || null,
       isValid: success ? "true" : "false",
     });

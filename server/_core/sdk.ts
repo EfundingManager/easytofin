@@ -293,7 +293,7 @@ class SDKServer {
     } as GetUserInfoWithJwtResponse;
   }
 
-  async authenticateRequest(req: Request): Promise<User> {
+  async authenticateRequest(req: Request): Promise<{ user: User; totpStatus?: any }> {
     // Regular authentication flow
     const cookies = this.parseCookies(req.headers.cookie);
     const sessionCookie = cookies.get(COOKIE_NAME);
@@ -373,8 +373,8 @@ class SDKServer {
       if (phoneUser) {
         console.log("[Auth] Successfully found phoneUser:", { id: phoneUser.id, email: phoneUser.email, phone: phoneUser.phone });
         await logger.info('[Auth] Successfully found phoneUser', { req, metadata: { id: phoneUser.id, email: phoneUser.email, phone: phoneUser.phone } });
-        // Convert phoneUser to User type for consistency
-        return {
+        
+        const userObj = {
           id: phoneUser.id,
           openId: phoneUser.googleId || phoneUser.email || phoneUser.phone || sessionUserId,
           name: phoneUser.name,
@@ -385,6 +385,10 @@ class SDKServer {
           updatedAt: phoneUser.updatedAt,
           lastSignedIn: signedInAt,
         } as any;
+        
+        // Check TOTP status for privileged roles
+        const totpStatus = await this.checkTOTPStatus(userObj, phoneUser.id);
+        return { user: userObj, totpStatus };
       }
 
       const notFoundMsg = "PhoneUser not found after all lookup strategies";
@@ -425,7 +429,47 @@ class SDKServer {
       lastSignedIn: signedInAt,
     });
 
-    return user;
+    // Check TOTP status for privileged roles
+    const totpStatus = await this.checkTOTPStatus(user, user.id as number);
+    return { user, totpStatus };
+  }
+
+  /**
+   * Check TOTP 2FA status for a user
+   * Returns TOTP requirements if user has privileged role
+   */
+  private async checkTOTPStatus(
+    user: User,
+    phoneUserId?: number
+  ): Promise<any> {
+    // Import TOTP integration module
+    const { hasPrivilegedRole, getTOTPAuthStatus } = await import('./totp-auth-integration');
+    
+    // Check if user has privileged role
+    if (!hasPrivilegedRole(user.role)) {
+      console.log('[Auth] User has non-privileged role, no TOTP required:', user.role);
+      return undefined;
+    }
+    
+    console.log('[Auth] User has privileged role, checking TOTP status:', user.role);
+    
+    // If phoneUserId not provided, try to get it from user.id
+    const userId = phoneUserId || (user.id as number);
+    if (!userId) {
+      console.warn('[Auth] Cannot determine user ID for TOTP check');
+      return undefined;
+    }
+    
+    try {
+      const totpStatus = await getTOTPAuthStatus(userId);
+      console.log('[Auth] TOTP status retrieved:', totpStatus);
+      await logger.info('[Auth] TOTP status retrieved', { req: undefined, metadata: { userId, totpStatus } });
+      return totpStatus;
+    } catch (error) {
+      console.error('[Auth] Error checking TOTP status:', error);
+      await logger.error('[Auth] Error checking TOTP status', { req: undefined, metadata: { userId, error: String(error) } });
+      return undefined;
+    }
   }
 }
 
