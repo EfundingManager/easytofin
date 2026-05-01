@@ -209,18 +209,39 @@ class SDKServer {
     }
 
     try {
+      console.log("[Auth] Verifying session cookie", {
+        cookieLength: cookieValue.length,
+        cookiePrefix: cookieValue.substring(0, 50),
+        cookieSuffix: cookieValue.substring(cookieValue.length - 20),
+      });
+
       const secretKey = this.getSessionSecret();
+      console.log("[Auth] Secret key info", {
+        secretLength: secretKey.byteLength,
+      });
+
       const { payload } = await jwtVerify(cookieValue, secretKey, {
         algorithms: ["HS256"],
       });
       const { openId, appId, name } = payload as Record<string, unknown>;
+
+      console.log("[Auth] JWT verification successful", {
+        openId,
+        appId,
+        name,
+        payloadKeys: Object.keys(payload),
+      });
 
       if (
         !isNonEmptyString(openId) ||
         !isNonEmptyString(appId) ||
         !isNonEmptyString(name)
       ) {
-        console.warn("[Auth] Session payload missing required fields");
+        console.warn("[Auth] Session payload missing required fields", {
+          openIdType: typeof openId,
+          appIdType: typeof appId,
+          nameType: typeof name,
+        });
         return null;
       }
 
@@ -230,7 +251,21 @@ class SDKServer {
         name,
       };
     } catch (error) {
-      console.warn("[Auth] Session verification failed", String(error));
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      console.warn("[Auth] Session verification failed", {
+        errorName: errorObj.name,
+        errorMessage: errorObj.message,
+        errorStack: errorObj.stack,
+        cookieLength: cookieValue?.length,
+      });
+      await logger.error("[Auth] Session verification failed", {
+        req: undefined,
+        metadata: {
+          errorName: errorObj.name,
+          errorMessage: errorObj.message,
+          cookieLength: cookieValue?.length,
+        },
+      });
       return null;
     }
   }
