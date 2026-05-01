@@ -1,27 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, RefreshCw, Download } from 'lucide-react';
-import { useAuth } from '@/_core/hooks/useAuth';
-import { useLocation } from 'wouter';
 
 export default function AdminLogs() {
-  const { user } = useAuth();
-  const [, setLocation] = useLocation();
   const [filter, setFilter] = useState<'all' | 'error' | 'warn' | 'info'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [hoursAgo, setHoursAgo] = useState(24);
   const [autoRefresh, setAutoRefresh] = useState(true);
-
-  // Check if user is admin
-  useEffect(() => {
-    if (user && user.role !== 'admin') {
-      setLocation('/');
-    }
-  }, [user, setLocation]);
 
   const logsQuery = trpc.logs.getRecentLogs.useQuery(
     {
@@ -83,19 +72,6 @@ export default function AdminLogs() {
     a.download = `logs-${new Date().toISOString()}.csv`;
     a.click();
   };
-
-  if (!user || user.role !== 'admin') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>You need admin privileges to view logs</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-8 px-4">

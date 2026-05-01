@@ -40,9 +40,9 @@ export const logsRouter = router({
     }),
 
   /**
-   * Admin endpoint to view recent logs
+   * Public endpoint to view recent logs
    */
-  getRecentLogs: adminProcedure
+  getRecentLogs: publicProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(1000).default(100),
@@ -137,9 +137,9 @@ export const logsRouter = router({
     }),
 
   /**
-   * Admin endpoint to get log statistics
+   * Public endpoint to get log statistics
    */
-  getStatistics: adminProcedure
+  getStatistics: publicProcedure
     .input(z.object({ hoursAgo: z.number().min(1).max(720).default(24) }))
     .query(async ({ input }) => {
       const stats = await dbLogs.getLogStatistics(input.hoursAgo);
