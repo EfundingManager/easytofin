@@ -252,19 +252,18 @@ class SDKServer {
       };
     } catch (error) {
       const errorObj = error instanceof Error ? error : new Error(String(error));
-      console.warn("[Auth] Session verification failed", {
+      const errorDetails = {
         errorName: errorObj.name,
         errorMessage: errorObj.message,
         errorStack: errorObj.stack,
         cookieLength: cookieValue?.length,
-      });
-      await logger.error("[Auth] Session verification failed", {
+      };
+      console.warn("[Auth] Session verification failed", errorDetails);
+      
+      const detailedMessage = `[Auth] Session verification failed - ${errorObj.name}: ${errorObj.message}`;
+      await logger.error(detailedMessage, {
         req: undefined,
-        metadata: {
-          errorName: errorObj.name,
-          errorMessage: errorObj.message,
-          cookieLength: cookieValue?.length,
-        },
+        metadata: errorDetails,
       });
       return null;
     }
