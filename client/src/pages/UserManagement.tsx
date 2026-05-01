@@ -174,6 +174,8 @@ export default function UserManagement() {
                     <SelectContent>
                       {isAdmin && (
                         <>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
                           <SelectItem value="staff">Staff</SelectItem>
                           <SelectItem value="support">Support</SelectItem>
                           <SelectItem value="customer">Customer</SelectItem>
@@ -184,6 +186,7 @@ export default function UserManagement() {
                         <>
                           <SelectItem value="super_admin">Super Admin</SelectItem>
                           <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
                           <SelectItem value="staff">Staff</SelectItem>
                           <SelectItem value="support">Support</SelectItem>
                           <SelectItem value="customer">Customer</SelectItem>
@@ -323,6 +326,8 @@ export default function UserManagement() {
                                           <SelectContent>
                                             {isAdmin && (
                                               <>
+                                                <SelectItem value="admin">Admin</SelectItem>
+                                                <SelectItem value="manager">Manager</SelectItem>
                                                 <SelectItem value="staff">Staff</SelectItem>
                                                 <SelectItem value="support">Support</SelectItem>
                                                 <SelectItem value="customer">Customer</SelectItem>

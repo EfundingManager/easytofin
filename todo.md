@@ -1871,3 +1871,99 @@
 - [x] Root cause: listUsers query returned roles array instead of single role field
 - [x] Solution: Updated listUsers to return primary role field matching frontend expectations
 - [x] Added allRoles field for future use if multi-role display needed
+
+
+## Bug: Add User Function Not Working
+- [ ] Investigate Add User form submission
+- [ ] Check server logs for errors during user creation
+- [ ] Verify user is saved to database
+- [ ] Check listUsers query and permissions
+- [ ] Verify frontend refetch logic
+- [ ] Fix end-to-end user creation workflow
+- [ ] Test by adding user and confirming it appears in list
+
+
+## Comprehensive User Management Audit & Fix
+
+### Phase 1: Code Review & Setup
+- [ ] Review UserManagement.tsx component code
+- [ ] Review admin router procedures (createUser, listUsers, editUser, deleteUser, assignRoles)
+- [ ] Review database schema for phoneUsers and userRoles tables
+- [ ] Identify all functions and their dependencies
+
+### Phase 2: ADD USER Testing & Fixes
+- [ ] Test adding user with Admin role - verify database
+- [ ] Test adding user with Manager role - verify database
+- [ ] Test adding user with Staff role - verify database
+- [ ] Test adding user with Support role - verify database
+- [ ] Test adding user with User role - verify database
+- [ ] Test adding user with Customer role - verify database
+- [ ] Verify list refreshes immediately after adding
+- [ ] Test duplicate email rejection with clear error message
+- [ ] Test invalid email format rejection
+- [ ] Verify all required fields saved: email, name, role, createdAt
+
+### Phase 3: EDIT USER Testing & Fixes
+- [ ] Test changing user role from User to Admin
+- [ ] Test changing user role from Admin to Staff
+- [ ] Verify role changes saved to database immediately
+- [ ] Verify user list reflects changes immediately
+- [ ] Test editing user name
+- [ ] Test editing user phone
+- [ ] Verify no data loss on edit
+
+### Phase 4: DELETE USER Testing & Fixes
+- [ ] Test deleting a regular user
+- [ ] Verify user removed from database
+- [ ] Verify user list updates immediately
+- [ ] Test that deleted user cannot log in
+- [ ] Verify other users' data unaffected
+- [ ] Test delete confirmation dialog works
+
+### Phase 5: USER LIST & SEARCH Testing & Fixes
+- [ ] Verify all users display in list
+- [ ] Test search by name functionality
+- [ ] Test search by email functionality
+- [ ] Verify role filter works (All Roles, Admin, Manager, Staff, Support, User, Customer)
+- [ ] Verify pagination if applicable
+- [ ] Verify user count is accurate
+- [ ] Verify role column displays correctly for each user
+
+### Phase 6: ROLE ASSIGNMENT Testing & Fixes
+- [ ] Test assigning single role to new user
+- [ ] Test changing role from one type to another
+- [ ] Test assigning multiple roles simultaneously
+- [ ] Verify role changes take effect on next login
+- [ ] Verify role hierarchy is enforced
+- [ ] Verify role-based access control works
+
+### Phase 7: DATABASE VERIFICATION
+- [ ] Query phoneUsers table after each test
+- [ ] Verify all fields populated correctly
+- [ ] Check for silent failures (frontend success, DB failure)
+- [ ] Verify no duplicate records created
+- [ ] Check data integrity across all operations
+- [ ] Verify timestamps are correct
+
+### Phase 8: ERROR HANDLING Testing & Fixes
+- [ ] Test duplicate email error message
+- [ ] Test invalid email format error
+- [ ] Test network failure scenarios
+- [ ] Test permission denied scenarios
+- [ ] Verify all errors show meaningful messages to admin
+- [ ] Test form validation on client side
+
+### Phase 9: Final Fixes & Deployment
+- [ ] Fix all identified issues
+- [ ] Update error messages for clarity
+- [ ] Add proper form validation
+- [ ] Ensure database consistency
+- [ ] Test all fixes end-to-end
+- [ ] Create checkpoint with all fixes
+
+### Phase 10: Audit Report
+- [ ] Document all tests performed
+- [ ] List all issues found
+- [ ] List all fixes applied
+- [ ] Confirm all functions work end-to-end
+- [ ] Provide summary report to user

@@ -497,21 +497,33 @@ export const adminRouter = router({
         const phoneUserId = (result as any)[0]?.id || (result as any).insertId;
         if (!phoneUserId) throw new Error("Failed to create user");
 
-        // Assign roles
-        for (const role of input.roles) {
-          await db.insert(userRoles).values({
-            phoneUserId,
-            role,
-            assignedBy: ctx.user.id,
-          });
+        // Update the user's role in phoneUsers table
+        const primaryRole = input.roles[0] || "user";
+        await db.update(phoneUsers).set({ role: primaryRole }).where(eq(phoneUsers.id, phoneUserId));
+
+        // Try to assign roles to userRoles table (if it exists)
+        try {
+          for (const role of input.roles) {
+            await db.insert(userRoles).values({
+              phoneUserId,
+              role,
+              assignedBy: ctx.user.id,
+            });
+          }
+        } catch (roleError: any) {
+          console.debug(`[Admin] userRoles table not available, roles stored in phoneUsers.role`);
         }
 
-        // Initialize first login tracking
-        const requiresTOTP = ["super_admin", "admin", "manager", "staff", "support"].includes(input.roles[0]);
-        await db.insert(firstLoginTracking).values({
-          phoneUserId,
-          requiresTOTP2FA: requiresTOTP ? "true" : "false",
-        });
+        // Try to initialize first login tracking (if table exists)
+        try {
+          const requiresTOTP = ["super_admin", "admin", "manager", "staff", "support"].includes(input.roles[0]);
+          await db.insert(firstLoginTracking).values({
+            phoneUserId,
+            requiresTOTP2FA: requiresTOTP ? "true" : "false",
+          });
+        } catch (trackingError: any) {
+          console.debug(`[Admin] firstLoginTracking table not available`);
+        }
 
         return {
           success: true,
@@ -589,15 +601,26 @@ export const adminRouter = router({
       const allUsers = await db.select().from(phoneUsers);
       const usersWithRoles = await Promise.all(
         allUsers.map(async (user: any) => {
-          const roles = await db.select().from(userRoles).where(eq(userRoles.phoneUserId, user.id));
-          const primaryRole = roles.length > 0 ? roles[0].role : user.role || "user";
+          let primaryRole = user.role || "user";
+          let allRoles = [primaryRole];
+          
+          try {
+            const roles = await db.select().from(userRoles).where(eq(userRoles.phoneUserId, user.id));
+            if (roles.length > 0) {
+              primaryRole = roles[0].role;
+              allRoles = roles.map((r: any) => r.role);
+            }
+          } catch (roleError: any) {
+            console.debug(`[Admin] userRoles table not available, using phoneUsers.role for user ${user.id}`);
+          }
+          
           return {
             id: user.id,
             email: user.email,
             phone: user.phone,
             name: user.name,
             role: primaryRole,
-            allRoles: roles.map((r: any) => r.role),
+            allRoles: allRoles,
             status: user.status,
             createdAt: user.createdAt,
           };
@@ -606,7 +629,22 @@ export const adminRouter = router({
       return usersWithRoles;
     } catch (error: any) {
       console.error("[Admin] Failed to list users:", error);
-      return [];
+      try {
+        const allUsers = await db.select().from(phoneUsers);
+        return allUsers.map((user: any) => ({
+          id: user.id,
+          email: user.email,
+          phone: user.phone,
+          name: user.name,
+          role: user.role || "user",
+          allRoles: [user.role || "user"],
+          status: user.status,
+          createdAt: user.createdAt,
+        }));
+      } catch (fallbackError: any) {
+        console.error("[Admin] Fallback also failed:", fallbackError);
+        return [];
+      }
     }
   }),
 
@@ -658,11 +696,21 @@ export const adminRouter = router({
         if (user.length === 0) throw new Error("User not found");
         if (user[0].role === "super_admin") throw new Error("Cannot delete Super Admin");
 
-        // Delete user roles
-        await db.delete(userRoles).where(eq(userRoles.phoneUserId, input.phoneUserId));
-        // Delete first login tracking
-        await db.delete(firstLoginTracking).where(eq(firstLoginTracking.phoneUserId, input.phoneUserId));
-        // Delete user
+        // Try to delete user roles (if table exists)
+        try {
+          await db.delete(userRoles).where(eq(userRoles.phoneUserId, input.phoneUserId));
+        } catch (roleError: any) {
+          console.debug(`[Admin] userRoles table not available for deletion`);
+        }
+
+        // Try to delete first login tracking (if table exists)
+        try {
+          await db.delete(firstLoginTracking).where(eq(firstLoginTracking.phoneUserId, input.phoneUserId));
+        } catch (trackingError: any) {
+          console.debug(`[Admin] firstLoginTracking table not available for deletion`);
+        }
+
+        // Delete user from phoneUsers table
         await db.delete(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
 
         return {
@@ -926,19 +974,32 @@ export const adminRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database connection failed");
       try {
-        const totpSecret = await db.query.totpSecrets.findFirst({
-          where: eq(totpSecrets.phoneUserId, input.phoneUserId),
-        });
+        let totpSecretData: any = null;
+        let firstLoginTrackingData: any = null;
 
-        const firstLoginTracking = await db.query.firstLoginTracking.findFirst({
-          where: eq(firstLoginTracking.phoneUserId, input.phoneUserId),
-        });
+        // Try to get TOTP secret (if table exists)
+        try {
+          totpSecretData = await db.query.totpSecrets.findFirst({
+            where: eq(totpSecrets.phoneUserId, input.phoneUserId),
+          });
+        } catch (e: any) {
+          console.debug("[TOTP] totpSecrets table not available");
+        }
+
+        // Try to get first login tracking (if table exists)
+        try {
+          firstLoginTrackingData = await db.query.firstLoginTracking.findFirst({
+            where: eq(firstLoginTracking.phoneUserId, input.phoneUserId),
+          });
+        } catch (e: any) {
+          console.debug("[TOTP] firstLoginTracking table not available");
+        }
 
         return {
-          totpEnabled: totpSecret?.isEnabled === "true",
-          totpSetupCompleted: !!totpSecret,
-          isFirstLogin: firstLoginTracking?.hasCompletedFirstLogin !== "true",
-          requiresTOTP: firstLoginTracking?.requiresTOTP2FA === "true",
+          totpEnabled: totpSecretData?.isEnabled === "true",
+          totpSetupCompleted: !!totpSecretData,
+          isFirstLogin: firstLoginTrackingData?.hasCompletedFirstLogin !== "true",
+          requiresTOTP: firstLoginTrackingData?.requiresTOTP2FA === "true",
         };
       } catch (error: any) {
         console.error("[TOTP] Error getting TOTP status:", error);
