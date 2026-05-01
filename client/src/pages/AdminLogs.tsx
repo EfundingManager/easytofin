@@ -291,8 +291,14 @@ export default function AdminLogs() {
                                 {log.metadata && (
                                   <div>
                                     <h4 className="font-semibold text-sm mb-2">Metadata</h4>
-                                    <pre className="text-xs bg-background p-2 rounded border overflow-x-auto">
-                                      {JSON.stringify(JSON.parse(log.metadata), null, 2)}
+                                    <pre className="text-xs bg-background p-2 rounded border overflow-x-auto max-h-96">
+                                      {(() => {
+                                        try {
+                                          return JSON.stringify(JSON.parse(log.metadata), null, 2);
+                                        } catch (e) {
+                                          return log.metadata || '(empty)';
+                                        }
+                                      })()}
                                     </pre>
                                   </div>
                                 )}
