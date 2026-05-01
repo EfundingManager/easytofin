@@ -724,3 +724,68 @@ export const sessionTokens = mysqlTable("sessionTokens", {
 
 export type SessionToken = typeof sessionTokens.$inferSelect;
 export type InsertSessionToken = typeof sessionTokens.$inferInsert;
+
+
+/**
+ * User roles junction table for multiple role assignments
+ * Allows users to have multiple roles simultaneously
+ */
+export const userRoles = mysqlTable("userRoles", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull().references(() => phoneUsers.id, { onDelete: "cascade" }),
+  role: mysqlEnum("role", ["super_admin", "admin", "manager", "staff", "support", "user", "customer"]).notNull(),
+  assignedBy: int("assignedBy"), // Admin user ID who assigned this role
+  assignedAt: timestamp("assignedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type UserRole = typeof userRoles.$inferSelect;
+export type InsertUserRole = typeof userRoles.$inferInsert;
+
+/**
+ * TOTP 2FA audit log for tracking authentication events
+ * Logs failed TOTP attempts, successful verifications, and role changes
+ */
+export const totp2faAuditLog = mysqlTable("totp2faAuditLog", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull(),
+  eventType: mysqlEnum("eventType", [
+    "setup_initiated",
+    "setup_completed",
+    "verification_success",
+    "verification_failed",
+    "backup_code_used",
+    "backup_code_failed",
+    "reset_initiated",
+    "reset_completed",
+    "disabled",
+  ]).notNull(),
+  code: varchar("code", { length: 6 }), // TOTP code if applicable
+  isValid: mysqlEnum("isValid", ["true", "false"]), // Whether the code was valid
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  description: text("description"), // Additional context
+  metadata: text("metadata"), // JSON object with additional details
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Totp2faAuditLog = typeof totp2faAuditLog.$inferSelect;
+export type InsertTotp2faAuditLog = typeof totp2faAuditLog.$inferInsert;
+
+/**
+ * First login tracking for TOTP 2FA setup enforcement
+ * Tracks whether users have completed TOTP 2FA setup on first login
+ */
+export const firstLoginTracking = mysqlTable("firstLoginTracking", {
+  id: int("id").autoincrement().primaryKey(),
+  phoneUserId: int("phoneUserId").notNull().unique().references(() => phoneUsers.id, { onDelete: "cascade" }),
+  hasCompletedFirstLogin: mysqlEnum("hasCompletedFirstLogin", ["true", "false"]).default("false").notNull(),
+  requiresTOTP2FA: mysqlEnum("requiresTOTP2FA", ["true", "false"]).default("false").notNull(),
+  totpSetupCompletedAt: timestamp("totpSetupCompletedAt"),
+  firstLoginAt: timestamp("firstLoginAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FirstLoginTracking = typeof firstLoginTracking.$inferSelect;
+export type InsertFirstLoginTracking = typeof firstLoginTracking.$inferInsert;

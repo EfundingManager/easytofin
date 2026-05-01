@@ -1787,3 +1787,67 @@
 - [ ] Access /admin/logs page to view production logs
 - [ ] Reproduce 'Access Denied' error and check logs for root cause
 - [ ] Implement fix based on log diagnostics
+
+
+## Phase 7: User Management & Authentication System with TOTP 2FA
+
+### Database & Schema
+- [ ] Add user roles enum (Super Admin, Admin, Manager, Staff, Support, User, Customer)
+- [ ] Add userRoles junction table for multiple role assignments
+- [ ] Add TOTP 2FA fields (secret, backupCodes, isEnabled, isFirstLogin)
+- [ ] Add audit log table for authentication events
+- [ ] Run database migrations (pnpm db:push)
+
+### Backend - User Management
+- [ ] Create createUser procedure (Admin only)
+- [ ] Create assignRoles procedure (Admin/Super Admin only)
+- [ ] Create listUsers procedure with role filtering
+- [ ] Create updateUser procedure (name, email, phone)
+- [ ] Create deleteUser procedure (Super Admin only)
+- [ ] Create resetTOTP2FA procedure (Super Admin only)
+
+### Backend - TOTP 2FA
+- [ ] Install speakeasy package
+- [ ] Create generateTOTPSecret procedure
+- [ ] Create verifyTOTPCode procedure
+- [ ] Create generateBackupCodes procedure (8 codes)
+- [ ] Create verifyBackupCode procedure
+- [ ] Create setupTOTP2FA procedure (first login flow)
+
+### Backend - Authentication Flow
+- [ ] Update authenticateRequest to check user roles
+- [ ] Add privileged role detection logic
+- [ ] Implement TOTP 2FA requirement check
+- [ ] Create TOTP verification middleware
+- [ ] Add failed TOTP attempt logging
+- [ ] Create role-based redirect logic
+
+### Frontend - User Management UI
+- [ ] Create UserManagement.tsx page
+- [ ] Build user creation form
+- [ ] Build role assignment interface
+- [ ] Build user list with filtering
+- [ ] Build user edit form
+- [ ] Build user delete confirmation
+
+### Frontend - TOTP 2FA UI
+- [ ] Create TOTPSetup.tsx page with QR code display
+- [ ] Create TOTP verification form
+- [ ] Create backup codes display & download
+- [ ] Create TOTP reset confirmation
+- [ ] Add error handling & retry logic
+
+### Testing & Security
+- [ ] Write tests for role assignment logic
+- [ ] Write tests for TOTP generation & verification
+- [ ] Write tests for backup code validation
+- [ ] Test first login flow (privileged roles)
+- [ ] Test subsequent login flow (TOTP verification)
+- [ ] Test role hierarchy enforcement
+- [ ] Verify audit logging works
+
+### Deployment
+- [ ] Create database migration script
+- [ ] Update environment variables
+- [ ] Deploy to production
+- [ ] Test all authentication flows in production

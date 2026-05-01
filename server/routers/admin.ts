@@ -1,6 +1,6 @@
 import { adminProcedure, managerProcedure, staffProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, clientDocuments } from "../../drizzle/schema";
+import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, clientDocuments, userRoles, firstLoginTracking } from "../../drizzle/schema";
 import { eq, desc, and, inArray, or, like, ne } from "drizzle-orm";
 import { z } from "zod";
 import { getRateLimitViolations, whitelistIdentifier, resetRateLimit, getRateLimitStats } from "../rate-limit-logger";
@@ -387,42 +387,10 @@ export const adminRouter = router({
   }),
 
   /**
-   * Delete a user
+   * Old deleteUser - removed (replaced by new implementation below)
    */
-  deleteUser: adminProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const db = await getDb();
-      if (!db) throw new Error("Database not available");
-
-      try {
-        const userIdNum = parseInt(input.id, 10);
-        const user = await db
-          .select()
-          .from(phoneUsers)
-          .where(eq(phoneUsers.id, userIdNum))
-          .then((res: any) => res[0]);
-
-        if (!user) throw new Error("User not found");
-
-        if (ctx.user.role === "admin") {
-          if (user.role !== "staff" && user.role !== "support") {
-            throw new Error("You cannot delete Admin or Super Admin users");
-          }
-        } else if (ctx.user.role !== "super_admin") {
-          throw new Error("Insufficient permissions");
-        }
-
-        await db.delete(phoneUsers).where(eq(phoneUsers.id, userIdNum));
-        return { success: true, message: "User deleted" };
-      } catch (error: any) {
-        console.error("[Admin] Failed to delete user:", error);
-        throw new Error(error.message || "Failed to delete user");
-      }
-    }),
-  
   /**
-   * Delete all clients except Super Admin (DESTRUCTIVE - use with caution)
+   * Delete all clients except Super Adminin (DESTRUCTIVE - use with caution)
    */
   deleteAllClientsExceptSuperAdmin: adminProcedure.mutation(async ({ ctx }) => {
     if (ctx.user.role !== "admin" && ctx.user.role !== "super_admin") {
@@ -491,4 +459,214 @@ export const adminRouter = router({
       throw new Error(error.message || "Failed to delete clients");
     }
   }),
+
+  /**
+   * Create a new user with roles
+   */
+  createUser: adminProcedure
+    .input(z.object({
+      email: z.string().email(),
+      phone: z.string().optional(),
+      name: z.string(),
+      roles: z.array(z.enum(["super_admin", "admin", "manager", "staff", "support", "user", "customer"])),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        // Check if user already exists
+        const existingUser = await db.select().from(phoneUsers).where(eq(phoneUsers.email, input.email));
+        if (existingUser.length > 0) {
+          throw new Error("User with this email already exists");
+        }
+
+        // Create phoneUser
+        const result = await db.insert(phoneUsers).values({
+          email: input.email,
+          phone: input.phone,
+          name: input.name,
+          role: "user", // Default role
+          verified: "true",
+          emailVerified: "true",
+        });
+
+        const phoneUserId = (result as any)[0]?.id || (result as any).insertId;
+        if (!phoneUserId) throw new Error("Failed to create user");
+
+        // Assign roles
+        for (const role of input.roles) {
+          await db.insert(userRoles).values({
+            phoneUserId,
+            role,
+            assignedBy: ctx.user.id,
+          });
+        }
+
+        // Initialize first login tracking
+        const requiresTOTP = ["super_admin", "admin", "manager", "staff", "support"].includes(input.roles[0]);
+        await db.insert(firstLoginTracking).values({
+          phoneUserId,
+          requiresTOTP2FA: requiresTOTP ? "true" : "false",
+        });
+
+        return {
+          success: true,
+          userId: phoneUserId,
+          message: `User ${input.name} created successfully with roles: ${input.roles.join(", ")}`,
+        };
+      } catch (error: any) {
+        console.error("[Admin] Failed to create user:", error);
+        throw new Error(error.message || "Failed to create user");
+      }
+    }),
+
+  /**
+   * Assign roles to an existing user
+   */
+  assignRoles: adminProcedure
+    .input(z.object({
+      phoneUserId: z.number(),
+      roles: z.array(z.enum(["super_admin", "admin", "manager", "staff", "support", "user", "customer"])),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        // Check if user exists
+        const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+        if (user.length === 0) throw new Error("User not found");
+
+        // Delete existing roles
+        await db.delete(userRoles).where(eq(userRoles.phoneUserId, input.phoneUserId));
+
+        // Assign new roles
+        for (const role of input.roles) {
+          await db.insert(userRoles).values({
+            phoneUserId: input.phoneUserId,
+            role,
+            assignedBy: ctx.user.id,
+          });
+        }
+
+        // Update first login tracking if needed
+        const requiresTOTP = input.roles.some(r => ["super_admin", "admin", "manager", "staff", "support"].includes(r));
+        const tracking = await db.select().from(firstLoginTracking).where(eq(firstLoginTracking.phoneUserId, input.phoneUserId));
+        
+        if (tracking.length > 0) {
+          await db.update(firstLoginTracking)
+            .set({ requiresTOTP2FA: requiresTOTP ? "true" : "false" })
+            .where(eq(firstLoginTracking.phoneUserId, input.phoneUserId));
+        } else {
+          await db.insert(firstLoginTracking).values({
+            phoneUserId: input.phoneUserId,
+            requiresTOTP2FA: requiresTOTP ? "true" : "false",
+          });
+        }
+
+        return {
+          success: true,
+          message: `Roles assigned to user. New roles: ${input.roles.join(", ")}`,
+        };
+      } catch (error: any) {
+        console.error("[Admin] Failed to assign roles:", error);
+        throw new Error(error.message || "Failed to assign roles");
+      }
+    }),
+
+  /**
+   * Get all users with their roles
+   */
+  listUsers: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+
+    try {
+      const allUsers = await db.select().from(phoneUsers);
+      const usersWithRoles = await Promise.all(
+        allUsers.map(async (user: any) => {
+          const roles = await db.select().from(userRoles).where(eq(userRoles.phoneUserId, user.id));
+          return {
+            id: user.id,
+            email: user.email,
+            phone: user.phone,
+            name: user.name,
+            roles: roles.map((r: any) => r.role),
+            status: user.status,
+            createdAt: user.createdAt,
+          };
+        })
+      );
+      return usersWithRoles;
+    } catch (error: any) {
+      console.error("[Admin] Failed to list users:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Get user details with roles
+   */
+  getUserDetails: adminProcedure
+    .input(z.object({ phoneUserId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+        if (user.length === 0) throw new Error("User not found");
+
+        const roles = await db.select().from(userRoles).where(eq(userRoles.phoneUserId, input.phoneUserId));
+        const tracking = await db.select().from(firstLoginTracking).where(eq(firstLoginTracking.phoneUserId, input.phoneUserId));
+
+        return {
+          id: user[0].id,
+          email: user[0].email,
+          phone: user[0].phone,
+          name: user[0].name,
+          roles: roles.map((r: any) => r.role),
+          verified: user[0].verified,
+          requiresTOTP2FA: tracking[0]?.requiresTOTP2FA === "true",
+          totpSetupCompleted: tracking[0]?.totpSetupCompletedAt ? true : false,
+          createdAt: user[0].createdAt,
+        };
+      } catch (error: any) {
+        console.error("[Admin] Failed to get user details:", error);
+        throw new Error(error.message || "Failed to get user details");
+      }
+    }),
+
+  /**
+   * Delete a user
+   */
+  deleteUser: adminProcedure
+    .input(z.object({ phoneUserId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        // Prevent deleting Super Admin
+        const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+        if (user.length === 0) throw new Error("User not found");
+        if (user[0].role === "super_admin") throw new Error("Cannot delete Super Admin");
+
+        // Delete user roles
+        await db.delete(userRoles).where(eq(userRoles.phoneUserId, input.phoneUserId));
+        // Delete first login tracking
+        await db.delete(firstLoginTracking).where(eq(firstLoginTracking.phoneUserId, input.phoneUserId));
+        // Delete user
+        await db.delete(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+
+        return {
+          success: true,
+          message: `User ${user[0].name} deleted successfully`,
+        };
+      } catch (error: any) {
+        console.error("[Admin] Failed to delete user:", error);
+        throw new Error(error.message || "Failed to delete user");
+      }
+    }),
 });

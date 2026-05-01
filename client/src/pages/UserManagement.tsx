@@ -38,20 +38,17 @@ export default function UserManagement() {
   const [deleteConfirmUser, setDeleteConfirmUser] = useState<any>(null);
 
   // Fetch users
-  const usersQuery = trpc.admin.getUsers.useQuery({
-    role: selectedRole === "all" ? undefined : selectedRole,
-    search: searchQuery || undefined,
-  });
+  const usersQuery = trpc.admin.listUsers.useQuery();
 
   // Mutations
-  const updateUserMutation = trpc.admin.updateUser.useMutation({
+  const assignRolesMutation = trpc.admin.assignRoles.useMutation({
     onSuccess: () => {
-      toast.success("User updated successfully");
+      toast.success("Roles updated successfully");
       setEditingUser(null);
       usersQuery.refetch();
     },
-    onError: (error) => {
-      toast.error(error.message || "Failed to update user");
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update roles");
     },
   });
 
@@ -60,7 +57,7 @@ export default function UserManagement() {
       toast.success("User deleted successfully");
       usersQuery.refetch();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "Failed to delete user");
     },
   });
@@ -73,7 +70,7 @@ export default function UserManagement() {
       setIsDialogOpen(false);
       usersQuery.refetch();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "Failed to create user");
     },
   });
@@ -197,7 +194,7 @@ export default function UserManagement() {
                   </Select>
                 </div>
                 <Button
-                  onClick={() => createUserMutation.mutate({ email: newUserEmail, role: newUserRole })}
+                  onClick={() => createUserMutation.mutate({ email: newUserEmail, name: newUserEmail.split("@")[0], roles: [newUserRole] })}
                   disabled={!newUserEmail || createUserMutation.isPending}
                   className="w-full"
                 >
@@ -347,15 +344,15 @@ export default function UserManagement() {
                                       </div>
                                       <Button
                                         onClick={() =>
-                                          updateUserMutation.mutate({
-                                            id: editingUser.id,
-                                            role: editingUser.role,
+                                          assignRolesMutation.mutate({
+                                            phoneUserId: editingUser.id,
+                                            roles: editingUser.roles || [editingUser.role],
                                           })
                                         }
-                                        disabled={updateUserMutation.isPending}
+                                        disabled={assignRolesMutation.isPending}
                                         className="w-full"
                                       >
-                                        {updateUserMutation.isPending ? "Updating..." : "Update User"}
+                                        {assignRolesMutation.isPending ? "Updating..." : "Update User"}
                                       </Button>
                                     </div>
                                   )}
@@ -394,7 +391,7 @@ export default function UserManagement() {
                                         <Button
                                           variant="destructive"
                                           onClick={() => {
-                                            deleteUserMutation.mutate({ id: deleteConfirmUser.id });
+                                            deleteUserMutation.mutate({ phoneUserId: deleteConfirmUser.id });
                                             setDeleteConfirmUser(null);
                                           }}
                                           disabled={deleteUserMutation.isPending}
