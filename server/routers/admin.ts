@@ -4,6 +4,9 @@ import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, c
 import { eq, desc, and, inArray, or, like, ne } from "drizzle-orm";
 import { z } from "zod";
 import { getRateLimitViolations, whitelistIdentifier, resetRateLimit, getRateLimitStats } from "../rate-limit-logger";
+import speakeasy from "speakeasy";
+import QRCode from "qrcode";
+import { totpSecrets, totp2faAuditLog } from "../../drizzle/schema";
 
 /**
  * Admin router for managing client submissions, configurations, and analytics
@@ -667,6 +670,249 @@ export const adminRouter = router({
       } catch (error: any) {
         console.error("[Admin] Failed to delete user:", error);
         throw new Error(error.message || "Failed to delete user");
+      }
+    }),
+
+  /**
+   * Generate TOTP secret and QR code for 2FA setup
+   */
+  generateTotpSecret: adminProcedure
+    .input(z.object({ phoneUserId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        // Generate TOTP secret
+        const secret = speakeasy.generateSecret({
+          name: `EasyToFin (${input.phoneUserId})`,
+          issuer: "EasyToFin",
+          length: 32,
+        });
+
+        // Generate QR code
+        const qrCode = await QRCode.toDataURL(secret.otpauth_url!);
+
+        // Generate 8 backup codes
+        const backupCodes = Array.from({ length: 8 }, () =>
+          Math.random().toString(36).substring(2, 10).toUpperCase()
+        );
+
+        return {
+          secret: secret.base32,
+          qrCode,
+          backupCodes,
+          otpauthUrl: secret.otpauth_url,
+        };
+      } catch (error: any) {
+        console.error("[TOTP] Failed to generate secret:", error);
+        throw new Error("Failed to generate TOTP secret");
+      }
+    }),
+
+  /**
+   * Verify TOTP code and save secret if valid
+   */
+  verifyAndSaveTotpSecret: adminProcedure
+    .input(
+      z.object({
+        phoneUserId: z.number(),
+        totpCode: z.string(),
+        secret: z.string(),
+        backupCodes: z.array(z.string()),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        // Verify TOTP code
+        const isValid = speakeasy.totp.verify({
+          secret: input.secret,
+          encoding: "base32",
+          token: input.totpCode,
+          window: 2,
+        });
+
+        if (!isValid) {
+          // Log failed attempt
+          await db.insert(totp2faAuditLog).values({
+            phoneUserId: input.phoneUserId,
+            eventType: "verification_failed",
+            code: input.totpCode,
+            isValid: "false",
+          });
+          throw new Error("Invalid TOTP code");
+        }
+
+        // Save TOTP secret
+        await db
+          .insert(totpSecrets)
+          .values({
+            phoneUserId: input.phoneUserId,
+            secret: input.secret,
+            backupCodes: JSON.stringify(input.backupCodes),
+            isEnabled: "true",
+          })
+          .onDuplicateKeyUpdate({
+            set: {
+              secret: input.secret,
+              backupCodes: JSON.stringify(input.backupCodes),
+              isEnabled: "true",
+            },
+          });
+
+        // Mark first login as complete
+        await db
+          .insert(firstLoginTracking)
+          .values({
+            phoneUserId: input.phoneUserId,
+            hasCompletedFirstLogin: "true",
+            requiresTOTP2FA: "true",
+            totpSetupCompletedAt: new Date(),
+          })
+          .onDuplicateKeyUpdate({
+            set: {
+              hasCompletedFirstLogin: "true",
+              requiresTOTP2FA: "true",
+              totpSetupCompletedAt: new Date(),
+            },
+          });
+
+        // Log successful setup
+        await db.insert(totp2faAuditLog).values({
+          phoneUserId: input.phoneUserId,
+          eventType: "setup_completed",
+          isValid: "true",
+        });
+
+        return {
+          success: true,
+          message: "TOTP 2FA setup completed successfully",
+        };
+      } catch (error: any) {
+        console.error("[TOTP] Failed to verify and save secret:", error);
+        throw new Error(error.message || "Failed to setup TOTP 2FA");
+      }
+    }),
+
+  /**
+   * Verify TOTP code during login
+   */
+  verifyTotpCode: adminProcedure
+    .input(z.object({ phoneUserId: z.number(), totpCode: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        // Get TOTP secret
+        const totpRecord = await db
+          .select()
+          .from(totpSecrets)
+          .where(eq(totpSecrets.phoneUserId, input.phoneUserId))
+          .limit(1);
+
+        if (!totpRecord || totpRecord.length === 0) {
+          throw new Error("TOTP 2FA not configured");
+        }
+
+        const secret = totpRecord[0].secret;
+        const backupCodes = JSON.parse(totpRecord[0].backupCodes || "[]");
+
+        // Check if it's a backup code
+        if (backupCodes.includes(input.totpCode)) {
+          // Remove used backup code
+          const updatedBackupCodes = backupCodes.filter(
+            (code: string) => code !== input.totpCode
+          );
+          await db
+            .update(totpSecrets)
+            .set({ backupCodes: JSON.stringify(updatedBackupCodes) })
+            .where(eq(totpSecrets.phoneUserId, input.phoneUserId));
+
+          // Log backup code usage
+          await db.insert(totp2faAuditLog).values({
+            phoneUserId: input.phoneUserId,
+            eventType: "backup_code_used",
+            isValid: "true",
+          });
+
+          return { success: true, message: "Authentication successful" };
+        }
+
+        // Verify TOTP code
+        const isValid = speakeasy.totp.verify({
+          secret,
+          encoding: "base32",
+          token: input.totpCode,
+          window: 2,
+        });
+
+        if (!isValid) {
+          // Log failed attempt
+          await db.insert(totp2faAuditLog).values({
+            phoneUserId: input.phoneUserId,
+            eventType: "verification_failed",
+            code: input.totpCode,
+            isValid: "false",
+          });
+          throw new Error("Invalid TOTP code");
+        }
+
+        // Log successful verification
+        await db.insert(totp2faAuditLog).values({
+          phoneUserId: input.phoneUserId,
+          eventType: "verification_success",
+          code: input.totpCode,
+          isValid: "true",
+        });
+
+        return { success: true, message: "Authentication successful" };
+      } catch (error: any) {
+        console.error("[TOTP] Failed to verify code:", error);
+        throw new Error(error.message || "Failed to verify TOTP code");
+      }
+    }),
+
+  /**
+   * Reset TOTP 2FA for a user (Super Admin only)
+   */
+  resetTotpForUser: adminProcedure
+    .input(z.object({ phoneUserId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        // Delete TOTP secret
+        await db.delete(totpSecrets).where(eq(totpSecrets.phoneUserId, input.phoneUserId));
+
+        // Reset first login tracking
+        await db
+          .update(firstLoginTracking)
+          .set({
+            hasCompletedFirstLogin: "false",
+            requiresTOTP2FA: "false",
+            totpSetupCompletedAt: null,
+          })
+          .where(eq(firstLoginTracking.phoneUserId, input.phoneUserId));
+
+        // Log TOTP reset
+        await db.insert(totp2faAuditLog).values({
+          phoneUserId: input.phoneUserId,
+          eventType: "reset_completed",
+          isValid: "true",
+        });
+
+        return {
+          success: true,
+          message: "TOTP 2FA reset successfully",
+        };
+      } catch (error: any) {
+        console.error("[TOTP] Failed to reset TOTP:", error);
+        throw new Error(error.message || "Failed to reset TOTP 2FA");
       }
     }),
 });

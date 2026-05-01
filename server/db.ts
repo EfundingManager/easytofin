@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, phoneUsers, InsertPhoneUser, PhoneUser, otpCodes, InsertOtpCode, OtpCode, InsertClientDocument, ClientDocument, clientDocuments } from "../drizzle/schema";
+import { InsertUser, users, phoneUsers, InsertPhoneUser, PhoneUser, otpCodes, InsertOtpCode, OtpCode, InsertClientDocument, ClientDocument, clientDocuments, totpSecrets, firstLoginTracking, userRoles } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -352,3 +352,40 @@ export async function getClientDocumentsByStatus(phoneUserId: number, status: "p
   );
 }
 
+
+
+// TOTP 2FA Helpers
+export async function getTotpSecret(phoneUserId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select()
+    .from(totpSecrets)
+    .where(eq(totpSecrets.phoneUserId, phoneUserId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getFirstLoginTracking(phoneUserId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select()
+    .from(firstLoginTracking)
+    .where(eq(firstLoginTracking.phoneUserId, phoneUserId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserRoles(phoneUserId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db.select()
+    .from(userRoles)
+    .where(eq(userRoles.phoneUserId, phoneUserId));
+
+  return result;
+}
