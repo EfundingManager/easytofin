@@ -41,6 +41,7 @@ import CustomerLanding from "./pages/CustomerLanding";
 import AccountLockoutManagement from "./pages/AccountLockoutManagement";
 import EmailBlasterPage from "./pages/EmailBlasterPage";
 import UserManagement from "./pages/UserManagement";
+import AdminLogs from "./pages/AdminLogs";
 import PostLogout from "./pages/PostLogout";
 import LifeAssurance from "./pages/ProtectionDetails/LifeAssurance";
 import SeriousIllness from "./pages/ProtectionDetails/SeriousIllness";
@@ -130,6 +131,7 @@ function Router() {
       <Route path="/admin/account-lockout-management" component={AccountLockoutManagement} />
       <Route path="/email-blaster" component={EmailBlasterPage} />
       <Route path="/admin/user-management" component={UserManagement} />
+      <Route path="/admin/logs" component={AdminLogs} />
       <Route path="/post-logout" component={PostLogout} />
       <Route path="/manager/dashboard" component={ManagerDashboard} />
       <Route path="/support/dashboard" component={SupportDashboard} />

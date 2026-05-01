@@ -29,6 +29,7 @@ import { authLockoutRouter } from "./routers/auth-lockout";
 import { ipRateLimitRouter } from "./routers/ip-rate-limit";
 import { accountLockoutManagementRouter } from "./routers/account-lockout-management";
 import { debugRouter } from "./routers/debug";
+import { logsRouter } from "./routers/logs";
 import * as db from "./db";
 
 export const appRouter = router({
@@ -90,6 +91,7 @@ export const appRouter = router({
   ipRateLimit: ipRateLimitRouter,
   accountLockoutManagement: accountLockoutManagementRouter,
   debug: debugRouter,
+  logs: logsRouter,
   // TODO: add feature routers here, e.g..
   // todo: router({
   //   list: protectedProcedure.query(({ ctx }) =>

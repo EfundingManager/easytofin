@@ -8,6 +8,13 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
+// Initialize global error reporting
+declare global {
+  interface Window {
+    addEventListener(type: 'error' | 'unhandledrejection', listener: EventListener): void;
+  }
+}
+
 // Create QueryClient with proper defaults to prevent infinite refetch loops
 // staleTime: 0 was causing infinite refetches when combined with component re-renders
 const queryClient = new QueryClient({
@@ -80,6 +87,63 @@ const trpcClient = trpc.createClient({
       },
     }),
   ],
+});
+
+// Global error listener for unhandled errors and promise rejections
+window.addEventListener('error', (event: ErrorEvent) => {
+  const errorMessage = event.message || String(event.error);
+  const errorStack = event.error?.stack || '';
+  const url = window.location.href;
+  
+  console.error('[Global Error]', {
+    message: errorMessage,
+    stack: errorStack,
+    url,
+    timestamp: new Date().toISOString(),
+  });
+  
+  // Report to backend logs API
+  fetch('/api/trpc/logs.reportError', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      json: {
+        message: errorMessage,
+        stack: errorStack,
+        url,
+        timestamp: new Date().toISOString(),
+      },
+    }),
+  }).catch(err => console.error('[Error Reporting Failed]', err));
+});
+
+window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
+  const errorMessage = event.reason?.message || String(event.reason);
+  const errorStack = event.reason?.stack || '';
+  const url = window.location.href;
+  
+  console.error('[Unhandled Promise Rejection]', {
+    message: errorMessage,
+    stack: errorStack,
+    url,
+    timestamp: new Date().toISOString(),
+  });
+  
+  // Report to backend logs API
+  fetch('/api/trpc/logs.reportError', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      json: {
+        message: `[Unhandled Promise] ${errorMessage}`,
+        stack: errorStack,
+        url,
+        timestamp: new Date().toISOString(),
+      },
+    }),
+  }).catch(err => console.error('[Error Reporting Failed]', err));
 });
 
 createRoot(document.getElementById("root")!).render(

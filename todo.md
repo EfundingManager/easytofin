@@ -1770,3 +1770,20 @@
 - [x] Update PhoneAuth.tsx to check requiresSMS2FA and pass token to /2fa page
 - [ ] Test complete 2FA flow with admin account
 - [ ] Verify admin dashboard loads after 2FA completion
+
+
+## Phase 6.6: Production Log Collection System
+- [x] Create applicationLogs database table schema (server/db-logs.ts)
+- [x] Implement logger service (server/_core/logger.ts) with database persistence
+- [x] Create logs tRPC router with admin endpoints (server/routers/logs.ts)
+- [x] Integrate logger into authenticateRequest for JWT verification debugging (server/_core/sdk.ts)
+- [x] Add comprehensive authentication logging at all checkpoints
+- [x] Create AdminLogs management page (client/src/pages/AdminLogs.tsx)
+- [x] Add global client-side error listener (client/src/main.tsx)
+- [x] Implement automatic error reporting to backend logs API
+- [x] Register /admin/logs route in App.tsx
+- [x] Register logsRouter in server/routers.ts
+- [ ] Deploy to production and test log collection
+- [ ] Access /admin/logs page to view production logs
+- [ ] Reproduce 'Access Denied' error and check logs for root cause
+- [ ] Implement fix based on log diagnostics

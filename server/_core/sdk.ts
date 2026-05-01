@@ -9,6 +9,7 @@ import { phoneUsers } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import * as db from "../db";
 import { ENV } from "./env";
+import { logger } from "./logger";
 import type {
   ExchangeTokenRequest,
   ExchangeTokenResponse,
@@ -263,22 +264,26 @@ class SDKServer {
     const cookies = this.parseCookies(req.headers.cookie);
     const sessionCookie = cookies.get(COOKIE_NAME);
     
-    console.log("[Auth] Authenticating request", {
+    const authContext = {
       hostname: req.hostname,
       protocol: req.protocol,
       secure: req.secure,
       xForwardedProto: req.headers['x-forwarded-proto'],
       xForwardedHost: req.headers['x-forwarded-host'],
       cookieHeader: req.headers.cookie ? "present" : "missing",
-      cookieHeaderValue: req.headers.cookie ? req.headers.cookie.substring(0, 100) : "none",
       sessionCookie: sessionCookie ? "present" : "missing",
-      allCookies: Array.from(cookies.keys()),
-    });
+      allCookies: Array.from(cookies.keys()).join(','),
+    };
+    
+    console.log("[Auth] Authenticating request", authContext);
+    await logger.info('[Auth] Authenticating request', { req, metadata: authContext });
     
     const session = await this.verifySession(sessionCookie);
 
     if (!session) {
-      console.log("[Auth] Session verification failed for cookie", { sessionCookie: sessionCookie ? "present" : "missing" });
+      const errorMsg = "Session verification failed for cookie";
+      console.log("[Auth]", errorMsg, { sessionCookie: sessionCookie ? "present" : "missing" });
+      await logger.error('[Auth] ' + errorMsg, { req, metadata: { ...authContext } });
       throw ForbiddenError("Invalid session cookie");
     }
 
@@ -291,12 +296,14 @@ class SDKServer {
       let phoneUser: any = null;
 
       console.log("[Auth] User not found in users table, checking phoneUsers with sessionUserId:", sessionUserId);
+      await logger.info('[Auth] User not found in users table, checking phoneUsers', { req, metadata: { sessionUserId } });
 
       // Try multiple lookup strategies for phoneUsers
       // 1. Try by googleId
       phoneUser = await db.getPhoneUserByGoogleId(sessionUserId);
       if (phoneUser) {
         console.log("[Auth] Found user by googleId");
+        await logger.info('[Auth] Found user by googleId', { req, metadata: { id: phoneUser.id, email: phoneUser.email } });
       }
 
       // 2. Try by email if sessionUserId looks like an email
@@ -304,6 +311,7 @@ class SDKServer {
         phoneUser = await db.getPhoneUserByEmail(sessionUserId);
         if (phoneUser) {
           console.log("[Auth] Found user by email");
+          await logger.info('[Auth] Found user by email', { req, metadata: { id: phoneUser.id, email: phoneUser.email } });
         }
       }
 
@@ -312,6 +320,7 @@ class SDKServer {
         phoneUser = await db.getPhoneUserByPhone(sessionUserId);
         if (phoneUser) {
           console.log("[Auth] Found user by phone");
+          await logger.info('[Auth] Found user by phone', { req, metadata: { id: phoneUser.id, phone: phoneUser.phone } });
         }
       }
 
@@ -322,12 +331,14 @@ class SDKServer {
           phoneUser = await db.getPhoneUserById(userId);
           if (phoneUser) {
             console.log("[Auth] Found user by ID extraction:", userId);
+            await logger.info('[Auth] Found user by ID extraction', { req, metadata: { id: phoneUser.id, userId } });
           }
         }
       }
 
       if (phoneUser) {
         console.log("[Auth] Successfully found phoneUser:", { id: phoneUser.id, email: phoneUser.email, phone: phoneUser.phone });
+        await logger.info('[Auth] Successfully found phoneUser', { req, metadata: { id: phoneUser.id, email: phoneUser.email, phone: phoneUser.phone } });
         // Convert phoneUser to User type for consistency
         return {
           id: phoneUser.id,
@@ -342,7 +353,9 @@ class SDKServer {
         } as any;
       }
 
-      console.log("[Auth] PhoneUser not found after all lookup strategies");
+      const notFoundMsg = "PhoneUser not found after all lookup strategies";
+      console.log("[Auth]", notFoundMsg);
+      await logger.warn('[Auth] ' + notFoundMsg, { req, metadata: { sessionUserId } });
     }
 
     // If still not found, try to sync from OAuth server
@@ -357,13 +370,19 @@ class SDKServer {
           lastSignedIn: signedInAt,
         });
         user = await db.getUserByOpenId(userInfo.openId);
+        await logger.info('[Auth] Synced user from OAuth', { req, metadata: { openId: userInfo.openId, email: userInfo.email } });
       } catch (error) {
+        const errorMsg = String(error);
         console.error("[Auth] Failed to sync user from OAuth:", error);
+        await logger.error('[Auth] Failed to sync user from OAuth', { req, metadata: { error: errorMsg } });
         throw ForbiddenError("Failed to sync user info");
       }
     }
 
     if (!user) {
+      const errorMsg = "User not found after all lookup strategies";
+      console.error("[Auth]", errorMsg);
+      await logger.error('[Auth] ' + errorMsg, { req, metadata: { sessionUserId } });
       throw ForbiddenError("User not found");
     }
 

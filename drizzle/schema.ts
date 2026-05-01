@@ -254,6 +254,30 @@ export type EmailTemplate = typeof emailTemplates.$inferSelect;
 export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
 
 /**
+ * Application logs for monitoring and debugging
+ */
+export const applicationLogs = mysqlTable("applicationLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  level: mysqlEnum("level", ["debug", "info", "warn", "error", "fatal"]).notNull(),
+  message: text("message").notNull(),
+  context: varchar("context", { length: 255 }), // e.g., "auth", "payment", "profile"
+  userId: int("userId"), // optional: which user this log is related to
+  phoneUserId: int("phoneUserId"), // optional: which phone user this log is related to
+  requestId: varchar("requestId", { length: 255 }), // for tracing requests
+  ipAddress: varchar("ipAddress", { length: 45 }), // IPv4 or IPv6
+  userAgent: text("userAgent"),
+  url: text("url"), // the URL that triggered this log
+  method: varchar("method", { length: 10 }), // GET, POST, etc
+  statusCode: int("statusCode"), // HTTP status code if applicable
+  errorStack: text("errorStack"), // full error stack trace
+  metadata: text("metadata"), // JSON object with additional context
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ApplicationLog = typeof applicationLogs.$inferSelect;
+export type InsertApplicationLog = typeof applicationLogs.$inferInsert;
+
+/**
  * Email blast campaigns
  */
 export const emailBlasts = mysqlTable("emailBlasts", {
