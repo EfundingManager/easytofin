@@ -1862,3 +1862,12 @@
 - [ ] Update environment variables
 - [ ] Deploy to production
 - [ ] Test all authentication flows in production
+
+
+## Bug Fixes
+
+### User Management List Display - FIXED
+- [x] Fixed issue where newly created team members weren't appearing in User Management list
+- [x] Root cause: listUsers query returned roles array instead of single role field
+- [x] Solution: Updated listUsers to return primary role field matching frontend expectations
+- [x] Added allRoles field for future use if multi-role display needed

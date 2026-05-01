@@ -590,12 +590,14 @@ export const adminRouter = router({
       const usersWithRoles = await Promise.all(
         allUsers.map(async (user: any) => {
           const roles = await db.select().from(userRoles).where(eq(userRoles.phoneUserId, user.id));
+          const primaryRole = roles.length > 0 ? roles[0].role : user.role || "user";
           return {
             id: user.id,
             email: user.email,
             phone: user.phone,
             name: user.name,
-            roles: roles.map((r: any) => r.role),
+            role: primaryRole,
+            allRoles: roles.map((r: any) => r.role),
             status: user.status,
             createdAt: user.createdAt,
           };
