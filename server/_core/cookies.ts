@@ -38,9 +38,9 @@ export function getSessionCookieOptions(
   const hostname = rawHost.split(":")[0];
   
   // For custom domains (easytofin.com, www.easytofin.com), set domain to allow sharing
-  // For preview/manus domains, use host-only cookies
+  // For preview/manus/cloud run domains, use host-only cookies
   // For localhost/IP, use host-only cookie
-  const isPreviewDomain = hostname.includes("manus.computer");
+  const isPreviewDomain = hostname.includes("manus.computer") || hostname.includes(".run.app") || hostname.includes("manus.space");
   
   let domain: string | undefined = undefined;
   
@@ -57,7 +57,8 @@ export function getSessionCookieOptions(
     domain = `.${baseDomain}`;
     console.log("[Cookie] Production domain - setting domain:", domain);
   } else {
-    console.log("[Cookie] Using host-only cookie for:", hostname, { isPreviewDomain, isLocal: LOCAL_HOSTS.has(hostname), isIp: isIpAddress(hostname) });
+    const reason = isPreviewDomain ? "preview/cloud-run domain" : LOCAL_HOSTS.has(hostname) ? "localhost" : "IP address";
+    console.log("[Cookie] Using host-only cookie for:", hostname, { reason, isPreviewDomain, isLocal: LOCAL_HOSTS.has(hostname), isIp: isIpAddress(hostname) });
   }
 
   const isSecure = isSecureRequest(req);
