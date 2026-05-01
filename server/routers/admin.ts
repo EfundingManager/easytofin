@@ -1,7 +1,7 @@
 import { adminProcedure, managerProcedure, staffProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, clientDocuments } from "../../drizzle/schema";
-import { eq, desc, and, inArray, or, like } from "drizzle-orm";
+import { eq, desc, and, inArray, or, like, ne } from "drizzle-orm";
 import { z } from "zod";
 import { getRateLimitViolations, whitelistIdentifier, resetRateLimit, getRateLimitStats } from "../rate-limit-logger";
 
@@ -56,7 +56,7 @@ export const adminRouter = router({
         pendingReview,
         completionRate,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("[Admin] Failed to get stats:", error);
       return {
         totalClients: 0,
@@ -66,265 +66,6 @@ export const adminRouter = router({
       };
     }
   }),
-
-  /**
-   * Get all client submissions with pagination
-   */
-  getClientSubmissions: adminProcedure
-    .input(
-      z.object({
-        page: z.number().int().positive().default(1),
-        limit: z.number().int().positive().max(100).default(10),
-        search: z.string().optional(),
-      })
-    )
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) {
-        return {
-          submissions: [],
-          total: 0,
-          page: input.page,
-          limit: input.limit,
-        };
-      }
-
-      try {
-        let query = db.select({
-          id: phoneUsers.id,
-          name: phoneUsers.name,
-          email: phoneUsers.email,
-          phone: phoneUsers.phone,
-          verified: phoneUsers.verified,
-          createdAt: phoneUsers.createdAt,
-          lastSignedIn: phoneUsers.lastSignedIn,
-        }).from(phoneUsers);
-
-        // Apply search filter if provided
-        if (input.search) {
-          // Note: This is a simplified search. For production, consider using full-text search
-          const searchTerm = `%${input.search}%`;
-          // In a real scenario, you'd use a proper search mechanism
-        }
-
-        const offset = (input.page - 1) * input.limit;
-        const submissions = await query.limit(input.limit).offset(offset);
-
-        const totalResult = await db.select({ id: phoneUsers.id }).from(phoneUsers);
-        const total = totalResult.length;
-
-        return {
-          submissions: submissions.map((sub) => ({
-            id: sub.id,
-            name: sub.name || "N/A",
-            email: sub.email || "N/A",
-            phone: sub.phone || "N/A",
-            verified: sub.verified === "true",
-            createdAt: sub.createdAt,
-            lastSignedIn: sub.lastSignedIn,
-          })),
-          total,
-          page: input.page,
-          limit: input.limit,
-        };
-      } catch (error) {
-        console.error("[Admin] Failed to get client submissions:", error);
-        return {
-          submissions: [],
-          total: 0,
-          page: input.page,
-          limit: input.limit,
-        };
-      }
-    }),
-
-  /**
-   * Get fact-finding form responses by product
-   */
-  getFormResponsesByProduct: adminProcedure
-    .input(
-      z.object({
-        product: z.enum([
-          "protection",
-          "pensions",
-          "healthInsurance",
-          "generalInsurance",
-          "investments",
-        ]),
-      })
-    )
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) {
-        return {
-          product: input.product,
-          responses: [],
-          total: 0,
-        };
-      }
-
-      try {
-        const responses = await db
-          .select()
-          .from(factFindingForms)
-          .where(eq(factFindingForms.product, input.product));
-
-        return {
-          product: input.product,
-          responses: responses.map((form) => ({
-            id: form.id,
-            phoneUserId: form.phoneUserId,
-            userId: form.userId,
-            status: form.status,
-            submittedAt: form.submittedAt,
-            createdAt: form.createdAt,
-            formData: form.formData ? JSON.parse(form.formData) : null,
-          })),
-          total: responses.length,
-        };
-      } catch (error) {
-        console.error("[Admin] Failed to get form responses:", error);
-        return {
-          product: input.product,
-          responses: [],
-          total: 0,
-        };
-      }
-    }),
-
-  /**
-   * Get all form responses with pagination
-   */
-  getAllFormResponses: adminProcedure
-    .input(
-      z.object({
-        page: z.number().int().positive().default(1),
-        limit: z.number().int().positive().max(100).default(10),
-        status: z
-          .enum(["draft", "submitted", "reviewed", "archived"])
-          .optional(),
-      })
-    )
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) {
-        return {
-          responses: [],
-          total: 0,
-          page: input.page,
-          limit: input.limit,
-        };
-      }
-
-      try {
-        let query: any = db.select().from(factFindingForms);
-
-        // Apply status filter if provided
-        if (input.status) {
-          query = query.where(eq(factFindingForms.status, input.status));
-        }
-
-        const offset = (input.page - 1) * input.limit;
-        const responses = await query
-          .orderBy(desc(factFindingForms.submittedAt))
-          .limit(input.limit)
-          .offset(offset);
-
-        const totalResult: any = await db.select().from(factFindingForms);
-        const total = totalResult ? totalResult.length : 0;
-
-        return {
-          responses: responses.map((form: any) => ({
-            id: form.id,
-            product: form.product,
-            status: form.status,
-            submittedAt: form.submittedAt,
-            createdAt: form.createdAt,
-          })),
-          total,
-          page: input.page,
-          limit: input.limit,
-        };
-      } catch (error) {
-        console.error("[Admin] Failed to get form responses:", error);
-        return {
-          responses: [],
-          total: 0,
-          page: input.page,
-          limit: input.limit,
-        };
-      }
-    }),
-
-  /**
-   * Get detailed form response
-   */
-  getFormResponse: adminProcedure
-    .input(z.object({ formId: z.number().int().positive() }))
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) {
-        return null;
-      }
-
-      try {
-        const result = await db
-          .select()
-          .from(factFindingForms)
-          .where(eq(factFindingForms.id, input.formId));
-
-        if (result.length === 0) {
-          return null;
-        }
-
-        const form = result[0];
-        return {
-          id: form.id,
-          product: form.product,
-          status: form.status,
-          submittedAt: form.submittedAt,
-          createdAt: form.createdAt,
-          formData: form.formData ? JSON.parse(form.formData) : null,
-          phoneUserId: form.phoneUserId,
-          userId: form.userId,
-        };
-      } catch (error) {
-        console.error("[Admin] Failed to get form response:", error);
-        return null;
-      }
-    }),
-
-  /**
-   * Update form response status
-   */
-  updateFormStatus: adminProcedure
-    .input(
-      z.object({
-        formId: z.number().int().positive(),
-        status: z.enum(["draft", "submitted", "reviewed", "archived"]),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) {
-        throw new Error("Database not available");
-      }
-
-      try {
-        await db
-          .update(factFindingForms)
-          .set({
-            status: input.status,
-            updatedAt: new Date(),
-          })
-          .where(eq(factFindingForms.id, input.formId));
-
-        return { success: true };
-      } catch (error) {
-        console.error("[Admin] Failed to update form status:", error);
-        throw error;
-      }
-    }),
 
   /**
    * Get product statistics
@@ -342,26 +83,25 @@ export const adminRouter = router({
     }
 
     try {
-      const products = [
-        "protection",
-        "pensions",
-        "healthInsurance",
-        "generalInsurance",
-        "investments",
-      ] as const;
+      const stats = {
+        protection: 0,
+        pensions: 0,
+        healthInsurance: 0,
+        generalInsurance: 0,
+        investments: 0,
+      };
 
-      const stats: Record<string, number> = {};
-
-      for (const product of products) {
-        const result = await db
-          .select()
-          .from(factFindingForms)
-          .where(eq(factFindingForms.product, product));
-        stats[product] = result.length;
-      }
+      const forms = await db.select().from(factFindingForms);
+      forms.forEach((form: any) => {
+        if (form.productType === "protection") stats.protection++;
+        else if (form.productType === "pensions") stats.pensions++;
+        else if (form.productType === "healthInsurance") stats.healthInsurance++;
+        else if (form.productType === "generalInsurance") stats.generalInsurance++;
+        else if (form.productType === "investments") stats.investments++;
+      });
 
       return stats;
-    } catch (error) {
+    } catch (error: any) {
       console.error("[Admin] Failed to get product stats:", error);
       return {
         protection: 0,
@@ -376,635 +116,291 @@ export const adminRouter = router({
   /**
    * Get recent activity
    */
-  getRecentActivity: adminProcedure
-    .input(z.object({ limit: z.number().int().positive().max(50).default(10) }))
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) {
-        return [];
-      }
-
-      try {
-        const recentForms = await db
-          .select()
-          .from(factFindingForms)
-          .orderBy(desc(factFindingForms.submittedAt))
-          .limit(input.limit);
-
-        return recentForms.map((form) => ({
-          id: form.id,
-          type: "form_submission",
-          product: form.product,
-          status: form.status,
-          timestamp: form.submittedAt || form.createdAt,
-        }));
-      } catch (error) {
-        console.error("[Admin] Failed to get recent activity:", error);
-        return [];
-      }
-    }),
-
-  /**
-   * Get detailed customer information
-   */
-  getCustomerDetail: adminProcedure
-    .input(
-      z.object({
-        customerId: z.number().int().positive(),
-      })
-    )
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) {
-        return null;
-      }
-
-      try {
-        const customer: any = await db
-          .select()
-          .from(phoneUsers)
-          .where(eq(phoneUsers.id, input.customerId))
-          .then((res) => res[0]);
-
-        if (!customer) {
-          return null;
-        }
-
-        // Fetch policies from policyAssignments table
-        const policies: any = await db
-          .select()
-          .from(policyAssignments)
-          .where(eq(policyAssignments.phoneUserId, input.customerId));
-
-        // Fetch documents from clientDocuments table
-        const documents: any = await db
-          .select()
-          .from(clientDocuments)
-          .where(eq(clientDocuments.phoneUserId, input.customerId));
-
-        // Fetch forms from factFindingForms table
-        const forms: any = await db
-          .select()
-          .from(factFindingForms)
-          .where(eq(factFindingForms.phoneUserId, input.customerId));
-
-        return {
-          id: customer.id,
-          name: customer.name,
-          email: customer.email,
-          phone: customer.phone,
-          address: customer.address || "",
-          kycStatus: customer.kycStatus || "pending",
-          emailVerified: customer.emailVerified === "true",
-          createdAt: customer.createdAt,
-          status: customer.clientStatus || "active",
-          policies: policies.map((p: any) => ({
-            id: p.id,
-            policyNumber: p.policyNumber,
-            product: p.product,
-            insurerName: p.insurerName,
-            premium: p.premiumAmount,
-            status: "active",
-            startDate: p.startDate,
-            endDate: p.endDate,
-            advisorName: p.advisorName,
-            advisorPhone: p.advisorPhone,
-          })),
-          documents: documents.map((d: any) => ({
-            id: d.id,
-            documentType: d.documentType,
-            fileName: d.fileName,
-            fileUrl: d.fileUrl,
-            status: d.status,
-            uploadedAt: d.uploadedAt,
-          })),
-          forms: forms.map((f: any) => ({
-            id: f.id,
-            product: f.product,
-            status: f.status,
-            submittedAt: f.submittedAt,
-            policyNumber: f.policyNumber,
-          })),
-        };
-      } catch (error) {
-        console.error("[Admin] Failed to get customer details:", error);
-        return null;
-      }
-    }),
-
-  /**
-   * Global search by policy number or client name
-   */
-  globalSearch: adminProcedure
-    .input(
-      z.object({
-        query: z.string().min(1).max(100),
-      })
-    )
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) {
-        return {
-          forms: [],
-          clients: [],
-          total: 0,
-        };
-      }
-
-      try {
-        // Search forms by policy number
-        const formsResult: any = await db.select().from(factFindingForms);
-        const matchedForms = formsResult
-          .filter((form: any) => form.policyNumber && form.policyNumber.includes(input.query))
-          .map((form: any) => ({
-            id: form.id,
-            type: "form",
-            policyNumber: form.policyNumber,
-            product: form.product,
-            status: form.status,
-            submittedAt: form.submittedAt,
-          }));
-
-        // Search clients by name
-        const clientsResult: any = await db.select({
-          id: phoneUsers.id,
-          name: phoneUsers.name,
-          email: phoneUsers.email,
-          phone: phoneUsers.phone,
-          verified: phoneUsers.verified,
-        }).from(phoneUsers);
-        const matchedClients = clientsResult
-          .filter(
-            (client: any) =>
-              client.name?.toLowerCase().includes(input.query.toLowerCase()) ||
-              client.email?.toLowerCase().includes(input.query.toLowerCase())
-          )
-          .map((client: any) => ({
-            id: client.id,
-            type: "client",
-            name: client.name,
-            email: client.email,
-            phone: client.phone,
-            verified: client.verified === "true",
-          }));
-
-        return {
-          forms: matchedForms,
-          clients: matchedClients,
-          total: matchedForms.length + matchedClients.length,
-        };
-      } catch (error) {
-        console.error("[Admin] Failed to perform global search:", error);
-        return {
-          forms: [],
-          clients: [],
-          total: 0,
-        };
-      }
-    }),
-  /**
-   * Update KYC status for a customer
-   */
-  updateKycStatus: adminProcedure
-    .input(z.object({
-      customerId: z.number(),
-      kycStatus: z.enum(["pending", "verified", "rejected"]),
-    }))
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error("Database connection failed");
-
-      try {
-        await db
-          .update(phoneUsers)
-          .set({ kycStatus: input.kycStatus })
-          .where(eq(phoneUsers.id, input.customerId));
-
-        return { success: true, message: `KYC status updated to ${input.kycStatus}` };
-      } catch (error) {
-        console.error("[Admin] Failed to update KYC status:", error);
-        throw new Error("Failed to update KYC status");
-      }
-    }),
-
-  /**
-   * Get rate limit violations for admin dashboard
-   */
-  getRateLimitViolationsData: adminProcedure
-    .input(
-      z.object({
-        identifier: z.string().optional(),
-        identifierType: z.enum(["phone", "email"]).optional(),
-        violationType: z.enum(["send_otp", "verify_otp"]).optional(),
-        resolved: z.boolean().optional(),
-        limit: z.number().int().positive().max(100).default(50),
-        offset: z.number().int().nonnegative().default(0),
-        sortBy: z.enum(["createdAt", "attemptCount"]).default("createdAt"),
-      })
-    )
-    .query(async ({ input }) => {
-      const violations = await getRateLimitViolations({
-        identifier: input.identifier,
-        identifierType: input.identifierType,
-        violationType: input.violationType,
-        resolved: input.resolved,
-        limit: input.limit,
-        offset: input.offset,
-        sortBy: input.sortBy,
-      });
-      return violations;
-    }),
-
-  /**
-   * Get rate limit statistics
-   */
-  getRateLimitStatsData: adminProcedure.query(async () => {
-    return await getRateLimitStats();
-  }),
-
-  /**
-   * Whitelist an identifier to exclude from rate limiting
-   */
-  whitelistIdentifierFromRateLimit: adminProcedure
-    .input(
-      z.object({
-        identifier: z.string(),
-        identifierType: z.enum(["phone", "email"]),
-        notes: z.string().optional(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const success = await whitelistIdentifier(
-        input.identifier,
-        input.identifierType,
-        ctx.user.id,
-        input.notes
-      );
-      return {
-        success,
-        message: success
-          ? `${input.identifier} has been whitelisted`
-          : "Failed to whitelist identifier",
-      };
-    }),
-
-  /**
-   * Reset rate limit for an identifier
-   */
-  resetRateLimitForIdentifier: adminProcedure
-    .input(
-      z.object({
-        identifier: z.string(),
-        identifierType: z.enum(["phone", "email"]),
-        notes: z.string().optional(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const success = await resetRateLimit(
-        input.identifier,
-        input.identifierType,
-        ctx.user.id,
-        input.notes
-      );
-      return {
-        success,
-        message: success
-          ? `Rate limit for ${input.identifier} has been reset`
-          : "Failed to reset rate limit",
-      };
-    }),
-
-  // ─── Role Management ─────────────────────────────────────────────────────────
-
-  /**
-   * Update a user's role (Admin only)
-   * Allows assigning manager, staff, user, or admin roles to any user.
-   */
-  updateUserRole: adminProcedure
-    .input(
-      z.object({
-        userId: z.number().int().positive(),
-        userType: z.enum(["user", "phoneUser"]),
-        role: z.enum(["user", "admin", "manager", "staff"]),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error("Database not available");
-
-      try {
-        if (input.userType === "phoneUser") {
-          await db
-            .update(phoneUsers)
-            .set({ role: input.role, updatedAt: new Date() })
-            .where(eq(phoneUsers.id, input.userId));
-        } else {
-          await db
-            .update(users)
-            .set({ role: input.role, updatedAt: new Date() })
-            .where(eq(users.id, input.userId));
-        }
-        return { success: true, message: `User role updated to ${input.role}` };
-      } catch (error) {
-        console.error("[Admin] Failed to update user role:", error);
-        throw new Error("Failed to update user role");
-      }
-    }),
-
-  /**
-   * List all staff members (users with manager or staff role)
-   * Accessible by Admin and Manager roles.
-   */
-  listStaffUsers: managerProcedure
-    .input(
-      z.object({
-        role: z.enum(["manager", "staff", "admin"]).optional(),
-        page: z.number().int().positive().default(1),
-        limit: z.number().int().positive().max(100).default(20),
-      })
-    )
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) return { users: [], total: 0, page: input.page, limit: input.limit };
-
-      try {
-        const staffRoles: Array<"user" | "admin" | "manager" | "staff"> = input.role
-          ? [input.role]
-          : ["admin", "manager", "staff"];
-
-        const allUsers = await db.select({
-          id: phoneUsers.id,
-          name: phoneUsers.name,
-          email: phoneUsers.email,
-          phone: phoneUsers.phone,
-          role: phoneUsers.role,
-          createdAt: phoneUsers.createdAt,
-          lastSignedIn: phoneUsers.lastSignedIn,
-        }).from(phoneUsers);
-        const filtered = allUsers.filter((u) => staffRoles.includes(u.role as any));
-        const offset = (input.page - 1) * input.limit;
-        const paginated = filtered.slice(offset, offset + input.limit);
-
-        return {
-          users: paginated.map((u) => ({
-            id: u.id,
-            name: u.name,
-            email: u.email,
-            phone: u.phone,
-            role: u.role,
-            createdAt: u.createdAt,
-            lastSignedIn: u.lastSignedIn,
-          })),
-          total: filtered.length,
-          page: input.page,
-          limit: input.limit,
-        };
-      } catch (error) {
-        console.error("[Admin] Failed to list staff users:", error);
-        return { users: [], total: 0, page: input.page, limit: input.limit };
-      }
-    }),
-
-  /**
-   * Get the current authenticated user's role and profile
-   * Accessible by Staff, Manager, and Admin roles.
-   */
-  getMyRoleInfo: staffProcedure.query(async ({ ctx }) => {
-    return {
-      id: ctx.user.id,
-      name: ctx.user.name,
-      email: ctx.user.email,
-      role: ctx.user.role,
-      loginMethod: ctx.user.loginMethod,
-    };
-  }),
-  
-  /**
-   * Delete all test users and their related records
-   * Only super admins can perform this action
-   */
-  cleanupTestUsers: adminProcedure.mutation(async () => {
+  getRecentActivity: adminProcedure.query(async () => {
     const db = await getDb();
-    if (!db) {
-      return { success: false, message: "Database connection failed", deletedCount: 0, timestamp: new Date().toISOString() };
-    }
+    if (!db) return [];
 
     try {
-      // Find all test users
-      const testUsers = await db
-        .select({ id: users.id, email: users.email, name: users.name })
-        .from(users)
-        .where(
-          or(
-            like(users.email, "%test%"),
-            like(users.email, "%verify%"),
-            like(users.email, "%otp%"),
-            like(users.email, "%demo%"),
-            like(users.email, "%example%")
-          )
-        );
+      const forms = await db
+        .select()
+        .from(factFindingForms)
+        .orderBy(desc(factFindingForms.createdAt))
+        .limit(10);
 
-      if (testUsers.length === 0) {
-        return { success: true, message: "No test users found", deletedCount: 0, timestamp: new Date().toISOString() };
-      }
-
-      const userIds = testUsers.map(u => u.id);
-      
-      // Delete related records first (respecting foreign key constraints)
-      // Get phoneUserIds first since policyAssignments uses phoneUserId
-      const phoneUserRecords = await db
-        .select({ id: phoneUsers.id })
-        .from(phoneUsers)
-        .where(inArray(phoneUsers.userId, userIds));
-      const phoneUserIds = phoneUserRecords.map(p => p.id);
-      
-      if (phoneUserIds.length > 0) {
-        await db.delete(policyAssignments).where(inArray(policyAssignments.phoneUserId, phoneUserIds));
-        await db.delete(clientDocuments).where(inArray(clientDocuments.phoneUserId, phoneUserIds));
-      }
-      
-      await db.delete(userProducts).where(inArray(userProducts.userId, userIds));
-      await db.delete(factFindingForms).where(inArray(factFindingForms.userId, userIds));
-      await db.delete(phoneUsers).where(inArray(phoneUsers.userId, userIds));
-      
-      // Delete users
-      await db.delete(users).where(inArray(users.id, userIds));
-
-      return {
-        success: true,
-        message: `Successfully deleted ${testUsers.length} test users and their related records`,
-        deletedCount: testUsers.length,
-        deletedUsers: testUsers.map(u => ({ email: u.email, name: u.name })),
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
-      console.error("Error cleaning up test users:", error);
-      return {
-        success: false,
-        message: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-        deletedCount: 0,
-        timestamp: new Date().toISOString(),
-      };
+      return forms.map((form: any) => ({
+        id: form.id,
+        productType: form.productType,
+        status: form.status,
+        createdAt: form.createdAt,
+      }));
+    } catch (error: any) {
+      console.error("[Admin] Failed to get recent activity:", error);
+      return [];
     }
   }),
 
   /**
-   * Get all users with optional role and search filters
+   * Get all clients
    */
-  getUsers: adminProcedure
-    .input(
-      z.object({
-        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin", "customer"]).optional(),
-        search: z.string().optional(),
-      })
-    )
+  getAllClients: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+
+    try {
+      const clients = await db.select().from(phoneUsers);
+      return clients;
+    } catch (error: any) {
+      console.error("[Admin] Failed to get clients:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Search clients by policy number or name
+   */
+  searchClients: adminProcedure
+    .input(z.object({ query: z.string() }))
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) return [];
 
       try {
-        let results: any = await db
-          .select({
-            id: phoneUsers.id,
-            name: phoneUsers.name,
-            email: phoneUsers.email,
-            role: phoneUsers.role,
-            createdAt: phoneUsers.createdAt,
-          })
-          .from(phoneUsers);
-
-        if (input.role) {
-          results = results.filter((u: any) => u.role === input.role);
-        }
-
-        if (input.search) {
-          const searchLower = input.search.toLowerCase();
-          results = results.filter((user: any) =>
-            user.name?.toLowerCase().includes(searchLower) ||
-            user.email?.toLowerCase().includes(searchLower)
+        const clients = await db
+          .select()
+          .from(phoneUsers)
+          .where(
+            or(
+              like(phoneUsers.name, `%${input.query}%`),
+              like(phoneUsers.email, `%${input.query}%`)
+            )
           );
-        }
 
-        return results;
-      } catch (error) {
-        console.error("[Admin] Failed to get users:", error);
+        return clients;
+      } catch (error: any) {
+        console.error("[Admin] Failed to search clients:", error);
         return [];
       }
     }),
 
   /**
-   * Create a new user with specified role
+   * Get KYC reviews
    */
-  createUser: adminProcedure
+  getKycReviews: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+
+    try {
+      const reviews = await db.select().from(phoneUsers);
+      return reviews.filter((u: any) => u.kycStatus === "pending");
+    } catch (error: any) {
+      console.error("[Admin] Failed to get KYC reviews:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Get clients queue
+   */
+  getClientsQueue: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+
+    try {
+      const queue = await db
+        .select()
+        .from(phoneUsers)
+        .where(eq(phoneUsers.clientStatus, "queue"));
+
+      return queue;
+    } catch (error: any) {
+      console.error("[Admin] Failed to get clients queue:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Get customers
+   */
+  getCustomers: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+
+    try {
+      const customers = await db
+        .select()
+        .from(phoneUsers)
+        .where(eq(phoneUsers.clientStatus, "customer"));
+
+      return customers;
+    } catch (error: any) {
+      console.error("[Admin] Failed to get customers:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Get submissions
+   */
+  getSubmissions: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+
+    try {
+      const submissions = await db
+        .select()
+        .from(factFindingForms)
+        .orderBy(desc(factFindingForms.createdAt));
+
+      return submissions;
+    } catch (error: any) {
+      console.error("[Admin] Failed to get submissions:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Get forms
+   */
+  getForms: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+
+    try {
+      const forms = await db.select().from(factFindingForms);
+      return forms;
+    } catch (error: any) {
+      console.error("[Admin] Failed to get forms:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Update client status
+   */
+  updateClientStatus: adminProcedure
     .input(
       z.object({
-        email: z.string().email(),
-        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin", "customer"]),
+        clientId: z.string(),
+        status: z.enum(["queue", "in_progress", "assigned", "customer"]),
       })
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      if (ctx.user.role === "admin") {
-        if (input.role !== "staff" && input.role !== "support") {
-          throw new Error("Admins can only create Staff and Support users");
-        }
-      } else if (ctx.user.role !== "super_admin") {
-        throw new Error("Insufficient permissions");
-      }
-
       try {
-        const existing = await db
-          .select()
-          .from(phoneUsers)
-          .where(eq(phoneUsers.email, input.email))
-          .then((res: any) => res[0]);
+        const clientIdNum = parseInt(input.clientId, 10);
+        await db
+          .update(phoneUsers)
+          .set({ clientStatus: input.status })
+          .where(eq(phoneUsers.id, clientIdNum));
 
-        if (existing) {
-          throw new Error("User with this email already exists");
-        }
-
-        await db.insert(phoneUsers).values({
-          email: input.email,
-          role: input.role as any,
-          name: input.email.split("@")[0],
-          verified: "false",
-          emailVerified: "false",
-          clientStatus: "assigned",
-          kycStatus: "pending",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-
-        return { success: true, message: "User created" };
+        return { success: true };
       } catch (error: any) {
-        console.error("[Admin] Failed to create user:", error);
-        throw new Error(error.message || "Failed to create user");
+        console.error("[Admin] Failed to update client status:", error);
+        throw new Error(error.message || "Failed to update client status");
       }
     }),
 
   /**
-   * Update a user's role
+   * Update KYC status
    */
-  updateUser: adminProcedure
+  updateKycStatus: adminProcedure
     .input(
       z.object({
-        id: z.number().int().positive(),
-        role: z.enum(["user", "admin", "manager", "staff", "support", "super_admin", "customer"]),
+        clientId: z.string(),
+        status: z.enum(["pending", "submitted", "verified", "rejected"]),
       })
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      if (ctx.user.role === "admin") {
-        if (input.role !== "staff" && input.role !== "support") {
-          throw new Error("Admins can only update Staff and Support users");
-        }
-      } else if (ctx.user.role !== "super_admin") {
-        throw new Error("Insufficient permissions");
-      }
-
       try {
-        const user = await db
-          .select()
-          .from(phoneUsers)
-          .where(eq(phoneUsers.id, input.id))
-          .then((res: any) => res[0]);
-
-        if (!user) throw new Error("User not found");
-
-        if (ctx.user.role === "admin" && (user.role === "admin" || user.role === "super_admin")) {
-          throw new Error("You cannot update Admin or Super Admin users");
-        }
-
+        const clientIdNum = parseInt(input.clientId, 10);
         await db
           .update(phoneUsers)
-          .set({ role: input.role as any, updatedAt: new Date() })
-          .where(eq(phoneUsers.id, input.id));
+          .set({ kycStatus: input.status })
+          .where(eq(phoneUsers.id, clientIdNum));
 
-        return { success: true, message: "User updated" };
+        return { success: true };
       } catch (error: any) {
-        console.error("[Admin] Failed to update user:", error);
-        throw new Error(error.message || "Failed to update user");
+        console.error("[Admin] Failed to update KYC status:", error);
+        throw new Error(error.message || "Failed to update KYC status");
       }
     }),
+
+  /**
+   * Get rate limit violations
+   */
+  getRateLimitViolations: adminProcedure.query(async () => {
+    try {
+      const violations = getRateLimitViolations();
+      return violations;
+    } catch (error: any) {
+      console.error("[Admin] Failed to get rate limit violations:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Whitelist identifier
+   */
+  whitelistIdentifier: adminProcedure
+    .input(z.object({ identifier: z.string(), identifierType: z.enum(["phone", "email"]) }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await whitelistIdentifier(input.identifier, input.identifierType, ctx.user.id);
+        return { success: true };
+      } catch (error: any) {
+        console.error("[Admin] Failed to whitelist identifier:", error);
+        throw new Error(error.message || "Failed to whitelist identifier");
+      }
+    }),
+
+  /**
+   * Reset rate limit
+   */
+  resetRateLimit: adminProcedure
+    .input(z.object({ identifier: z.string(), identifierType: z.enum(["phone", "email"]) }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await resetRateLimit(input.identifier, input.identifierType, ctx.user.id);
+        return { success: true };
+      } catch (error: any) {
+        console.error("[Admin] Failed to reset rate limit:", error);
+        throw new Error(error.message || "Failed to reset rate limit");
+      }
+    }),
+
+  /**
+   * Get rate limit stats
+   */
+  getRateLimitStats: adminProcedure.query(async () => {
+    try {
+      const stats = getRateLimitStats();
+      return stats;
+    } catch (error: any) {
+      console.error("[Admin] Failed to get rate limit stats:", error);
+      return {};
+    }
+  }),
 
   /**
    * Delete a user
    */
   deleteUser: adminProcedure
-    .input(z.object({ id: z.number().int().positive() }))
-    .mutation(async ({ input, ctx }) => {
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
       try {
+        const userIdNum = parseInt(input.id, 10);
         const user = await db
           .select()
           .from(phoneUsers)
-          .where(eq(phoneUsers.id, input.id))
+          .where(eq(phoneUsers.id, userIdNum))
           .then((res: any) => res[0]);
 
         if (!user) throw new Error("User not found");
@@ -1017,11 +413,82 @@ export const adminRouter = router({
           throw new Error("Insufficient permissions");
         }
 
-        await db.delete(phoneUsers).where(eq(phoneUsers.id, input.id));
+        await db.delete(phoneUsers).where(eq(phoneUsers.id, userIdNum));
         return { success: true, message: "User deleted" };
       } catch (error: any) {
         console.error("[Admin] Failed to delete user:", error);
         throw new Error(error.message || "Failed to delete user");
       }
     }),
+  
+  /**
+   * Delete all clients except Super Admin (DESTRUCTIVE - use with caution)
+   */
+  deleteAllClientsExceptSuperAdmin: adminProcedure.mutation(async ({ ctx }) => {
+    if (ctx.user.role !== "admin" && ctx.user.role !== "super_admin") {
+      throw new Error("Insufficient permissions");
+    }
+
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    try {
+      // Find Super Admin user
+      const superAdmin = await db
+        .select()
+        .from(users)
+        .where(eq(users.role, "admin"))
+        .then((res: any) => res[0]);
+
+      if (!superAdmin) {
+        throw new Error("Super Admin user not found");
+      }
+
+      console.log("[Admin] Deleting all clients except Super Admin:", superAdmin.id);
+
+      // Delete all phoneUsers except Super Admin
+      console.log("[Admin] Deleting phoneUsers...");
+      await db
+        .delete(phoneUsers)
+        .where(ne(phoneUsers.id, superAdmin.id));
+
+      // Delete all related data (forms, documents, etc.)
+      console.log("[Admin] Deleting related data...");
+      await db.delete(factFindingForms).where(ne(factFindingForms.phoneUserId, superAdmin.id));
+      await db.delete(clientDocuments).where(ne(clientDocuments.phoneUserId, superAdmin.id));
+      await db.delete(userProducts).where(ne(userProducts.phoneUserId, superAdmin.id));
+      await db.delete(policyAssignments).where(ne(policyAssignments.phoneUserId, superAdmin.id));
+
+      // Delete all users except Super Admin
+      console.log("[Admin] Deleting users...");
+      await db
+        .delete(users)
+        .where(and(
+          // Keep the Super Admin
+          ne(users.id, superAdmin.id),
+          // Also keep the current admin performing the deletion
+          ne(users.id, ctx.user.id)
+        ));
+
+      console.log("[Admin] Deletion complete");
+
+      // Get remaining users
+      const remaining = await db.select().from(users);
+      const remainingPhoneUsers = await db.select().from(phoneUsers);
+
+      return {
+        success: true,
+        message: `Deleted all clients. ${remaining.length} users and ${remainingPhoneUsers.length} phone users remaining.`,
+        remainingUsers: remaining.map((u: any) => ({
+          id: u.id,
+          email: u.email,
+          name: u.name,
+          role: u.role,
+        })),
+      };
+    } catch (error: any) {
+      console.error("[Admin] Failed to delete all clients:", error);
+      throw new Error(error.message || "Failed to delete clients");
+    }
+  }),
 });
