@@ -4,13 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw, Download } from 'lucide-react';
+import { Loader2, RefreshCw, Download, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function AdminLogs() {
   const [filter, setFilter] = useState<'all' | 'error' | 'warn' | 'info'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [hoursAgo, setHoursAgo] = useState(24);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [expandedLogId, setExpandedLogId] = useState<number | null>(null);
 
   const logsQuery = trpc.logs.getRecentLogs.useQuery(
     {
@@ -245,29 +246,73 @@ export default function AdminLogs() {
                   </thead>
                   <tbody>
                     {filteredLogs.map((log) => (
-                      <tr key={log.id} className="border-b hover:bg-muted/50">
-                        <td className="py-3 px-4 text-xs text-muted-foreground">
-                          {formatDate(log.createdAt)}
-                        </td>
-                        <td className="py-3 px-4">
-                          <Badge variant={getLevelColor(log.level) as any}>
-                            {log.level.toUpperCase()}
-                          </Badge>
-                        </td>
-                        <td className="py-3 px-4 max-w-md truncate" title={log.message}>
-                          {log.message}
-                        </td>
-                        <td className="py-3 px-4">
-                          {log.context ? (
-                            <Badge variant="outline">{log.context}</Badge>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </td>
-                        <td className="py-3 px-4 text-xs text-muted-foreground">
-                          {log.ipAddress || '-'}
-                        </td>
-                      </tr>
+                      <tbody key={log.id}>
+                        <tr
+                          className="border-b hover:bg-muted/50 cursor-pointer"
+                          onClick={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
+                        >
+                          <td className="py-3 px-4 text-xs text-muted-foreground">
+                            {formatDate(log.createdAt)}
+                          </td>
+                          <td className="py-3 px-4">
+                            <Badge variant={getLevelColor(log.level) as any}>
+                              {log.level.toUpperCase()}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-4 max-w-md truncate" title={log.message}>
+                            {log.message}
+                          </td>
+                          <td className="py-3 px-4">
+                            {log.context ? (
+                              <Badge variant="outline">{log.context}</Badge>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-xs text-muted-foreground flex items-center justify-between">
+                            <span>{log.ipAddress || '-'}</span>
+                            {expandedLogId === log.id ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </td>
+                        </tr>
+                        {expandedLogId === log.id && (
+                          <tr className="border-b bg-muted/30">
+                            <td colSpan={5} className="py-4 px-4">
+                              <div className="space-y-3">
+                                <div>
+                                  <h4 className="font-semibold text-sm mb-2">Full Message</h4>
+                                  <p className="text-sm bg-background p-2 rounded border break-words whitespace-pre-wrap">
+                                    {log.message}
+                                  </p>
+                                </div>
+                                {log.metadata && (
+                                  <div>
+                                    <h4 className="font-semibold text-sm mb-2">Metadata</h4>
+                                    <pre className="text-xs bg-background p-2 rounded border overflow-x-auto">
+                                      {JSON.stringify(JSON.parse(log.metadata), null, 2)}
+                                    </pre>
+                                  </div>
+                                )}
+                                {log.url && (
+                                  <div>
+                                    <h4 className="font-semibold text-sm mb-2">URL</h4>
+                                    <p className="text-xs text-muted-foreground break-words">{log.url}</p>
+                                  </div>
+                                )}
+                                {log.userAgent && (
+                                  <div>
+                                    <h4 className="font-semibold text-sm mb-2">User Agent</h4>
+                                    <p className="text-xs text-muted-foreground break-words">{log.userAgent}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
                     ))}
                   </tbody>
                 </table>
