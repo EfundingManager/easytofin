@@ -55,6 +55,9 @@ export function getSessionCookieOptions(
     const baseDomain = hostname.startsWith('www.') ? hostname.slice(4) : hostname;
     // Set domain with leading dot to match all subdomains
     domain = `.${baseDomain}`;
+    console.log("[Cookie] Production domain - setting domain:", domain);
+  } else {
+    console.log("[Cookie] Using host-only cookie for:", hostname, { isPreviewDomain, isLocal: LOCAL_HOSTS.has(hostname), isIp: isIpAddress(hostname) });
   }
 
   const isSecure = isSecureRequest(req);

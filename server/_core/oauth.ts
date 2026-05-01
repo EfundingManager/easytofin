@@ -95,6 +95,12 @@ export function registerOAuthRoutes(app: Express) {
       });
 
       const cookieOptions = getSessionCookieOptions(req);
+      console.log("[OAuth] Setting session cookie with options:", {
+        cookieName: COOKIE_NAME,
+        cookieOptions,
+        tokenLength: sessionToken.length,
+        maxAge: ONE_YEAR_MS,
+      });
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
       // Determine redirect URL based on user's clientStatus
