@@ -34,9 +34,12 @@ export const gmailAuthRouter = router({
     )
     .mutation(async ({ input, ctx: { req, res } }) => {
       try {
+        console.log("[Gmail Auth] handleGoogleCallback mutation started", { email: input.email, googleId: input.googleId });
+        
         // Check if user already exists by email
         let existingUser = await getPhoneUserByEmail(input.email);
         let isNewRegistration = false;
+        console.log("[Gmail Auth] User lookup result:", { exists: !!existingUser, userId: existingUser?.id, email: existingUser?.email, role: existingUser?.role });
 
         if (!existingUser) {
           // Create new user from Google profile — always starts as 'user' role
@@ -116,13 +119,14 @@ export const gmailAuthRouter = router({
         // Set session cookie on the server response
         // This is CRITICAL: the cookie must be set on the response, not returned in the body
         const cookieOptions = getSessionCookieOptions(req);
-        console.log("[Gmail Auth] Setting session cookie:", { COOKIE_NAME, sessionDuration });
+        console.log("[Gmail Auth] Setting session cookie:", { COOKIE_NAME, sessionDuration, tokenLength: sessionToken.length });
         console.log("[Gmail Auth] Request details:", {
           protocol: req.protocol,
           hostname: req.hostname,
           secure: req.secure,
           xForwardedProto: req.headers['x-forwarded-proto'],
           xForwardedHost: req.headers['x-forwarded-host'],
+          origin: req.headers['origin'],
         });
         console.log("[Gmail Auth] Cookie options:", cookieOptions);
         res.cookie(COOKIE_NAME, sessionToken, {
@@ -130,7 +134,8 @@ export const gmailAuthRouter = router({
           maxAge: sessionDuration,
         } as any);
         console.log("[Gmail Auth] Session cookie set successfully");
-        console.log("[Gmail Auth] Response headers after cookie set:", res.getHeaders());
+        const setCookieHeader = res.getHeaders()['set-cookie'];
+        console.log("[Gmail Auth] Set-Cookie header:", setCookieHeader);
 
         // Determine redirect URL based on role and clientStatus
         let redirectUrl = "/user/dashboard";

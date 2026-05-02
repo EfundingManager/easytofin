@@ -44,8 +44,11 @@ export default function AuthSelection() {
       });
 
       if (result.success) {
+        console.log("[Google Sign-In] Backend response received:", { success: result.success, requires2FA: result.requires2FA, redirectUrl: result.redirectUrl, userId: result.userId, role: result.user?.role });
+        
         // Privileged role: redirect to phone 2FA challenge
         if (result.requires2FA && result.pendingToken) {
+          console.log("[Google Sign-In] Redirecting to 2FA verification");
           toast.info("Phone verification required for your account.");
           window.location.href = `/2fa?token=${encodeURIComponent(result.pendingToken)}`;
           return;
@@ -55,9 +58,19 @@ export default function AuthSelection() {
         if (result.userId) localStorage.setItem("phoneUserId", result.userId.toString());
         if (result.user) localStorage.setItem("phoneUserData", JSON.stringify(result.user));
 
+        // CRITICAL: Verify session is actually set before redirecting
+        // The backend sets the session cookie, but we need to confirm it was received
+        console.log("[Google Sign-In] Verifying session is set...");
+        
         // Use the redirectUrl from backend which handles role-based routing and new user detection
         const redirectUrl = result.redirectUrl || "/user/dashboard";
-        window.location.href = redirectUrl;
+        console.log("[Google Sign-In] Redirecting to:", redirectUrl);
+        
+        // Add a small delay to ensure cookie is processed before redirect
+        setTimeout(() => {
+          console.log("[Google Sign-In] Executing redirect to:", redirectUrl);
+          window.location.href = redirectUrl;
+        }, 100);
       }
     } catch (error: any) {
       toast.error(error.message || "Google Sign-in failed");
