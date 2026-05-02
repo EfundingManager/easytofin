@@ -6,6 +6,8 @@ import { z } from "zod";
 import { getRateLimitViolations, whitelistIdentifier, resetRateLimit, getRateLimitStats } from "../rate-limit-logger";
 import speakeasy from "speakeasy";
 import QRCode from "qrcode";
+import { sendKycApprovalEmail, sendKycRejectionEmail } from "../_core/emailService";
+import { ENV } from "../_core/env";
 
 
 /**
@@ -1542,10 +1544,35 @@ export const adminRouter = router({
           throw new Error("Submission not found");
         }
 
-        // TODO: Send approval notification email to client
+        const submissionData = submission[0];
+
+        // Get client details for email notification
+        const clientResult = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.id, submissionData.userId))
+          .limit(1);
+
+        if (clientResult.length > 0) {
+          const client = clientResult[0];
+          if (client.email) {
+            const dashboardUrl = "https://easytofin.com/dashboard";
+            
+            // Send approval email
+            await sendKycApprovalEmail(
+              client.email,
+              client.name || "Valued Client",
+              submissionData.product || "Your Application",
+              dashboardUrl
+            );
+            
+            console.log(`[Admin] Sent approval email to ${client.email}`);
+          }
+        }
+
         console.log(`[Admin] Approved submission ${input.submissionId}`);
 
-        return { success: true, message: "Submission approved" };
+        return { success: true, message: "Submission approved and client notified" };
       } catch (error: any) {
         console.error("[Admin] Failed to approve submission:", error);
         throw new Error(error.message || "Failed to approve submission");
@@ -1582,10 +1609,36 @@ export const adminRouter = router({
           throw new Error("Submission not found");
         }
 
-        // TODO: Send rejection notification email to client with reason
+        const submissionData = submission[0];
+
+        // Get client details for email notification
+        const clientResult = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.id, submissionData.userId))
+          .limit(1);
+
+        if (clientResult.length > 0) {
+          const client = clientResult[0];
+          if (client.email) {
+            const dashboardUrl = "https://easytofin.com/dashboard";
+            
+            // Send rejection email
+            await sendKycRejectionEmail(
+              client.email,
+              client.name || "Valued Client",
+              submissionData.product || "Your Application",
+              input.reason,
+              dashboardUrl
+            );
+            
+            console.log(`[Admin] Sent rejection email to ${client.email}`);
+          }
+        }
+
         console.log(`[Admin] Rejected submission ${input.submissionId}: ${input.reason || 'No reason provided'}`);
 
-        return { success: true, message: "Submission rejected" };
+        return { success: true, message: "Submission rejected and client notified" };
       } catch (error: any) {
         console.error("[Admin] Failed to reject submission:", error);
         throw new Error(error.message || "Failed to reject submission");
