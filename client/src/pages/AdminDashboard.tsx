@@ -29,11 +29,44 @@ export default function AdminDashboard() {
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const [selectedClientForPolicy, setSelectedClientForPolicy] = useState<{ id: number; name: string } | null>(null);
 
+  // State for KYC actions
+  const [loadingSubmissionId, setLoadingSubmissionId] = useState<number | null>(null);
+  const [actionType, setActionType] = useState<'approve' | 'reject' | null>(null);
+
   // Fetch admin data
   const statsQuery = trpc.admin.getStats.useQuery();
   const productStatsQuery = trpc.admin.getProductStats.useQuery();
   const recentActivityQuery = trpc.admin.getRecentActivity.useQuery({ limit: 10 });
   const kycReviewsQuery = trpc.admin.getKycReviews.useQuery();
+
+  // KYC approval/rejection mutations
+  const approveMutation = trpc.admin.approveSubmission.useMutation({
+    onSuccess: () => {
+      kycReviewsQuery.refetch();
+      statsQuery.refetch();
+      setLoadingSubmissionId(null);
+      setActionType(null);
+    },
+    onError: (error) => {
+      console.error('Failed to approve submission:', error);
+      setLoadingSubmissionId(null);
+      setActionType(null);
+    },
+  });
+
+  const rejectMutation = trpc.admin.rejectSubmission.useMutation({
+    onSuccess: () => {
+      kycReviewsQuery.refetch();
+      statsQuery.refetch();
+      setLoadingSubmissionId(null);
+      setActionType(null);
+    },
+    onError: (error) => {
+      console.error('Failed to reject submission:', error);
+      setLoadingSubmissionId(null);
+      setActionType(null);
+    },
+  });
   const clientSubmissionsQuery = trpc.admin.getClientSubmissions.useQuery({
     page: 1,
     limit: 10,
@@ -396,9 +429,31 @@ export default function AdminDashboard() {
                             Submitted: {new Date(review.submittedAt || review.createdAt).toLocaleString()}
                           </div>
                           <div className="flex gap-2 mt-3">
-                            <Button size="sm" variant="default">Approve</Button>
-                            <Button size="sm" variant="outline">Reject</Button>
-                            <Button size="sm" variant="outline">Request Info</Button>
+                            <Button 
+                              size="sm" 
+                              variant="default"
+                              disabled={loadingSubmissionId === review.id}
+                              onClick={() => {
+                                setLoadingSubmissionId(review.id);
+                                setActionType('approve');
+                                approveMutation.mutate({ submissionId: review.id });
+                              }}
+                            >
+                              {loadingSubmissionId === review.id && actionType === 'approve' ? 'Approving...' : 'Approve'}
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              disabled={loadingSubmissionId === review.id}
+                              onClick={() => {
+                                setLoadingSubmissionId(review.id);
+                                setActionType('reject');
+                                rejectMutation.mutate({ submissionId: review.id });
+                              }}
+                            >
+                              {loadingSubmissionId === review.id && actionType === 'reject' ? 'Rejecting...' : 'Reject'}
+                            </Button>
+                            <Button size="sm" variant="outline" disabled>Request Info</Button>
                           </div>
                         </div>
                       ))}

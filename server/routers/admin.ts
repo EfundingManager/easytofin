@@ -1513,4 +1513,83 @@ export const adminRouter = router({
       }
     }),
 
+  /**
+   * Approve a fact-finding form submission
+   */
+  approveSubmission: adminProcedure
+    .input(z.object({
+      submissionId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      try {
+        // Update the submission status to 'reviewed'
+        await db
+          .update(factFindingForms)
+          .set({ status: "reviewed" })
+          .where(eq(factFindingForms.id, input.submissionId));
+
+        // Get the submission to retrieve client info for notification
+        const submission = await db
+          .select()
+          .from(factFindingForms)
+          .where(eq(factFindingForms.id, input.submissionId))
+          .limit(1);
+
+        if (submission.length === 0) {
+          throw new Error("Submission not found");
+        }
+
+        // TODO: Send approval notification email to client
+        console.log(`[Admin] Approved submission ${input.submissionId}`);
+
+        return { success: true, message: "Submission approved" };
+      } catch (error: any) {
+        console.error("[Admin] Failed to approve submission:", error);
+        throw new Error(error.message || "Failed to approve submission");
+      }
+    }),
+
+  /**
+   * Reject a fact-finding form submission
+   */
+  rejectSubmission: adminProcedure
+    .input(z.object({
+      submissionId: z.number(),
+      reason: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      try {
+        // Update the submission status to 'archived' (or create a 'rejected' status if needed)
+        await db
+          .update(factFindingForms)
+          .set({ status: "archived" })
+          .where(eq(factFindingForms.id, input.submissionId));
+
+        // Get the submission to retrieve client info for notification
+        const submission = await db
+          .select()
+          .from(factFindingForms)
+          .where(eq(factFindingForms.id, input.submissionId))
+          .limit(1);
+
+        if (submission.length === 0) {
+          throw new Error("Submission not found");
+        }
+
+        // TODO: Send rejection notification email to client with reason
+        console.log(`[Admin] Rejected submission ${input.submissionId}: ${input.reason || 'No reason provided'}`);
+
+        return { success: true, message: "Submission rejected" };
+      } catch (error: any) {
+        console.error("[Admin] Failed to reject submission:", error);
+        throw new Error(error.message || "Failed to reject submission");
+      }
+    }),
+
 });
