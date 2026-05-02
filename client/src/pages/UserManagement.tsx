@@ -86,8 +86,8 @@ export default function UserManagement() {
   });
 
   const createUserMutation = trpc.admin.createUser.useMutation({
-    onSuccess: (data) => {
-      toast.success(data.message || "User created successfully");
+    onSuccess: () => {
+      toast.success("User created successfully");
       setNewUserEmail("");
       setNewUserName("");
       setNewUserRole("staff");
@@ -95,13 +95,7 @@ export default function UserManagement() {
       usersQuery.refetch();
     },
     onError: (error: any) => {
-      // Extract error message from tRPC error
-      const errorMessage = error?.data?.zodError?.[0]?.message || 
-                          error?.message || 
-                          error?.shape?.message ||
-                          "Failed to create user";
-      console.error("[CreateUser Error]", error);
-      toast.error(errorMessage);
+      toast.error(error.message || "Failed to create user");
     },
   });
 
@@ -269,17 +263,11 @@ export default function UserManagement() {
                   </Select>
                 </div>
                 <Button
-                  onClick={() => {
-                    if (!newUserEmail) {
-                      toast.error("Email is required");
-                      return;
-                    }
-                    createUserMutation.mutate({ 
-                      email: newUserEmail, 
-                      name: newUserName || newUserEmail.split("@")[0], 
-                      roles: [newUserRole] 
-                    });
-                  }}
+                  onClick={() => createUserMutation.mutate({ 
+                    email: newUserEmail, 
+                    name: newUserName || newUserEmail.split("@")[0], 
+                    roles: [newUserRole] 
+                  })}
                   disabled={!newUserEmail || createUserMutation.isPending}
                   className="w-full"
                 >

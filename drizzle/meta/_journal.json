@@ -204,34 +204,6 @@
       "when": 1777721555719,
       "tag": "0028_powerful_madripoor",
       "breakpoints": true
-    },
-    {
-      "idx": 29,
-      "version": "5",
-      "when": 1777730658489,
-      "tag": "0029_cold_talisman",
-      "breakpoints": true
-    },
-    {
-      "idx": 30,
-      "version": "5",
-      "when": 1777731871234,
-      "tag": "0030_fixed_white_queen",
-      "breakpoints": true
-    },
-    {
-      "idx": 31,
-      "version": "5",
-      "when": 1777732851982,
-      "tag": "0031_next_ma_gnuci",
-      "breakpoints": true
-    },
-    {
-      "idx": 32,
-      "version": "5",
-      "when": 1777733428862,
-      "tag": "0032_thick_metal_master",
-      "breakpoints": true
     }
   ]
 }

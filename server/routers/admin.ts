@@ -637,10 +637,9 @@ export const adminRouter = router({
           role: phoneUsers.role,
           status: phoneUsers.clientStatus,
           createdAt: phoneUsers.createdAt,
-        }).from(phoneUsers).where(ne(phoneUsers.isDeleted, "true"));
+        }).from(phoneUsers).where(eq(phoneUsers.isDeleted, "false"));
       } catch (error: any) {
-        console.debug(`[Admin] Error fetching users with soft-delete filter, using fallback`);
-        // Fallback: fetch all users without any filter
+        console.debug(`[Admin] isDeleted column not available, fetching all users`);
         allUsers = await db.select({
           id: phoneUsers.id,
           email: phoneUsers.email,
@@ -711,17 +710,7 @@ export const adminRouter = router({
       // Fetch all soft-deleted users
       let deletedUsers: any[] = [];
       try {
-        deletedUsers = await db.select({
-          id: phoneUsers.id,
-          email: phoneUsers.email,
-          phone: phoneUsers.phone,
-          name: phoneUsers.name,
-          role: phoneUsers.role,
-          status: phoneUsers.clientStatus,
-          createdAt: phoneUsers.createdAt,
-          deletedAt: phoneUsers.deletedAt,
-          deletedBy: phoneUsers.deletedBy,
-        }).from(phoneUsers).where(eq(phoneUsers.isDeleted, "true"));
+        deletedUsers = await db.select().from(phoneUsers).where(eq(phoneUsers.isDeleted, "true"));
       } catch (error: any) {
         console.debug(`[Admin] isDeleted column not available, no deleted users to fetch`);
         deletedUsers = [];
@@ -774,19 +763,8 @@ export const adminRouter = router({
       if (!db) throw new Error("Database connection failed");
 
       try {
-        // Get user details - select only existing columns
-        const user = await db
-          .select({
-            id: phoneUsers.id,
-            email: phoneUsers.email,
-            phone: phoneUsers.phone,
-            name: phoneUsers.name,
-            role: phoneUsers.role,
-            status: phoneUsers.clientStatus,
-            isDeleted: phoneUsers.isDeleted,
-          })
-          .from(phoneUsers)
-          .where(eq(phoneUsers.id, input.phoneUserId));
+        // Get user details
+        const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
         if (!user || user.length === 0) {
           throw new Error("User not found");
         }
@@ -869,18 +847,8 @@ export const adminRouter = router({
         // Import permission helpers
         const { canDeleteUser, isProtectedRole } = await import("../role-permissions");
 
-        // Get target user - select only existing columns to avoid schema mismatch
-        const user = await db
-          .select({
-            id: phoneUsers.id,
-            email: phoneUsers.email,
-            phone: phoneUsers.phone,
-            name: phoneUsers.name,
-            role: phoneUsers.role,
-            status: phoneUsers.clientStatus,
-          })
-          .from(phoneUsers)
-          .where(eq(phoneUsers.id, input.phoneUserId));
+        // Get target user
+        const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
         if (user.length === 0) throw new Error("User not found");
         
         const targetRole = user[0].role as any;
@@ -920,38 +888,20 @@ export const adminRouter = router({
           console.debug(`[Admin] firstLoginTracking table not available for deletion`);
         }
 
-        // Soft delete user from phoneUsers table
-        // Mark as deleted instead of removing the record
-        const deletedAt = new Date();
+        // Soft-delete user from phoneUsers table
+        // Instead of deleting, mark as deleted with metadata
         await db
           .update(phoneUsers)
           .set({
             isDeleted: "true",
-            deletedAt: deletedAt.getTime(),
+            deletedAt: new Date(),
             deletedBy: ctx.user.email,
           })
           .where(eq(phoneUsers.id, input.phoneUserId));
 
-        // Log the deletion in audit log
-        try {
-          await db.insert(userManagementAuditLog).values({
-            phoneUserId: input.phoneUserId,
-            actionType: "delete",
-            actionBy: ctx.user.id,
-            actionByEmail: ctx.user.email,
-            targetUserEmail: user[0].email,
-            targetUserName: user[0].name,
-            changeDetails: `Deleted ${targetRole} user`,
-            status: "success",
-            createdAt: new Date(),
-          });
-        } catch (auditError: any) {
-          console.debug(`[Admin] Failed to log deletion in audit log:`, auditError);
-        }
-
         return {
           success: true,
-          message: `User ${user[0].name} deleted successfully`,
+          message: `User ${user[0].name} deleted successfully (soft-delete)`,
         };
       } catch (error: any) {
         console.error("[Admin] Failed to delete user:", error);
@@ -969,18 +919,8 @@ export const adminRouter = router({
       if (!db) throw new Error("Database connection failed");
 
       try {
-        // Get user details - select only existing columns
-        const user = await db
-          .select({
-            id: phoneUsers.id,
-            email: phoneUsers.email,
-            phone: phoneUsers.phone,
-            name: phoneUsers.name,
-            role: phoneUsers.role,
-            status: phoneUsers.clientStatus,
-          })
-          .from(phoneUsers)
-          .where(eq(phoneUsers.id, input.phoneUserId));
+        // Get user details
+        const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
         if (!user || user.length === 0) {
           throw new Error("User not found");
         }

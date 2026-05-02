@@ -1,1 +1,0 @@
-ALTER TABLE `phoneUsers` MODIFY COLUMN `isDeleted` enum('true','false') NOT NULL DEFAULT 'false';
