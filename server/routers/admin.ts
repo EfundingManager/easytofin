@@ -478,8 +478,8 @@ export const adminRouter = router({
       if (!db) throw new Error("Database connection failed");
 
       try {
-        // Check if user already exists
-        const existingUser = await db.select().from(phoneUsers).where(eq(phoneUsers.email, input.email));
+        // Check if user already exists (select only existing columns to avoid schema mismatch)
+        const existingUser = await db.select({ id: phoneUsers.id, email: phoneUsers.email }).from(phoneUsers).where(eq(phoneUsers.email, input.email));
         if (existingUser.length > 0) {
           throw new Error("User with this email already exists");
         }
@@ -537,7 +537,7 @@ export const adminRouter = router({
     }),
 
   /**
-   * Assign roles to an existing user
+   * Assign roles to an existing user with role-based permission checks
    */
   assignRoles: adminProcedure
     .input(z.object({
@@ -549,9 +549,36 @@ export const adminRouter = router({
       if (!db) throw new Error("Database connection failed");
 
       try {
+        // Import permission helpers
+        const { canAssignRoles, isProtectedRole } = await import("../role-permissions");
+
         // Check if user exists
         const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
         if (user.length === 0) throw new Error("User not found");
+        
+        const targetRole = user[0].role as any;
+        const targetUserId = user[0].id;
+        const loggedInUserId = ctx.user.id;
+        const loggedInRole = ctx.user.role as any;
+        const newRoles = input.roles as any[];
+
+        // Check 1: Cannot assign roles to self
+        if (loggedInUserId === targetUserId) {
+          console.warn(`[Admin] Unauthorized role assignment: User ${loggedInUserId} tried to assign roles to themselves`);
+          throw new Error("You cannot change your own roles");
+        }
+
+        // Check 2: Cannot assign protected roles
+        if (newRoles.some(role => isProtectedRole(role))) {
+          console.warn(`[Admin] Unauthorized role assignment: User ${loggedInUserId} tried to assign protected roles`);
+          throw new Error("You cannot assign Super Admin or Admin roles");
+        }
+
+        // Check 3: Verify role hierarchy permission
+        if (!canAssignRoles(loggedInRole, loggedInUserId, targetUserId, targetRole, newRoles)) {
+          console.warn(`[Admin] Unauthorized role assignment: User ${loggedInUserId} (${loggedInRole}) tried to assign roles to ${targetRole} user ${targetUserId}`);
+          throw new Error(`You do not have permission to assign roles to this user`);
+        }
 
         // Delete existing roles
         await db.delete(userRoles).where(eq(userRoles.phoneUserId, input.phoneUserId));
@@ -602,11 +629,26 @@ export const adminRouter = router({
       // Handle case where isDeleted column doesn't exist yet
       let allUsers: any[] = [];
       try {
-        allUsers = await db.select().from(phoneUsers).where(eq(phoneUsers.isDeleted, "false"));
+        allUsers = await db.select({
+          id: phoneUsers.id,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          name: phoneUsers.name,
+          role: phoneUsers.role,
+          status: phoneUsers.clientStatus,
+          createdAt: phoneUsers.createdAt,
+        }).from(phoneUsers).where(eq(phoneUsers.isDeleted, "false"));
       } catch (error: any) {
-        // Fallback if isDeleted column doesn't exist yet
         console.debug(`[Admin] isDeleted column not available, fetching all users`);
-        allUsers = await db.select().from(phoneUsers);
+        allUsers = await db.select({
+          id: phoneUsers.id,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          name: phoneUsers.name,
+          role: phoneUsers.role,
+          status: phoneUsers.clientStatus,
+          createdAt: phoneUsers.createdAt,
+        }).from(phoneUsers);
       }
       const usersWithRoles = await Promise.all(
         allUsers.map(async (user: any) => {
@@ -793,7 +835,7 @@ export const adminRouter = router({
     }),
 
   /**
-   * Delete a user
+   * Delete a user with role-based permission checks
    */
   deleteUser: adminProcedure
     .input(z.object({ phoneUserId: z.number() }))
@@ -802,10 +844,35 @@ export const adminRouter = router({
       if (!db) throw new Error("Database connection failed");
 
       try {
-        // Prevent deleting Super Admin
+        // Import permission helpers
+        const { canDeleteUser, isProtectedRole } = await import("../role-permissions");
+
+        // Get target user
         const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
         if (user.length === 0) throw new Error("User not found");
-        if (user[0].role === "super_admin") throw new Error("Cannot delete Super Admin");
+        
+        const targetRole = user[0].role as any;
+        const targetUserId = user[0].id;
+        const loggedInUserId = ctx.user.id;
+        const loggedInRole = ctx.user.role as any;
+
+        // Check 1: Cannot delete self
+        if (loggedInUserId === targetUserId) {
+          console.warn(`[Admin] Unauthorized delete attempt: User ${loggedInUserId} tried to delete themselves`);
+          throw new Error("You cannot delete your own account");
+        }
+
+        // Check 2: Cannot delete protected roles
+        if (isProtectedRole(targetRole)) {
+          console.warn(`[Admin] Unauthorized delete attempt: User ${loggedInUserId} (${loggedInRole}) tried to delete protected role ${targetRole}`);
+          throw new Error(`Cannot delete ${targetRole} accounts. This role is protected.`);
+        }
+
+        // Check 3: Verify role hierarchy permission
+        if (!canDeleteUser(loggedInRole, loggedInUserId, targetUserId, targetRole)) {
+          console.warn(`[Admin] Unauthorized delete attempt: User ${loggedInUserId} (${loggedInRole}) tried to delete ${targetRole} user ${targetUserId}`);
+          throw new Error(`You do not have permission to delete ${targetRole} accounts`);
+        }
 
         // Try to delete user roles (if table exists)
         try {

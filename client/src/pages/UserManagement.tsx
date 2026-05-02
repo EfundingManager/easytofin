@@ -1,12 +1,12 @@
-import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Search, Edit2, Trash2, Plus, UserCheck, ArrowLeft } from "lucide-react";
+import { AlertCircle, Search, Edit2, Trash2, Plus, UserCheck, ArrowLeft, Lock } from "lucide-react";
 import { useLocation } from "wouter";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +23,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-
-type UserRole = "super_admin" | "admin" | "staff" | "support" | "customer" | "user";
+import { 
+  canEditUser, 
+  canDeleteUser, 
+  isProtectedRole, 
+  getAssignableRoles, 
+  getDefaultVisibleRoles,
+  getPermissionDeniedReason,
+  type UserRole 
+} from "@/lib/role-permissions";
 
 export default function UserManagement() {
   const { user, loading } = useAuth();
@@ -34,9 +41,23 @@ export default function UserManagement() {
   const [editingUser, setEditingUser] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserName, setNewUserName] = useState("");
   const [newUserRole, setNewUserRole] = useState<UserRole>("staff");
   const [deleteConfirmUser, setDeleteConfirmUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"active" | "deleted">("active");
+
+  // Load filter from session storage on mount
+  useEffect(() => {
+    const savedFilter = sessionStorage.getItem("userManagementFilter");
+    if (savedFilter) {
+      setSelectedRole(savedFilter as UserRole | "all");
+    }
+  }, []);
+
+  // Save filter to session storage when it changes
+  useEffect(() => {
+    sessionStorage.setItem("userManagementFilter", selectedRole);
+  }, [selectedRole]);
 
   // Fetch users
   const usersQuery = trpc.admin.listUsers.useQuery();
@@ -68,6 +89,7 @@ export default function UserManagement() {
     onSuccess: () => {
       toast.success("User created successfully");
       setNewUserEmail("");
+      setNewUserName("");
       setNewUserRole("staff");
       setIsDialogOpen(false);
       usersQuery.refetch();
@@ -133,15 +155,44 @@ export default function UserManagement() {
   const users = usersQuery.data || [];
   const isAdmin = user?.role === "admin";
   const isSuperAdmin = user?.role === "super_admin";
+  const loggedInUserId = user?.id || 0;
+  const loggedInUserRole = (user?.role as UserRole) || "user";
 
-  // Determine which roles can be edited
-  const canEditRole = (targetRole: UserRole) => {
-    if (isSuperAdmin) return true;
-    if (isAdmin) {
-      // Admin can edit staff and support, but not other admins or super_admin
-      return targetRole === "staff" || targetRole === "support";
+  // Filter users based on selected role
+  const filteredUsers = users.filter((u: any) => {
+    // Apply role filter
+    if (selectedRole !== "all" && u.role !== selectedRole) {
+      return false;
     }
-    return false;
+    
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        u.name?.toLowerCase().includes(query) ||
+        u.email?.toLowerCase().includes(query)
+      );
+    }
+    
+    return true;
+  });
+
+  // Apply default visibility filter only when "all" is selected
+  const displayedUsers = selectedRole === "all" 
+    ? filteredUsers.filter((u: any) => getDefaultVisibleRoles().includes(u.role))
+    : filteredUsers;
+
+  // Get assignable roles for the current user
+  const assignableRoles = getAssignableRoles(loggedInUserRole);
+
+  // Check if user can edit a specific user
+  const canEdit = (targetUser: any) => {
+    return canEditUser(loggedInUserRole, loggedInUserId, targetUser.id, targetUser.role as UserRole);
+  };
+
+  // Check if user can delete a specific user
+  const canDelete = (targetUser: any) => {
+    return canDeleteUser(loggedInUserRole, loggedInUserId, targetUser.id, targetUser.role as UserRole);
   };
 
   return (
@@ -189,38 +240,34 @@ export default function UserManagement() {
                   />
                 </div>
                 <div>
+                  <label className="text-sm font-medium">Name</label>
+                  <Input
+                    placeholder="Full Name"
+                    value={newUserName}
+                    onChange={(e) => setNewUserName(e.target.value)}
+                  />
+                </div>
+                <div>
                   <label className="text-sm font-medium">Role</label>
                   <Select value={newUserRole} onValueChange={(value) => setNewUserRole(value as UserRole)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {isAdmin && (
-                        <>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="manager">Manager</SelectItem>
-                          <SelectItem value="staff">Staff</SelectItem>
-                          <SelectItem value="support">Support</SelectItem>
-                          <SelectItem value="customer">Customer</SelectItem>
-                          <SelectItem value="user">User</SelectItem>
-                        </>
-                      )}
-                      {isSuperAdmin && (
-                        <>
-                          <SelectItem value="super_admin">Super Admin</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="manager">Manager</SelectItem>
-                          <SelectItem value="staff">Staff</SelectItem>
-                          <SelectItem value="support">Support</SelectItem>
-                          <SelectItem value="customer">Customer</SelectItem>
-                          <SelectItem value="user">User</SelectItem>
-                        </>
-                      )}
+                      {assignableRoles.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {role.replace("_", " ")}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <Button
-                  onClick={() => createUserMutation.mutate({ email: newUserEmail, name: newUserEmail.split("@")[0], roles: [newUserRole] })}
+                  onClick={() => createUserMutation.mutate({ 
+                    email: newUserEmail, 
+                    name: newUserName || newUserEmail.split("@")[0], 
+                    roles: [newUserRole] 
+                  })}
                   disabled={!newUserEmail || createUserMutation.isPending}
                   className="w-full"
                 >
@@ -242,7 +289,7 @@ export default function UserManagement() {
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          Active Users ({users.length})
+          Active Users ({displayedUsers.length})
         </button>
         <button
           onClick={() => setActiveTab("deleted")}
@@ -258,315 +305,301 @@ export default function UserManagement() {
 
       {/* Filters */}
       {activeTab === "active" && (
-      <div className="flex gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name or email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as UserRole | "all")}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="super_admin">Super Admin</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="manager">Manager</SelectItem>
+              <SelectItem value="staff">Staff</SelectItem>
+              <SelectItem value="support">Support</SelectItem>
+              <SelectItem value="user">User</SelectItem>
+              <SelectItem value="customer">Customer</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as UserRole | "all")}>
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="super_admin">Super Admin</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="staff">Staff</SelectItem>
-            <SelectItem value="support">Support</SelectItem>
-            <SelectItem value="customer">Customer</SelectItem>
-            <SelectItem value="user">User</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
       )}
 
       {/* Users Table - Active Tab */}
       {activeTab === "active" && (
-      <Card>
-        <CardHeader>
-          <CardTitle>Team Members</CardTitle>
-          <CardDescription>
-            {users.length} user{users.length !== 1 ? "s" : ""} found
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {usersQuery.isLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : users.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No users found
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Name</th>
-                    <th className="text-left py-3 px-4 font-semibold">Email</th>
-                    <th className="text-left py-3 px-4 font-semibold">Role</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-right py-3 px-4 font-semibold">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((u: any) => (
-                    <tr key={u.id} className="border-b hover:bg-muted/50 transition-colors">
-                      <td className="py-3 px-4">{u.name || "—"}</td>
-                      <td className="py-3 px-4">{u.email}</td>
-                      <td className="py-3 px-4">
-                        <Badge variant="outline" className="capitalize">
-                          {u.role.replace("_", " ")}
-                        </Badge>
-                      </td>
-                      <td className="py-3 px-4">
-                        <Badge variant="secondary" className="gap-1">
-                          <UserCheck className="h-3 w-3" />
-                          Active
-                        </Badge>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          {canEditRole(u.role) && (
-                            <>
-                              <Dialog>
-                                <DialogTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setEditingUser(u)}
-                                  >
-                                    <Edit2 className="h-4 w-4" />
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                  <DialogHeader>
-                                    <DialogTitle>Edit User</DialogTitle>
-                                    <DialogDescription>
-                                      Update user details
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                  {editingUser && (
-                                    <div className="space-y-4">
-                                      <div>
-                                        <label className="text-sm font-medium">Email</label>
-                                        <Input
-                                          value={editingUser.email}
-                                          disabled
-                                          className="bg-muted"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium">Role</label>
-                                        <Select
-                                          value={editingUser.role}
-                                          onValueChange={(value) =>
-                                            setEditingUser({ ...editingUser, role: value })
-                                          }
-                                        >
-                                          <SelectTrigger>
-                                            <SelectValue />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            {isAdmin && (
-                                              <>
-                                                <SelectItem value="admin">Admin</SelectItem>
-                                                <SelectItem value="manager">Manager</SelectItem>
-                                                <SelectItem value="staff">Staff</SelectItem>
-                                                <SelectItem value="support">Support</SelectItem>
-                                                <SelectItem value="customer">Customer</SelectItem>
-                                                <SelectItem value="user">User</SelectItem>
-                                              </>
-                                            )}
-                                            {isSuperAdmin && (
-                                              <>
-                                                <SelectItem value="super_admin">Super Admin</SelectItem>
-                                                <SelectItem value="admin">Admin</SelectItem>
-                                                <SelectItem value="staff">Staff</SelectItem>
-                                                <SelectItem value="support">Support</SelectItem>
-                                                <SelectItem value="customer">Customer</SelectItem>
-                                                <SelectItem value="user">User</SelectItem>
-                                              </>
-                                            )}
-                                          </SelectContent>
-                                        </Select>
-                                      </div>
-                                      <Button
-                                        onClick={() =>
-                                          assignRolesMutation.mutate({
-                                            phoneUserId: editingUser.id,
-                                            roles: editingUser.roles || [editingUser.role],
-                                          })
-                                        }
-                                        disabled={assignRolesMutation.isPending}
-                                        className="w-full"
-                                      >
-                                        {assignRolesMutation.isPending ? "Updating..." : "Update User"}
-                                      </Button>
-                                    </div>
-                                  )}
-                                </DialogContent>
-                              </Dialog>
-                              <Dialog open={deleteConfirmUser?.id === u.id} onOpenChange={(open) => !open && setDeleteConfirmUser(null)}>
-                                <DialogTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setDeleteConfirmUser(u)}
-                                  >
-                                    <Trash2 className="h-4 w-4 text-red-500" />
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                  <DialogHeader>
-                                    <DialogTitle>Delete User</DialogTitle>
-                                    <DialogDescription>
-                                      Are you sure you want to delete this user? This action cannot be undone.
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                  {deleteConfirmUser && (
-                                    <div className="space-y-4">
-                                      <div className="bg-muted p-3 rounded">
-                                        <p className="text-sm"><strong>Email:</strong> {deleteConfirmUser.email}</p>
-                                        <p className="text-sm"><strong>Role:</strong> {deleteConfirmUser.role.replace("_", " ")}</p>
-                                      </div>
-                                      <div className="flex gap-3 justify-end">
-                                        <Button
-                                          variant="outline"
-                                          onClick={() => setDeleteConfirmUser(null)}
-                                        >
-                                          Cancel
-                                        </Button>
-                                        <Button
-                                          variant="destructive"
-                                          onClick={() => {
-                                            deleteUserMutation.mutate({ phoneUserId: deleteConfirmUser.id });
-                                            setDeleteConfirmUser(null);
-                                          }}
-                                          disabled={deleteUserMutation.isPending}
-                                        >
-                                          {deleteUserMutation.isPending ? "Deleting..." : "Delete"}
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  )}
-                                </DialogContent>
-                              </Dialog>
-                            </>
-                          )}
-                        </div>
-                      </td>
+        <Card>
+          <CardHeader>
+            <CardTitle>Team Members</CardTitle>
+            <CardDescription>
+              {displayedUsers.length} user{displayedUsers.length !== 1 ? "s" : ""} found
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {usersQuery.isLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : displayedUsers.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No users found
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-semibold">Name</th>
+                      <th className="text-left py-3 px-4 font-semibold">Email</th>
+                      <th className="text-left py-3 px-4 font-semibold">Role</th>
+                      <th className="text-left py-3 px-4 font-semibold">Status</th>
+                      <th className="text-right py-3 px-4 font-semibold">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  </thead>
+                  <tbody>
+                    {displayedUsers.map((u: any) => {
+                      const isProtected = isProtectedRole(u.role as UserRole);
+                      const canEditThisUser = canEdit(u);
+                      const canDeleteThisUser = canDelete(u);
+                      const permissionDeniedReason = !canEditThisUser ? getPermissionDeniedReason(loggedInUserRole, loggedInUserId, u.id, u.role as UserRole) : null;
+
+                      return (
+                        <tr 
+                          key={u.id} 
+                          className={`border-b hover:bg-muted/50 transition-colors ${isProtected ? "bg-muted/30" : ""}`}
+                        >
+                          <td className="py-3 px-4">{u.name || "—"}</td>
+                          <td className="py-3 px-4">{u.email}</td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="capitalize">
+                                {u.role.replace("_", " ")}
+                              </Badge>
+                              {isProtected && (
+                                <Lock className="h-4 w-4 text-amber-600" title="This account is protected and cannot be modified" />
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <Badge variant="secondary" className="gap-1">
+                              <UserCheck className="h-3 w-3" />
+                              Active
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              {canEditThisUser && (
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setEditingUser(u)}
+                                      title="Edit user"
+                                    >
+                                      <Edit2 className="h-4 w-4" />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>Edit User</DialogTitle>
+                                      <DialogDescription>
+                                        Update user details
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    {editingUser && (
+                                      <div className="space-y-4">
+                                        <div>
+                                          <label className="text-sm font-medium">Email</label>
+                                          <Input
+                                            value={editingUser.email}
+                                            disabled
+                                            className="bg-muted"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-sm font-medium">Role</label>
+                                          <Select
+                                            value={editingUser.role}
+                                            onValueChange={(value) =>
+                                              setEditingUser({ ...editingUser, role: value })
+                                            }
+                                          >
+                                            <SelectTrigger>
+                                              <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              {assignableRoles.map((role) => (
+                                                <SelectItem key={role} value={role}>
+                                                  {role.replace("_", " ")}
+                                                </SelectItem>
+                                              ))}
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                        <Button
+                                          onClick={() =>
+                                            assignRolesMutation.mutate({
+                                              phoneUserId: editingUser.id,
+                                              roles: [editingUser.role],
+                                            })
+                                          }
+                                          disabled={assignRolesMutation.isPending}
+                                          className="w-full"
+                                        >
+                                          {assignRolesMutation.isPending ? "Updating..." : "Update User"}
+                                        </Button>
+                                      </div>
+                                    )}
+                                  </DialogContent>
+                                </Dialog>
+                              )}
+                              {canDeleteThisUser && (
+                                <Dialog open={deleteConfirmUser?.id === u.id} onOpenChange={(open) => !open && setDeleteConfirmUser(null)}>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setDeleteConfirmUser(u)}
+                                      title="Delete user"
+                                    >
+                                      <Trash2 className="h-4 w-4 text-red-500" />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>Delete User</DialogTitle>
+                                      <DialogDescription>
+                                        Are you sure you want to delete this user? This action cannot be undone.
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    {deleteConfirmUser && (
+                                      <div className="space-y-4">
+                                        <div className="bg-muted p-3 rounded">
+                                          <p className="text-sm"><strong>Email:</strong> {deleteConfirmUser.email}</p>
+                                          <p className="text-sm"><strong>Role:</strong> {deleteConfirmUser.role.replace("_", " ")}</p>
+                                        </div>
+                                        <div className="flex gap-3 justify-end">
+                                          <Button
+                                            variant="outline"
+                                            onClick={() => setDeleteConfirmUser(null)}
+                                          >
+                                            Cancel
+                                          </Button>
+                                          <Button
+                                            variant="destructive"
+                                            onClick={() => {
+                                              deleteUserMutation.mutate({ phoneUserId: deleteConfirmUser.id });
+                                              setDeleteConfirmUser(null);
+                                            }}
+                                            disabled={deleteUserMutation.isPending}
+                                          >
+                                            {deleteUserMutation.isPending ? "Deleting..." : "Delete"}
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </DialogContent>
+                                </Dialog>
+                              )}
+                              {!canEditThisUser && !canDeleteThisUser && permissionDeniedReason && (
+                                <div title={permissionDeniedReason} className="text-muted-foreground text-sm">
+                                  <Lock className="h-4 w-4 inline" />
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {/* Deleted Users Tab */}
       {activeTab === "deleted" && (
-      <Card>
-        <CardHeader>
-          <CardTitle>Deleted Users</CardTitle>
-          <CardDescription>
-            {(deletedUsersQuery.data || []).length} deleted user{(deletedUsersQuery.data || []).length !== 1 ? "s" : ""}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {deletedUsersQuery.isLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : (deletedUsersQuery.data || []).length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No deleted users
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Name</th>
-                    <th className="text-left py-3 px-4 font-semibold">Email</th>
-                    <th className="text-left py-3 px-4 font-semibold">Role</th>
-                    <th className="text-left py-3 px-4 font-semibold">Deleted At</th>
-                    <th className="text-left py-3 px-4 font-semibold">Deleted By</th>
-                    <th className="text-right py-3 px-4 font-semibold">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(deletedUsersQuery.data || []).map((u: any) => (
-                    <tr key={u.id} className="border-b hover:bg-muted/50 transition-colors">
-                      <td className="py-3 px-4">{u.name || "—"}</td>
-                      <td className="py-3 px-4">{u.email}</td>
-                      <td className="py-3 px-4">
-                        <Badge variant="outline" className="capitalize">
-                          {u.role.replace("_", " ")}
-                        </Badge>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-muted-foreground">
-                        {u.deletedAt ? new Date(u.deletedAt).toLocaleDateString() : "—"}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-muted-foreground">
-                        {u.deletedBy || "—"}
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex gap-2 justify-end">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              if (confirm(`Restore ${u.name || u.email}?`)) {
-                                restoreUserMutation.mutate({ phoneUserId: u.id });
-                              }
-                            }}
-                            disabled={restoreUserMutation.isPending}
-                            className="gap-1"
-                          >
-                            <UserCheck className="h-4 w-4" />
-                            Restore
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              const firstConfirm = confirm(
-                                `Permanently delete ${u.name || u.email}? This cannot be undone.`
-                              );
-                              if (firstConfirm) {
-                                const secondConfirm = confirm(
-                                  "Are you absolutely sure? This will permanently remove all data."
-                                );
-                                if (secondConfirm) {
-                                  permanentlyDeleteUserMutation.mutate({ phoneUserId: u.id });
-                                }
-                              }
-                            }}
-                            disabled={permanentlyDeleteUserMutation.isPending}
-                            className="gap-1"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Delete
-                          </Button>
-                        </div>
-                      </td>
+        <Card>
+          <CardHeader>
+            <CardTitle>Deleted Users</CardTitle>
+            <CardDescription>
+              {(deletedUsersQuery.data || []).length} deleted user{(deletedUsersQuery.data || []).length !== 1 ? "s" : ""}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {deletedUsersQuery.isLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : (deletedUsersQuery.data || []).length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No deleted users
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-semibold">Name</th>
+                      <th className="text-left py-3 px-4 font-semibold">Email</th>
+                      <th className="text-left py-3 px-4 font-semibold">Role</th>
+                      <th className="text-left py-3 px-4 font-semibold">Deleted At</th>
+                      <th className="text-right py-3 px-4 font-semibold">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  </thead>
+                  <tbody>
+                    {(deletedUsersQuery.data || []).map((u: any) => (
+                      <tr key={u.id} className="border-b hover:bg-muted/50 transition-colors">
+                        <td className="py-3 px-4">{u.name || "—"}</td>
+                        <td className="py-3 px-4">{u.email}</td>
+                        <td className="py-3 px-4">
+                          <Badge variant="outline" className="capitalize">
+                            {u.role.replace("_", " ")}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-muted-foreground">
+                          {u.deletedAt ? new Date(u.deletedAt).toLocaleString() : "—"}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => restoreUserMutation.mutate({ phoneUserId: u.id })}
+                              disabled={restoreUserMutation.isPending}
+                              title="Restore user"
+                            >
+                              Restore
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => permanentlyDeleteUserMutation.mutate({ phoneUserId: u.id })}
+                              disabled={permanentlyDeleteUserMutation.isPending}
+                              title="Permanently delete user"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );

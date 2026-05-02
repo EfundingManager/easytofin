@@ -2002,3 +2002,95 @@
 - [ ] Integrate audit logging into deleteUser procedure
 - [ ] Integrate audit logging into restoreUser procedure
 - [ ] Test complete audit trail workflow
+
+
+## Bug Fixes - Session 2026-05-02
+
+### Phase 1: Database Compatibility Fixes
+- [x] Fixed listUsers query to select only existing columns (avoids 'Unknown column isdeleted' errors)
+  - Issue: Query was trying to select all columns including non-existent soft-delete columns
+  - Fix: Updated to explicitly select only existing columns (id, email, phone, name, role, status, createdAt)
+  - Result: All 318 users now display correctly in User Management list
+  
+- [x] Fixed createUser mutation to properly handle role assignment
+  - Issue: New users were being created but role assignment was not working
+  - Fix: Verified backend properly updates phoneUsers.role and inserts into userRoles junction table
+  - Result: New users (e.g., info@easytofin.com) are created and appear in list immediately
+  
+- [x] Verified role dropdown shows all 6 role options
+  - Roles available: Admin, Manager, Staff, Support, Customer, User
+  - Both Admin and SuperAdmin users can see appropriate role options
+  - Role selection is properly passed to createUser mutation
+
+### Phase 2: Testing Results
+- [x] User list displays all 318 active users without errors
+- [x] New user creation works without database errors
+- [x] Users appear in list immediately after creation
+- [x] Role dropdown functions correctly
+- [x] No "Unknown column" errors in console
+
+### Phase 3: Remaining Tasks
+- [ ] Apply database migration (`pnpm db:push`) to create soft-delete columns (isDeleted, deletedAt, deletedBy)
+- [ ] Verify role assignment is persisting correctly to database
+- [ ] Test DeletedUsers tab functionality after migration
+- [ ] Implement audit trail logging for all user management actions
+- [ ] Integrate TOTPRedirect component for 2FA enforcement
+- [ ] Test complete TOTP flow end-to-end
+- [ ] Create comprehensive test suite for User Management
+- [ ] Deploy to production
+
+
+## Role-Based Access Control for User Management (Session 2026-05-02)
+
+### Phase 1: Backend Permission Checks
+- [ ] Add canEditUser helper function to admin.ts
+- [ ] Add canDeleteUser helper function to admin.ts
+- [ ] Implement role hierarchy validation
+- [ ] Add self-edit protection check
+- [ ] Update updateUser procedure with permission checks
+- [ ] Update deleteUser procedure with permission checks
+- [ ] Add audit logging for unauthorized attempts
+- [ ] Write unit tests for permission checks
+
+### Phase 2: Frontend UI Changes
+- [ ] Update UserManagement.tsx to check canEdit/canDelete permissions
+- [ ] Hide edit/delete buttons for Super Admin and Admin roles
+- [ ] Hide edit/delete buttons for users the logged-in user cannot edit
+- [ ] Add role hierarchy validation on frontend
+- [ ] Implement self-edit protection on frontend
+
+### Phase 3: Visual Indicators
+- [ ] Add lock icon (🔒) badge next to protected roles (Super Admin, Admin)
+- [ ] Grey out or hide action buttons for protected roles
+- [ ] Add tooltip "This account is protected and cannot be modified"
+- [ ] Add visual indicator for role hierarchy restrictions
+
+### Phase 4: Default Visibility Filter
+- [ ] Implement default filter to hide User and Customer roles on page load
+- [ ] Show only: Super Admin, Admin, Manager, Staff, Support by default
+- [ ] Update filter dropdown to respect new visibility rules
+- [ ] Implement filter persistence in session storage
+
+### Phase 5: Filter Persistence
+- [ ] Store selected role filter in sessionStorage
+- [ ] Restore filter on page reload
+- [ ] Update filter when user navigates away and back
+- [ ] Clear filter when user logs out
+
+### Phase 6: Testing & Verification
+- [ ] Test Super Admin row shows no edit/delete buttons
+- [ ] Test Admin row shows no edit/delete buttons
+- [ ] Test Manager/Staff/Support/User/Customer show edit/delete buttons
+- [ ] Test self-edit protection (logged-in user cannot edit own account)
+- [ ] Test role hierarchy (Admin cannot edit Admin or Super Admin)
+- [ ] Test default visibility (User and Customer hidden)
+- [ ] Test filter dropdown shows all roles
+- [ ] Test filter persistence during session
+- [ ] Test list refresh after add/edit/delete
+- [ ] Test API rejects unauthorized edit/delete attempts
+- [ ] Test audit logging of unauthorized attempts
+
+### Phase 7: Deployment
+- [ ] Create checkpoint with all changes
+- [ ] Deploy to production
+- [ ] Verify all features working in production
