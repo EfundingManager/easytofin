@@ -277,23 +277,18 @@ export const emailAuthRouter = router({
         let requiresSMS2FA = false;
         let twoFASessionToken: string | undefined;
         
-        // New users always go to profile completion
+        // New users always go to user dashboard
         if (isNewUser) {
-          redirectUrl = '/profile';
+          redirectUrl = '/user/dashboard';
         } else {
-          // Existing users: redirect based on role (role-based routing)
-          if (userRole === 'admin' || userRole === 'super_admin') {
-            redirectUrl = '/admin/dashboard';
-          } else if (userRole === 'manager') {
-            redirectUrl = '/manager/dashboard';
-          } else if (userRole === 'staff') {
-            redirectUrl = '/staff/dashboard';
-          } else if (userRole === 'support') {
-            redirectUrl = '/admin/dashboard'; // Support staff use admin dashboard
-          } else if (user.clientStatus === 'customer') {
-            redirectUrl = '/customer/dashboard';
+          // Existing users: redirect based on role
+          if (false) {
+            // 2FA disabled
           } else {
-            redirectUrl = '/user/dashboard';
+            // Regular users go to role-based dashboard
+            redirectUrl = user.clientStatus === 'customer' 
+              ? `/customer/dashboard`
+              : `/user/dashboard`;
           }
         }
 
