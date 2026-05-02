@@ -94,13 +94,18 @@ export const adminRouter = router({
         investments: 0,
       };
 
-      const forms = await db.select().from(factFindingForms);
+      const forms = await db
+        .select({
+          id: factFindingForms.id,
+          product: factFindingForms.product,
+        })
+        .from(factFindingForms);
       forms.forEach((form: any) => {
-        if (form.productType === "protection") stats.protection++;
-        else if (form.productType === "pensions") stats.pensions++;
-        else if (form.productType === "healthInsurance") stats.healthInsurance++;
-        else if (form.productType === "generalInsurance") stats.generalInsurance++;
-        else if (form.productType === "investments") stats.investments++;
+        if (form.product === "protection") stats.protection++;
+        else if (form.product === "pensions") stats.pensions++;
+        else if (form.product === "healthInsurance") stats.healthInsurance++;
+        else if (form.product === "generalInsurance") stats.generalInsurance++;
+        else if (form.product === "investments") stats.investments++;
       });
 
       return stats;
@@ -190,14 +195,45 @@ export const adminRouter = router({
    */
   getKycReviews: adminProcedure.query(async () => {
     const db = await getDb();
-    if (!db) return [];
+    if (!db) return { reviews: [], total: 0 };
 
     try {
-      const reviews = await db.select().from(phoneUsers);
-      return reviews.filter((u: any) => u.kycStatus === "pending");
+      const reviews = await db
+        .select({
+          id: factFindingForms.id,
+          phoneUserId: factFindingForms.phoneUserId,
+          clientName: phoneUsers.name,
+          clientEmail: phoneUsers.email,
+          clientPhone: phoneUsers.phone,
+          product: factFindingForms.product,
+          status: factFindingForms.status,
+          formData: factFindingForms.formData,
+          submittedAt: factFindingForms.submittedAt,
+          createdAt: factFindingForms.createdAt,
+        })
+        .from(factFindingForms)
+        .innerJoin(phoneUsers, eq(factFindingForms.phoneUserId, phoneUsers.id))
+        .where(eq(factFindingForms.status, "submitted"))
+        .orderBy(desc(factFindingForms.createdAt)) as any;
+
+      return {
+        reviews: reviews.map((row: any) => ({
+          id: row.id,
+          phoneUserId: row.phoneUserId,
+          clientName: row.clientName,
+          clientEmail: row.clientEmail,
+          clientPhone: row.clientPhone,
+          product: row.product,
+          status: row.status,
+          formData: row.formData,
+          submittedAt: row.submittedAt,
+          createdAt: row.createdAt,
+        })),
+        total: reviews.length,
+      };
     } catch (error: any) {
       console.error("[Admin] Failed to get KYC reviews:", error);
-      return [];
+      return { reviews: [], total: 0 };
     }
   }),
 
@@ -250,7 +286,19 @@ export const adminRouter = router({
 
     try {
       const submissions = await db
-        .select()
+        .select({
+          id: factFindingForms.id,
+          userId: factFindingForms.userId,
+          phoneUserId: factFindingForms.phoneUserId,
+          policyNumber: factFindingForms.policyNumber,
+          product: factFindingForms.product,
+          formData: factFindingForms.formData,
+          status: factFindingForms.status,
+          submittedAt: factFindingForms.submittedAt,
+          policyAssignedAt: factFindingForms.policyAssignedAt,
+          createdAt: factFindingForms.createdAt,
+          updatedAt: factFindingForms.updatedAt,
+        })
         .from(factFindingForms)
         .orderBy(desc(factFindingForms.createdAt));
 
@@ -269,13 +317,115 @@ export const adminRouter = router({
     if (!db) return [];
 
     try {
-      const forms = await db.select().from(factFindingForms);
+      const forms = await db
+        .select({
+          id: factFindingForms.id,
+          userId: factFindingForms.userId,
+          phoneUserId: factFindingForms.phoneUserId,
+          policyNumber: factFindingForms.policyNumber,
+          product: factFindingForms.product,
+          formData: factFindingForms.formData,
+          status: factFindingForms.status,
+          submittedAt: factFindingForms.submittedAt,
+          policyAssignedAt: factFindingForms.policyAssignedAt,
+          createdAt: factFindingForms.createdAt,
+          updatedAt: factFindingForms.updatedAt,
+        })
+        .from(factFindingForms);
       return forms;
     } catch (error: any) {
       console.error("[Admin] Failed to get forms:", error);
       return [];
     }
   }),
+
+  /**
+   * Get client submissions with pagination and search
+   */
+  getClientSubmissions: adminProcedure
+    .input(
+      z.object({
+        page: z.number().min(1).default(1),
+        limit: z.number().min(1).max(100).default(10),
+        search: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { submissions: [], total: 0, limit: input.limit, page: input.page };
+
+      try {
+        // Get clients who have submitted forms
+        let query = db
+          .selectDistinct({
+            id: phoneUsers.id,
+            name: phoneUsers.name,
+            email: phoneUsers.email,
+            phone: phoneUsers.phone,
+            verified: phoneUsers.verified,
+            createdAt: phoneUsers.createdAt,
+          })
+          .from(phoneUsers)
+          .innerJoin(factFindingForms, eq(phoneUsers.id, factFindingForms.phoneUserId)) as any;
+
+        // Apply search filter if provided
+        if (input.search) {
+          query = query.where(
+            or(
+              like(phoneUsers.email, `%${input.search}%`),
+              like(phoneUsers.phone, `%${input.search}%`),
+              like(phoneUsers.name, `%${input.search}%`)
+            )
+          );
+        }
+
+        // Get total count
+        let countQuery = db
+          .selectDistinct({ id: phoneUsers.id })
+          .from(phoneUsers)
+          .innerJoin(factFindingForms, eq(phoneUsers.id, factFindingForms.phoneUserId));
+        
+        if (input.search) {
+          countQuery = countQuery.where(
+            or(
+              like(phoneUsers.email, `%${input.search}%`),
+              like(phoneUsers.phone, `%${input.search}%`),
+              like(phoneUsers.name, `%${input.search}%`)
+            )
+          );
+        }
+        const countResult = await countQuery;
+        const total = countResult.length;
+
+        // Apply pagination
+        const offset = (input.page - 1) * input.limit;
+        const submissions = await query
+          .orderBy(desc(phoneUsers.createdAt))
+          .limit(input.limit)
+          .offset(offset);
+
+        return {
+          submissions: submissions.map((row: any) => {
+            // Handle both flat and nested result structures
+            const phoneUserData = row.phoneUsers || row;
+            return {
+              id: phoneUserData.id || row.id,
+              name: phoneUserData.name || row.name,
+              email: phoneUserData.email || row.email,
+              phone: phoneUserData.phone || row.phone,
+              verified: phoneUserData.verified || row.verified,
+              createdAt: phoneUserData.createdAt || row.createdAt,
+            };
+          }),
+          total,
+          limit: input.limit,
+          page: input.page,
+        };
+      } catch (error: any) {
+        console.error("[Admin] Failed to get client submissions:", error);
+        return { submissions: [], total: 0, limit: input.limit, page: input.page };
+      }
+    }),
 
   /**
    * Update client status
