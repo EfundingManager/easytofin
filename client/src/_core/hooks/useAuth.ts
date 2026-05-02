@@ -56,10 +56,10 @@ export function useAuth(options?: UseAuthOptions) {
       localStorage.clear();
       sessionStorage.clear();
       
-      // 4. Hard redirect to post-logout page
+      // 4. Hard redirect to post-logout page with cache busting timestamp
       if (typeof window !== "undefined") {
         console.log("[Auth] Redirecting to post-logout page...");
-        window.location.href = `/post-logout`;
+        window.location.href = `/post-logout?t=${Date.now()}`;
       }
     }
   }, [logoutMutation, utils]);
