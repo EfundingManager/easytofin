@@ -232,7 +232,32 @@ export default function UserManagement() {
         )}
       </div>
 
+      {/* Tab Navigation */}
+      <div className="flex gap-2 border-b">
+        <button
+          onClick={() => setActiveTab("active")}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === "active"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Active Users ({users.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("deleted")}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === "deleted"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Deleted Users ({(deletedUsersQuery.data || []).length})
+        </button>
+      </div>
+
       {/* Filters */}
+      {activeTab === "active" && (
       <div className="flex gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -258,8 +283,10 @@ export default function UserManagement() {
           </SelectContent>
         </Select>
       </div>
+      )}
 
-      {/* Users Table */}
+      {/* Users Table - Active Tab */}
+      {activeTab === "active" && (
       <Card>
         <CardHeader>
           <CardTitle>Team Members</CardTitle>
@@ -443,6 +470,104 @@ export default function UserManagement() {
           )}
         </CardContent>
       </Card>
+      )}
+
+      {/* Deleted Users Tab */}
+      {activeTab === "deleted" && (
+      <Card>
+        <CardHeader>
+          <CardTitle>Deleted Users</CardTitle>
+          <CardDescription>
+            {(deletedUsersQuery.data || []).length} deleted user{(deletedUsersQuery.data || []).length !== 1 ? "s" : ""}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {deletedUsersQuery.isLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : (deletedUsersQuery.data || []).length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No deleted users
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 font-semibold">Name</th>
+                    <th className="text-left py-3 px-4 font-semibold">Email</th>
+                    <th className="text-left py-3 px-4 font-semibold">Role</th>
+                    <th className="text-left py-3 px-4 font-semibold">Deleted At</th>
+                    <th className="text-left py-3 px-4 font-semibold">Deleted By</th>
+                    <th className="text-right py-3 px-4 font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(deletedUsersQuery.data || []).map((u: any) => (
+                    <tr key={u.id} className="border-b hover:bg-muted/50 transition-colors">
+                      <td className="py-3 px-4">{u.name || "—"}</td>
+                      <td className="py-3 px-4">{u.email}</td>
+                      <td className="py-3 px-4">
+                        <Badge variant="outline" className="capitalize">
+                          {u.role.replace("_", " ")}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">
+                        {u.deletedAt ? new Date(u.deletedAt).toLocaleDateString() : "—"}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">
+                        {u.deletedBy || "—"}
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              if (confirm(`Restore ${u.name || u.email}?`)) {
+                                restoreUserMutation.mutate({ phoneUserId: u.id });
+                              }
+                            }}
+                            disabled={restoreUserMutation.isPending}
+                            className="gap-1"
+                          >
+                            <UserCheck className="h-4 w-4" />
+                            Restore
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                              const firstConfirm = confirm(
+                                `Permanently delete ${u.name || u.email}? This cannot be undone.`
+                              );
+                              if (firstConfirm) {
+                                const secondConfirm = confirm(
+                                  "Are you absolutely sure? This will permanently remove all data."
+                                );
+                                if (secondConfirm) {
+                                  permanentlyDeleteUserMutation.mutate({ phoneUserId: u.id });
+                                }
+                              }
+                            }}
+                            disabled={permanentlyDeleteUserMutation.isPending}
+                            className="gap-1"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      )}
     </div>
   );
 }
