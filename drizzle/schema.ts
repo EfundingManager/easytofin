@@ -792,29 +792,3 @@ export const firstLoginTracking = mysqlTable("firstLoginTracking", {
 
 export type FirstLoginTracking = typeof firstLoginTracking.$inferSelect;
 export type InsertFirstLoginTracking = typeof firstLoginTracking.$inferInsert;
-
-
-/**
- * User Management Audit Log
- * Tracks all user management actions (create, edit, delete, restore) for compliance and forensics
- */
-export const userManagementAuditLog = mysqlTable("userManagementAuditLog", {
-  id: int("id").autoincrement().primaryKey(),
-  phoneUserId: int("phoneUserId"), // The user being acted upon
-  actionType: mysqlEnum("actionType", ["create", "edit", "delete", "restore", "role_change", "password_reset"]).notNull(),
-  actionBy: int("actionBy"), // Admin user ID who performed the action
-  actionByEmail: varchar("actionByEmail", { length: 320 }), // Email of admin for reference
-  targetUserEmail: varchar("targetUserEmail", { length: 320 }), // Email of user being acted upon
-  targetUserName: text("targetUserName"), // Name of user being acted upon
-  changeDetails: text("changeDetails"), // JSON object describing what changed (old/new values)
-  reason: text("reason"), // Why the action was taken
-  ipAddress: varchar("ipAddress", { length: 45 }), // IP address of admin performing action
-  userAgent: text("userAgent"), // Browser/client info
-  status: mysqlEnum("status", ["success", "failed", "pending"]).default("success").notNull(),
-  errorMessage: text("errorMessage"), // If action failed, error details
-  metadata: text("metadata"), // JSON object with additional context
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type UserManagementAuditLog = typeof userManagementAuditLog.$inferSelect;
-export type InsertUserManagementAuditLog = typeof userManagementAuditLog.$inferInsert;
