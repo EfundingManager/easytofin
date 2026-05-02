@@ -55,13 +55,9 @@ export default function AuthSelection() {
         if (result.userId) localStorage.setItem("phoneUserId", result.userId.toString());
         if (result.user) localStorage.setItem("phoneUserData", JSON.stringify(result.user));
 
-        if (result.isNewRegistration) {
-          window.location.href = "/profile";
-        } else {
-          // Redirect to user or customer portal based on clientStatus
-          const redirectUrl = result.redirectUrl || "/dashboard";
-          window.location.href = redirectUrl;
-        }
+        // Use the redirectUrl from backend which handles role-based routing and new user detection
+        const redirectUrl = result.redirectUrl || "/user/dashboard";
+        window.location.href = redirectUrl;
       }
     } catch (error: any) {
       toast.error(error.message || "Google Sign-in failed");
