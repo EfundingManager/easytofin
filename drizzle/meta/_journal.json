@@ -204,6 +204,20 @@
       "when": 1777721555719,
       "tag": "0028_powerful_madripoor",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "5",
+      "when": 1777730658489,
+      "tag": "0029_cold_talisman",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1777731871234,
+      "tag": "0030_fixed_white_queen",
+      "breakpoints": true
     }
   ]
 }
