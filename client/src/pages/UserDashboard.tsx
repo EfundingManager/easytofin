@@ -14,7 +14,10 @@ import { KYCPDFExportButton } from '@/components/KYCPDFExportButton';
 import { LogoutConfirmDialog } from '@/components/LogoutConfirmDialog';
 
 export default function UserDashboard() {
-  const { user, loading, logout, logoutDialogOpen, setLogoutDialogOpen, handleLogout, isLoggingOut } = useAuth();
+  const { user, loading, logout, logoutDialogOpen, setLogoutDialogOpen, handleLogout, isLoggingOut } = useAuth({
+    redirectOnUnauthenticated: true,
+    redirectPath: '/post-logout',
+  });
   const [, setLocation] = useLocation();
 
   const profileQuery = trpc.profile.getProfile.useQuery();

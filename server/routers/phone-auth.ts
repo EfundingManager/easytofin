@@ -241,7 +241,7 @@ export const phoneAuthRouter = router({
           let requiresSMS2FA = false;
           let twoFASessionToken: string | undefined;
           
-          // Existing users: redirect based on role
+          // Existing users: redirect based on role (role-based routing)
           if (userRole === 'admin' || userRole === 'super_admin') {
             // Admin and super admin require SMS 2FA
             requiresSMS2FA = true;
@@ -255,11 +255,11 @@ export const phoneAuthRouter = router({
               ...cookieOptions,
               maxAge: 15 * 60 * 1000,
             } as any);
-          } else if (userRole === 'manager' || userRole === 'staff') {
-            // Manager and staff require SMS 2FA
+          } else if (userRole === 'manager' || userRole === 'staff' || userRole === 'support') {
+            // Manager, staff, and support require SMS 2FA
             requiresSMS2FA = true;
             redirectUrl = '/2fa';
-            // Create 2FA session token for manager/staff users
+            // Create 2FA session token for manager/staff/support users
             twoFASessionToken = await sdk.createSessionToken(
               openId,
               { expiresInMs: 15 * 60 * 1000, name: user.name || 'Staff' }
@@ -269,10 +269,12 @@ export const phoneAuthRouter = router({
               maxAge: 15 * 60 * 1000,
             } as any);
           } else {
-            // Regular users go to role-based dashboard
-            redirectUrl = user.clientStatus === 'customer' 
-              ? `/customer/dashboard`
-              : `/user/dashboard`;
+            // Regular users: redirect based on role and clientStatus
+            if (userRole === 'customer' || user.clientStatus === 'customer') {
+              redirectUrl = '/customer/dashboard';
+            } else {
+              redirectUrl = '/user/dashboard';
+            }
           }
 
           return {

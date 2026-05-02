@@ -22,6 +22,7 @@ export function registerOAuthRoutes(app: Express) {
 
       // Get or create phone user
       let phoneUser = await db.getPhoneUserByGoogleId(googleId);
+      let isNewUser = false;
       if (!phoneUser) {
         phoneUser = await db.createPhoneUser({
           googleId,
@@ -33,6 +34,17 @@ export function registerOAuthRoutes(app: Express) {
           role: "user",
           loginMethod: "google",
         });
+        isNewUser = true;
+      } else {
+        // Update existing user with Google profile data if needed
+        if (!phoneUser.googleId || phoneUser.loginMethod !== "google") {
+          await db.updatePhoneUser(phoneUser.id, {
+            googleId,
+            name: name || phoneUser.name,
+            emailVerified: "true",
+            loginMethod: "google",
+          });
+        }
       }
 
       // Create session token with non-empty name
@@ -45,15 +57,30 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: sessionDuration });
 
-      // Determine redirect URL based on clientStatus and 2FA requirement
-      let redirectUrl = "/dashboard";
-      if (phoneUser.clientStatus === "customer") {
-        redirectUrl = `/customer/${phoneUser.id}`;
+      // Determine redirect URL based on role (role-based routing)
+      const userRole = phoneUser.role ?? "user";
+      let redirectUrl = "/user/dashboard";
+      
+      if (userRole === "admin" || userRole === "super_admin") {
+        redirectUrl = "/admin/dashboard";
+      } else if (userRole === "manager") {
+        redirectUrl = "/manager/dashboard";
+      } else if (userRole === "staff") {
+        redirectUrl = "/staff/dashboard";
+      } else if (userRole === "support") {
+        redirectUrl = "/admin/dashboard"; // Support staff use admin dashboard
+      } else if (phoneUser.clientStatus === "customer") {
+        redirectUrl = "/customer/dashboard";
       } else {
-        redirectUrl = `/user/${phoneUser.id}`;
+        redirectUrl = "/user/dashboard";
       }
 
-      res.json({ success: true, redirectUrl });
+      // For new users, redirect to profile completion instead
+      if (isNewUser) {
+        redirectUrl = "/profile";
+      }
+
+      res.json({ success: true, redirectUrl, isNewUser });
     } catch (error) {
       console.error("[Gmail] Callback failed", error);
       res.status(500).json({ error: "Gmail callback failed" });

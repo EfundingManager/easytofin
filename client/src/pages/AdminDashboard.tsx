@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus, Mail } from "lucide-react";
+import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus, Mail, ArrowRight } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { PolicyAssignmentModal } from "@/components/PolicyAssignmentModal";
 // Feature flags disabled - table not yet migrated
@@ -29,10 +29,44 @@ export default function AdminDashboard() {
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const [selectedClientForPolicy, setSelectedClientForPolicy] = useState<{ id: number; name: string } | null>(null);
 
+  // State for KYC actions
+  const [loadingSubmissionId, setLoadingSubmissionId] = useState<number | null>(null);
+  const [actionType, setActionType] = useState<'approve' | 'reject' | null>(null);
+
   // Fetch admin data
   const statsQuery = trpc.admin.getStats.useQuery();
   const productStatsQuery = trpc.admin.getProductStats.useQuery();
   const recentActivityQuery = trpc.admin.getRecentActivity.useQuery({ limit: 10 });
+  const kycReviewsQuery = trpc.admin.getKycReviews.useQuery();
+
+  // KYC approval/rejection mutations
+  const approveMutation = trpc.admin.approveSubmission.useMutation({
+    onSuccess: () => {
+      kycReviewsQuery.refetch();
+      statsQuery.refetch();
+      setLoadingSubmissionId(null);
+      setActionType(null);
+    },
+    onError: (error) => {
+      console.error('Failed to approve submission:', error);
+      setLoadingSubmissionId(null);
+      setActionType(null);
+    },
+  });
+
+  const rejectMutation = trpc.admin.rejectSubmission.useMutation({
+    onSuccess: () => {
+      kycReviewsQuery.refetch();
+      statsQuery.refetch();
+      setLoadingSubmissionId(null);
+      setActionType(null);
+    },
+    onError: (error) => {
+      console.error('Failed to reject submission:', error);
+      setLoadingSubmissionId(null);
+      setActionType(null);
+    },
+  });
   const clientSubmissionsQuery = trpc.admin.getClientSubmissions.useQuery({
     page: 1,
     limit: 10,
@@ -217,39 +251,73 @@ export default function AdminDashboard() {
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-4">
-          <Card>
+          {/* Total Clients Card - Clickable */}
+          <Card
+            className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/50 hover:bg-accent/50"
+            onClick={() => {
+              setActiveTab("customers");
+            }}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.totalClients || 0}</div>
-              <p className="text-xs text-muted-foreground">Registered clients</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold">{stats?.totalClients || 0}</div>
+                  <p className="text-xs text-muted-foreground">Registered clients</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
+          {/* Submissions Card - Clickable */}
+          <Card
+            className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/50 hover:bg-accent/50"
+            onClick={() => {
+              setActiveTab("submissions");
+            }}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Submissions</CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.totalSubmissions || 0}</div>
-              <p className="text-xs text-muted-foreground">Form submissions</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold">{stats?.totalSubmissions || 0}</div>
+                  <p className="text-xs text-muted-foreground">Form submissions</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
+          {/* Pending Review Card - Clickable */}
+          <Card
+            className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/50 hover:bg-accent/50"
+            onClick={() => {
+              setActiveTab("kyc");
+            }}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
               <AlertCircle className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.pendingReview || 0}</div>
-              <p className="text-xs text-muted-foreground">Awaiting review</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold">{stats?.pendingReview || 0}</div>
+                  <p className="text-xs text-muted-foreground">Awaiting review</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
             </CardContent>
           </Card>
 
+          {/* Completion Rate Card - NOT Clickable */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
@@ -323,6 +391,82 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* KYC Review Tab */}
+          <TabsContent value="kyc" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>KYC Review</CardTitle>
+                <CardDescription>Fact-finding form submissions pending review</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {kycReviewsQuery.isLoading ? (
+                  <div className="text-center py-8">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <p className="mt-2 text-muted-foreground">Loading submissions...</p>
+                  </div>
+                ) : kycReviewsQuery.data && kycReviewsQuery.data.reviews && kycReviewsQuery.data.reviews.length > 0 ? (
+                  <div className="space-y-4">
+                    <div className="text-sm text-muted-foreground mb-4">
+                      Total pending: {kycReviewsQuery.data.total}
+                    </div>
+                    <div className="space-y-3">
+                      {kycReviewsQuery.data.reviews.map((review: any) => (
+                        <div key={review.id} className="p-4 border rounded-lg hover:bg-muted/50 transition cursor-pointer">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <p className="font-medium">{review.clientName}</p>
+                              <p className="text-sm text-muted-foreground">{review.clientEmail}</p>
+                              <p className="text-xs text-muted-foreground">{review.clientPhone}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="capitalize">{review.product}</Badge>
+                              <Badge variant="secondary">Pending</Badge>
+                            </div>
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-2">
+                            Submitted: {new Date(review.submittedAt || review.createdAt).toLocaleString()}
+                          </div>
+                          <div className="flex gap-2 mt-3">
+                            <Button 
+                              size="sm" 
+                              variant="default"
+                              disabled={loadingSubmissionId === review.id}
+                              onClick={() => {
+                                setLoadingSubmissionId(review.id);
+                                setActionType('approve');
+                                approveMutation.mutate({ submissionId: review.id });
+                              }}
+                            >
+                              {loadingSubmissionId === review.id && actionType === 'approve' ? 'Approving...' : 'Approve'}
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              disabled={loadingSubmissionId === review.id}
+                              onClick={() => {
+                                setLoadingSubmissionId(review.id);
+                                setActionType('reject');
+                                rejectMutation.mutate({ submissionId: review.id });
+                              }}
+                            >
+                              {loadingSubmissionId === review.id && actionType === 'reject' ? 'Rejecting...' : 'Reject'}
+                            </Button>
+                            <Button size="sm" variant="outline" disabled>Request Info</Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No submissions pending review</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Clients Queue Tab */}

@@ -1,12 +1,14 @@
 import { adminProcedure, managerProcedure, staffProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, clientDocuments, userRoles, firstLoginTracking } from "../../drizzle/schema";
+import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, clientDocuments, userRoles, firstLoginTracking, userManagementAuditLog } from "../../drizzle/schema";
 import { eq, desc, and, inArray, or, like, ne } from "drizzle-orm";
 import { z } from "zod";
 import { getRateLimitViolations, whitelistIdentifier, resetRateLimit, getRateLimitStats } from "../rate-limit-logger";
 import speakeasy from "speakeasy";
 import QRCode from "qrcode";
-import { totpSecrets, totp2faAuditLog } from "../../drizzle/schema";
+import { sendKycApprovalEmail, sendKycRejectionEmail } from "../_core/emailService";
+import { ENV } from "../_core/env";
+
 
 /**
  * Admin router for managing client submissions, configurations, and analytics
@@ -94,13 +96,18 @@ export const adminRouter = router({
         investments: 0,
       };
 
-      const forms = await db.select().from(factFindingForms);
+      const forms = await db
+        .select({
+          id: factFindingForms.id,
+          product: factFindingForms.product,
+        })
+        .from(factFindingForms);
       forms.forEach((form: any) => {
-        if (form.productType === "protection") stats.protection++;
-        else if (form.productType === "pensions") stats.pensions++;
-        else if (form.productType === "healthInsurance") stats.healthInsurance++;
-        else if (form.productType === "generalInsurance") stats.generalInsurance++;
-        else if (form.productType === "investments") stats.investments++;
+        if (form.product === "protection") stats.protection++;
+        else if (form.product === "pensions") stats.pensions++;
+        else if (form.product === "healthInsurance") stats.healthInsurance++;
+        else if (form.product === "generalInsurance") stats.generalInsurance++;
+        else if (form.product === "investments") stats.investments++;
       });
 
       return stats;
@@ -190,14 +197,45 @@ export const adminRouter = router({
    */
   getKycReviews: adminProcedure.query(async () => {
     const db = await getDb();
-    if (!db) return [];
+    if (!db) return { reviews: [], total: 0 };
 
     try {
-      const reviews = await db.select().from(phoneUsers);
-      return reviews.filter((u: any) => u.kycStatus === "pending");
+      const reviews = await db
+        .select({
+          id: factFindingForms.id,
+          phoneUserId: factFindingForms.phoneUserId,
+          clientName: phoneUsers.name,
+          clientEmail: phoneUsers.email,
+          clientPhone: phoneUsers.phone,
+          product: factFindingForms.product,
+          status: factFindingForms.status,
+          formData: factFindingForms.formData,
+          submittedAt: factFindingForms.submittedAt,
+          createdAt: factFindingForms.createdAt,
+        })
+        .from(factFindingForms)
+        .innerJoin(phoneUsers, eq(factFindingForms.phoneUserId, phoneUsers.id))
+        .where(eq(factFindingForms.status, "submitted"))
+        .orderBy(desc(factFindingForms.createdAt)) as any;
+
+      return {
+        reviews: reviews.map((row: any) => ({
+          id: row.id,
+          phoneUserId: row.phoneUserId,
+          clientName: row.clientName,
+          clientEmail: row.clientEmail,
+          clientPhone: row.clientPhone,
+          product: row.product,
+          status: row.status,
+          formData: row.formData,
+          submittedAt: row.submittedAt,
+          createdAt: row.createdAt,
+        })),
+        total: reviews.length,
+      };
     } catch (error: any) {
       console.error("[Admin] Failed to get KYC reviews:", error);
-      return [];
+      return { reviews: [], total: 0 };
     }
   }),
 
@@ -250,7 +288,19 @@ export const adminRouter = router({
 
     try {
       const submissions = await db
-        .select()
+        .select({
+          id: factFindingForms.id,
+          userId: factFindingForms.userId,
+          phoneUserId: factFindingForms.phoneUserId,
+          policyNumber: factFindingForms.policyNumber,
+          product: factFindingForms.product,
+          formData: factFindingForms.formData,
+          status: factFindingForms.status,
+          submittedAt: factFindingForms.submittedAt,
+          policyAssignedAt: factFindingForms.policyAssignedAt,
+          createdAt: factFindingForms.createdAt,
+          updatedAt: factFindingForms.updatedAt,
+        })
         .from(factFindingForms)
         .orderBy(desc(factFindingForms.createdAt));
 
@@ -269,13 +319,115 @@ export const adminRouter = router({
     if (!db) return [];
 
     try {
-      const forms = await db.select().from(factFindingForms);
+      const forms = await db
+        .select({
+          id: factFindingForms.id,
+          userId: factFindingForms.userId,
+          phoneUserId: factFindingForms.phoneUserId,
+          policyNumber: factFindingForms.policyNumber,
+          product: factFindingForms.product,
+          formData: factFindingForms.formData,
+          status: factFindingForms.status,
+          submittedAt: factFindingForms.submittedAt,
+          policyAssignedAt: factFindingForms.policyAssignedAt,
+          createdAt: factFindingForms.createdAt,
+          updatedAt: factFindingForms.updatedAt,
+        })
+        .from(factFindingForms);
       return forms;
     } catch (error: any) {
       console.error("[Admin] Failed to get forms:", error);
       return [];
     }
   }),
+
+  /**
+   * Get client submissions with pagination and search
+   */
+  getClientSubmissions: adminProcedure
+    .input(
+      z.object({
+        page: z.number().min(1).default(1),
+        limit: z.number().min(1).max(100).default(10),
+        search: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { submissions: [], total: 0, limit: input.limit, page: input.page };
+
+      try {
+        // Get clients who have submitted forms
+        let query = db
+          .selectDistinct({
+            id: phoneUsers.id,
+            name: phoneUsers.name,
+            email: phoneUsers.email,
+            phone: phoneUsers.phone,
+            verified: phoneUsers.verified,
+            createdAt: phoneUsers.createdAt,
+          })
+          .from(phoneUsers)
+          .innerJoin(factFindingForms, eq(phoneUsers.id, factFindingForms.phoneUserId)) as any;
+
+        // Apply search filter if provided
+        if (input.search) {
+          query = query.where(
+            or(
+              like(phoneUsers.email, `%${input.search}%`),
+              like(phoneUsers.phone, `%${input.search}%`),
+              like(phoneUsers.name, `%${input.search}%`)
+            )
+          );
+        }
+
+        // Get total count
+        let countQuery = db
+          .selectDistinct({ id: phoneUsers.id })
+          .from(phoneUsers)
+          .innerJoin(factFindingForms, eq(phoneUsers.id, factFindingForms.phoneUserId));
+        
+        if (input.search) {
+          countQuery = countQuery.where(
+            or(
+              like(phoneUsers.email, `%${input.search}%`),
+              like(phoneUsers.phone, `%${input.search}%`),
+              like(phoneUsers.name, `%${input.search}%`)
+            )
+          );
+        }
+        const countResult = await countQuery;
+        const total = countResult.length;
+
+        // Apply pagination
+        const offset = (input.page - 1) * input.limit;
+        const submissions = await query
+          .orderBy(desc(phoneUsers.createdAt))
+          .limit(input.limit)
+          .offset(offset);
+
+        return {
+          submissions: submissions.map((row: any) => {
+            // Handle both flat and nested result structures
+            const phoneUserData = row.phoneUsers || row;
+            return {
+              id: phoneUserData.id || row.id,
+              name: phoneUserData.name || row.name,
+              email: phoneUserData.email || row.email,
+              phone: phoneUserData.phone || row.phone,
+              verified: phoneUserData.verified || row.verified,
+              createdAt: phoneUserData.createdAt || row.createdAt,
+            };
+          }),
+          total,
+          limit: input.limit,
+          page: input.page,
+        };
+      } catch (error: any) {
+        console.error("[Admin] Failed to get client submissions:", error);
+        return { submissions: [], total: 0, limit: input.limit, page: input.page };
+      }
+    }),
 
   /**
    * Update client status
@@ -478,8 +630,8 @@ export const adminRouter = router({
       if (!db) throw new Error("Database connection failed");
 
       try {
-        // Check if user already exists
-        const existingUser = await db.select().from(phoneUsers).where(eq(phoneUsers.email, input.email));
+        // Check if user already exists (select only existing columns to avoid schema mismatch)
+        const existingUser = await db.select({ id: phoneUsers.id, email: phoneUsers.email }).from(phoneUsers).where(eq(phoneUsers.email, input.email));
         if (existingUser.length > 0) {
           throw new Error("User with this email already exists");
         }
@@ -537,7 +689,7 @@ export const adminRouter = router({
     }),
 
   /**
-   * Assign roles to an existing user
+   * Assign roles to an existing user with role-based permission checks
    */
   assignRoles: adminProcedure
     .input(z.object({
@@ -549,9 +701,36 @@ export const adminRouter = router({
       if (!db) throw new Error("Database connection failed");
 
       try {
+        // Import permission helpers
+        const { canAssignRoles, isProtectedRole } = await import("../role-permissions");
+
         // Check if user exists
         const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
         if (user.length === 0) throw new Error("User not found");
+        
+        const targetRole = user[0].role as any;
+        const targetUserId = user[0].id;
+        const loggedInUserId = ctx.user.id;
+        const loggedInRole = ctx.user.role as any;
+        const newRoles = input.roles as any[];
+
+        // Check 1: Cannot assign roles to self
+        if (loggedInUserId === targetUserId) {
+          console.warn(`[Admin] Unauthorized role assignment: User ${loggedInUserId} tried to assign roles to themselves`);
+          throw new Error("You cannot change your own roles");
+        }
+
+        // Check 2: Cannot assign protected roles
+        if (newRoles.some(role => isProtectedRole(role))) {
+          console.warn(`[Admin] Unauthorized role assignment: User ${loggedInUserId} tried to assign protected roles`);
+          throw new Error("You cannot assign Super Admin or Admin roles");
+        }
+
+        // Check 3: Verify role hierarchy permission
+        if (!canAssignRoles(loggedInRole, loggedInUserId, targetUserId, targetRole, newRoles)) {
+          console.warn(`[Admin] Unauthorized role assignment: User ${loggedInUserId} (${loggedInRole}) tried to assign roles to ${targetRole} user ${targetUserId}`);
+          throw new Error(`You do not have permission to assign roles to this user`);
+        }
 
         // Delete existing roles
         await db.delete(userRoles).where(eq(userRoles.phoneUserId, input.phoneUserId));
@@ -602,11 +781,27 @@ export const adminRouter = router({
       // Handle case where isDeleted column doesn't exist yet
       let allUsers: any[] = [];
       try {
-        allUsers = await db.select().from(phoneUsers).where(eq(phoneUsers.isDeleted, "false"));
+        allUsers = await db.select({
+          id: phoneUsers.id,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          name: phoneUsers.name,
+          role: phoneUsers.role,
+          status: phoneUsers.clientStatus,
+          createdAt: phoneUsers.createdAt,
+        }).from(phoneUsers).where(ne(phoneUsers.isDeleted, "true"));
       } catch (error: any) {
-        // Fallback if isDeleted column doesn't exist yet
-        console.debug(`[Admin] isDeleted column not available, fetching all users`);
-        allUsers = await db.select().from(phoneUsers);
+        console.debug(`[Admin] Error fetching users with soft-delete filter, using fallback`);
+        // Fallback: fetch all users without any filter
+        allUsers = await db.select({
+          id: phoneUsers.id,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          name: phoneUsers.name,
+          role: phoneUsers.role,
+          status: phoneUsers.clientStatus,
+          createdAt: phoneUsers.createdAt,
+        }).from(phoneUsers);
       }
       const usersWithRoles = await Promise.all(
         allUsers.map(async (user: any) => {
@@ -658,6 +853,129 @@ export const adminRouter = router({
   }),
 
   /**
+   * Get all soft-deleted users
+   */
+  listDeletedUsers: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+
+    try {
+      // Fetch all soft-deleted users
+      let deletedUsers: any[] = [];
+      try {
+        deletedUsers = await db.select({
+          id: phoneUsers.id,
+          email: phoneUsers.email,
+          phone: phoneUsers.phone,
+          name: phoneUsers.name,
+          role: phoneUsers.role,
+          status: phoneUsers.clientStatus,
+          createdAt: phoneUsers.createdAt,
+          deletedAt: phoneUsers.deletedAt,
+          deletedBy: phoneUsers.deletedBy,
+        }).from(phoneUsers).where(eq(phoneUsers.isDeleted, "true"));
+      } catch (error: any) {
+        console.debug(`[Admin] isDeleted column not available, no deleted users to fetch`);
+        deletedUsers = [];
+      }
+      
+      const usersWithRoles = await Promise.all(
+        deletedUsers.map(async (user: any) => {
+          let primaryRole = user.role || "user";
+          let allRoles = [primaryRole];
+          
+          try {
+            const roles = await db.select().from(userRoles).where(eq(userRoles.phoneUserId, user.id));
+            if (roles.length > 0) {
+              primaryRole = roles[0].role;
+              allRoles = roles.map((r: any) => r.role);
+            }
+          } catch (roleError: any) {
+            console.debug(`[Admin] userRoles table not available for deleted user ${user.id}`);
+          }
+          
+          return {
+            id: user.id,
+            email: user.email,
+            phone: user.phone,
+            name: user.name,
+            role: primaryRole,
+            allRoles: allRoles,
+            status: user.status,
+            createdAt: user.createdAt,
+            deletedAt: user.deletedAt,
+            deletedBy: user.deletedBy,
+          };
+        })
+      );
+      return usersWithRoles;
+    } catch (error: any) {
+      console.error("[Admin] Failed to list deleted users:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Permanently delete a soft-deleted user (hard delete)
+   * This is only available for already soft-deleted users
+   */
+  permanentlyDeleteUser: adminProcedure
+    .input(z.object({ phoneUserId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        // Get user details - select only existing columns
+        const user = await db
+          .select({
+            id: phoneUsers.id,
+            email: phoneUsers.email,
+            phone: phoneUsers.phone,
+            name: phoneUsers.name,
+            role: phoneUsers.role,
+            status: phoneUsers.clientStatus,
+            isDeleted: phoneUsers.isDeleted,
+          })
+          .from(phoneUsers)
+          .where(eq(phoneUsers.id, input.phoneUserId));
+        if (!user || user.length === 0) {
+          throw new Error("User not found");
+        }
+
+        // Verify user is actually soft-deleted
+        if (user[0].isDeleted !== "true") {
+          throw new Error("User is not deleted. Only soft-deleted users can be permanently deleted.");
+        }
+
+        // Hard delete user from phoneUsers table
+        await db.delete(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+
+        // Try to delete user roles (if table exists)
+        try {
+          await db.delete(userRoles).where(eq(userRoles.phoneUserId, input.phoneUserId));
+        } catch (roleError: any) {
+          console.debug(`[Admin] userRoles table not available for permanent deletion`);
+        }
+
+        // Try to delete first login tracking (if table exists)
+        try {
+          await db.delete(firstLoginTracking).where(eq(firstLoginTracking.phoneUserId, input.phoneUserId));
+        } catch (trackingError: any) {
+          console.debug(`[Admin] firstLoginTracking table not available for permanent deletion`);
+        }
+
+        return {
+          success: true,
+          message: `User ${user[0].name} permanently deleted`,
+        };
+      } catch (error: any) {
+        console.error("[Admin] Failed to permanently delete user:", error);
+        throw new Error(error.message || "Failed to permanently delete user");
+      }
+    }),
+
+  /**
    * Get user details with roles
    */
   getUserDetails: adminProcedure
@@ -691,7 +1009,7 @@ export const adminRouter = router({
     }),
 
   /**
-   * Delete a user
+   * Delete a user with role-based permission checks
    */
   deleteUser: adminProcedure
     .input(z.object({ phoneUserId: z.number() }))
@@ -700,10 +1018,45 @@ export const adminRouter = router({
       if (!db) throw new Error("Database connection failed");
 
       try {
-        // Prevent deleting Super Admin
-        const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+        // Import permission helpers
+        const { canDeleteUser, isProtectedRole } = await import("../role-permissions");
+
+        // Get target user - select only existing columns to avoid schema mismatch
+        const user = await db
+          .select({
+            id: phoneUsers.id,
+            email: phoneUsers.email,
+            phone: phoneUsers.phone,
+            name: phoneUsers.name,
+            role: phoneUsers.role,
+            status: phoneUsers.clientStatus,
+          })
+          .from(phoneUsers)
+          .where(eq(phoneUsers.id, input.phoneUserId));
         if (user.length === 0) throw new Error("User not found");
-        if (user[0].role === "super_admin") throw new Error("Cannot delete Super Admin");
+        
+        const targetRole = user[0].role as any;
+        const targetUserId = user[0].id;
+        const loggedInUserId = ctx.user.id;
+        const loggedInRole = ctx.user.role as any;
+
+        // Check 1: Cannot delete self
+        if (loggedInUserId === targetUserId) {
+          console.warn(`[Admin] Unauthorized delete attempt: User ${loggedInUserId} tried to delete themselves`);
+          throw new Error("You cannot delete your own account");
+        }
+
+        // Check 2: Cannot delete protected roles
+        if (isProtectedRole(targetRole)) {
+          console.warn(`[Admin] Unauthorized delete attempt: User ${loggedInUserId} (${loggedInRole}) tried to delete protected role ${targetRole}`);
+          throw new Error(`Cannot delete ${targetRole} accounts. This role is protected.`);
+        }
+
+        // Check 3: Verify role hierarchy permission
+        if (!canDeleteUser(loggedInRole, loggedInUserId, targetUserId, targetRole)) {
+          console.warn(`[Admin] Unauthorized delete attempt: User ${loggedInUserId} (${loggedInRole}) tried to delete ${targetRole} user ${targetUserId}`);
+          throw new Error(`You do not have permission to delete ${targetRole} accounts`);
+        }
 
         // Try to delete user roles (if table exists)
         try {
@@ -719,20 +1072,38 @@ export const adminRouter = router({
           console.debug(`[Admin] firstLoginTracking table not available for deletion`);
         }
 
-        // Soft-delete user from phoneUsers table
-        // Instead of deleting, mark as deleted with metadata
+        // Soft delete user from phoneUsers table
+        // Mark as deleted instead of removing the record
+        const deletedAt = new Date();
         await db
           .update(phoneUsers)
           .set({
             isDeleted: "true",
-            deletedAt: new Date(),
+            deletedAt: deletedAt.getTime(),
             deletedBy: ctx.user.email,
           })
           .where(eq(phoneUsers.id, input.phoneUserId));
 
+        // Log the deletion in audit log
+        try {
+          await db.insert(userManagementAuditLog).values({
+            phoneUserId: input.phoneUserId,
+            actionType: "delete",
+            actionBy: ctx.user.id,
+            actionByEmail: ctx.user.email,
+            targetUserEmail: user[0].email,
+            targetUserName: user[0].name,
+            changeDetails: `Deleted ${targetRole} user`,
+            status: "success",
+            createdAt: new Date(),
+          });
+        } catch (auditError: any) {
+          console.debug(`[Admin] Failed to log deletion in audit log:`, auditError);
+        }
+
         return {
           success: true,
-          message: `User ${user[0].name} deleted successfully (soft-delete)`,
+          message: `User ${user[0].name} deleted successfully`,
         };
       } catch (error: any) {
         console.error("[Admin] Failed to delete user:", error);
@@ -750,8 +1121,18 @@ export const adminRouter = router({
       if (!db) throw new Error("Database connection failed");
 
       try {
-        // Get user details
-        const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+        // Get user details - select only existing columns
+        const user = await db
+          .select({
+            id: phoneUsers.id,
+            email: phoneUsers.email,
+            phone: phoneUsers.phone,
+            name: phoneUsers.name,
+            role: phoneUsers.role,
+            status: phoneUsers.clientStatus,
+          })
+          .from(phoneUsers)
+          .where(eq(phoneUsers.id, input.phoneUserId));
         if (!user || user.length === 0) {
           throw new Error("User not found");
         }
@@ -1063,6 +1444,204 @@ export const adminRouter = router({
           isFirstLogin: false,
           requiresTOTP: false,
         };
+      }
+    }),
+
+  /**
+   * Get audit trail logs with filtering and pagination
+   */
+  getAuditLogs: adminProcedure
+    .input(z.object({
+      limit: z.number().default(50),
+      offset: z.number().default(0),
+      actionType: z.string().optional(),
+      phoneUserId: z.number().optional(),
+      startDate: z.date().optional(),
+      endDate: z.date().optional(),
+      searchQuery: z.string().optional(),
+    }))
+    .query(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+      
+      try {
+        let query = db.select().from(userManagementAuditLog);
+        const conditions = [];
+        
+        if (input.actionType) {
+          conditions.push(eq(userManagementAuditLog.actionType, input.actionType as any));
+        }
+        
+        if (input.phoneUserId) {
+          conditions.push(eq(userManagementAuditLog.phoneUserId, input.phoneUserId));
+        }
+        
+        if (input.searchQuery) {
+          conditions.push(
+            or(
+              like(userManagementAuditLog.targetUserEmail, `%${input.searchQuery}%`),
+              like(userManagementAuditLog.targetUserName, `%${input.searchQuery}%`),
+              like(userManagementAuditLog.actionByEmail, `%${input.searchQuery}%`)
+            )
+          );
+        }
+        
+        if (conditions.length > 0) {
+          query = query.where(and(...conditions));
+        }
+        
+        const logs = await query
+          .orderBy(desc(userManagementAuditLog.createdAt))
+          .limit(input.limit)
+          .offset(input.offset);
+        
+        const totalResult = await db.select({ count: userManagementAuditLog.id }).from(userManagementAuditLog);
+        const total = totalResult.length;
+        
+        return {
+          logs,
+          total,
+          limit: input.limit,
+          offset: input.offset,
+        };
+      } catch (error: any) {
+        console.error("[Audit] Failed to get audit logs:", error);
+        return {
+          logs: [],
+          total: 0,
+          limit: input.limit,
+          offset: input.offset,
+        };
+      }
+    }),
+
+  /**
+   * Approve a fact-finding form submission
+   */
+  approveSubmission: adminProcedure
+    .input(z.object({
+      submissionId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      try {
+        // Update the submission status to 'reviewed'
+        await db
+          .update(factFindingForms)
+          .set({ status: "reviewed" })
+          .where(eq(factFindingForms.id, input.submissionId));
+
+        // Get the submission to retrieve client info for notification
+        const submission = await db
+          .select()
+          .from(factFindingForms)
+          .where(eq(factFindingForms.id, input.submissionId))
+          .limit(1);
+
+        if (submission.length === 0) {
+          throw new Error("Submission not found");
+        }
+
+        const submissionData = submission[0];
+
+        // Get client details for email notification
+        const clientResult = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.id, submissionData.userId))
+          .limit(1);
+
+        if (clientResult.length > 0) {
+          const client = clientResult[0];
+          if (client.email) {
+            const dashboardUrl = "https://easytofin.com/dashboard";
+            
+            // Send approval email
+            await sendKycApprovalEmail(
+              client.email,
+              client.name || "Valued Client",
+              submissionData.product || "Your Application",
+              dashboardUrl
+            );
+            
+            console.log(`[Admin] Sent approval email to ${client.email}`);
+          }
+        }
+
+        console.log(`[Admin] Approved submission ${input.submissionId}`);
+
+        return { success: true, message: "Submission approved and client notified" };
+      } catch (error: any) {
+        console.error("[Admin] Failed to approve submission:", error);
+        throw new Error(error.message || "Failed to approve submission");
+      }
+    }),
+
+  /**
+   * Reject a fact-finding form submission
+   */
+  rejectSubmission: adminProcedure
+    .input(z.object({
+      submissionId: z.number(),
+      reason: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      try {
+        // Update the submission status to 'archived' (or create a 'rejected' status if needed)
+        await db
+          .update(factFindingForms)
+          .set({ status: "archived" })
+          .where(eq(factFindingForms.id, input.submissionId));
+
+        // Get the submission to retrieve client info for notification
+        const submission = await db
+          .select()
+          .from(factFindingForms)
+          .where(eq(factFindingForms.id, input.submissionId))
+          .limit(1);
+
+        if (submission.length === 0) {
+          throw new Error("Submission not found");
+        }
+
+        const submissionData = submission[0];
+
+        // Get client details for email notification
+        const clientResult = await db
+          .select()
+          .from(phoneUsers)
+          .where(eq(phoneUsers.id, submissionData.userId))
+          .limit(1);
+
+        if (clientResult.length > 0) {
+          const client = clientResult[0];
+          if (client.email) {
+            const dashboardUrl = "https://easytofin.com/dashboard";
+            
+            // Send rejection email
+            await sendKycRejectionEmail(
+              client.email,
+              client.name || "Valued Client",
+              submissionData.product || "Your Application",
+              input.reason,
+              dashboardUrl
+            );
+            
+            console.log(`[Admin] Sent rejection email to ${client.email}`);
+          }
+        }
+
+        console.log(`[Admin] Rejected submission ${input.submissionId}: ${input.reason || 'No reason provided'}`);
+
+        return { success: true, message: "Submission rejected and client notified" };
+      } catch (error: any) {
+        console.error("[Admin] Failed to reject submission:", error);
+        throw new Error(error.message || "Failed to reject submission");
       }
     }),
 

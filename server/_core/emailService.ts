@@ -210,3 +210,90 @@ export async function sendWelcomeEmail(
     return false;
   }
 }
+
+
+/**
+ * Send KYC approval email to client
+ */
+export async function sendKycApprovalEmail(
+  email: string,
+  recipientName: string,
+  productType: string,
+  dashboardUrl: string
+): Promise<boolean> {
+  try {
+    const { getKycApprovalTemplate } = await import("./emailTemplates");
+    const htmlContent = getKycApprovalTemplate({
+      recipientName,
+      productType,
+      dashboardUrl,
+    });
+
+    const subject = `Your ${productType} Submission Has Been Approved ✅`;
+
+    console.log(`[EMAIL] Sending KYC approval email to ${email}`);
+    console.log(`[EMAIL] Subject: ${subject}`);
+
+    // Send via SendGrid
+    const msg = {
+      to: email,
+      from: {
+        email: ENV.sendgridFromEmail,
+        name: ENV.sendgridFromName,
+      },
+      subject,
+      html: htmlContent,
+    };
+
+    await sgMail.send(msg);
+    console.log(`[EMAIL] KYC approval email sent successfully to ${email}`);
+    return true;
+  } catch (error) {
+    console.error(`[EMAIL] Error sending KYC approval email to ${email}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Send KYC rejection/request more info email to client
+ */
+export async function sendKycRejectionEmail(
+  email: string,
+  recipientName: string,
+  productType: string,
+  reason: string | undefined,
+  dashboardUrl: string
+): Promise<boolean> {
+  try {
+    const { getKycRejectionTemplate } = await import("./emailTemplates");
+    const htmlContent = getKycRejectionTemplate({
+      recipientName,
+      productType,
+      reason,
+      dashboardUrl,
+    });
+
+    const subject = `Your ${productType} Submission Requires Additional Information`;
+
+    console.log(`[EMAIL] Sending KYC rejection email to ${email}`);
+    console.log(`[EMAIL] Subject: ${subject}`);
+
+    // Send via SendGrid
+    const msg = {
+      to: email,
+      from: {
+        email: ENV.sendgridFromEmail,
+        name: ENV.sendgridFromName,
+      },
+      subject,
+      html: htmlContent,
+    };
+
+    await sgMail.send(msg);
+    console.log(`[EMAIL] KYC rejection email sent successfully to ${email}`);
+    return true;
+  } catch (error) {
+    console.error(`[EMAIL] Error sending KYC rejection email to ${email}:`, error);
+    return false;
+  }
+}
