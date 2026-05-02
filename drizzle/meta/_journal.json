@@ -218,6 +218,20 @@
       "when": 1777731871234,
       "tag": "0030_fixed_white_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1777732851982,
+      "tag": "0031_next_ma_gnuci",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1777733428862,
+      "tag": "0032_thick_metal_master",
+      "breakpoints": true
     }
   ]
 }

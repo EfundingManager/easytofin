@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus, Mail } from "lucide-react";
+import { BarChart3, Users, FileText, Settings, AlertCircle, TrendingUp, Clock, Search, X, Plus, Mail, ArrowRight } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { PolicyAssignmentModal } from "@/components/PolicyAssignmentModal";
 // Feature flags disabled - table not yet migrated
@@ -217,39 +217,73 @@ export default function AdminDashboard() {
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-4">
-          <Card>
+          {/* Total Clients Card - Clickable */}
+          <Card
+            className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/50 hover:bg-accent/50"
+            onClick={() => {
+              setActiveTab("customers");
+            }}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.totalClients || 0}</div>
-              <p className="text-xs text-muted-foreground">Registered clients</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold">{stats?.totalClients || 0}</div>
+                  <p className="text-xs text-muted-foreground">Registered clients</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
+          {/* Submissions Card - Clickable */}
+          <Card
+            className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/50 hover:bg-accent/50"
+            onClick={() => {
+              setActiveTab("submissions");
+            }}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Submissions</CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.totalSubmissions || 0}</div>
-              <p className="text-xs text-muted-foreground">Form submissions</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold">{stats?.totalSubmissions || 0}</div>
+                  <p className="text-xs text-muted-foreground">Form submissions</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
+          {/* Pending Review Card - Clickable */}
+          <Card
+            className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/50 hover:bg-accent/50"
+            onClick={() => {
+              setActiveTab("kyc");
+            }}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
               <AlertCircle className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.pendingReview || 0}</div>
-              <p className="text-xs text-muted-foreground">Awaiting review</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold">{stats?.pendingReview || 0}</div>
+                  <p className="text-xs text-muted-foreground">Awaiting review</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
             </CardContent>
           </Card>
 
+          {/* Completion Rate Card - NOT Clickable */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
