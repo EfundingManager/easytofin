@@ -1,12 +1,12 @@
 import { adminProcedure, managerProcedure, staffProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, clientDocuments, userRoles, firstLoginTracking } from "../../drizzle/schema";
+import { phoneUsers, users, userProducts, factFindingForms, policyAssignments, clientDocuments, userRoles, firstLoginTracking, userManagementAuditLog } from "../../drizzle/schema";
 import { eq, desc, and, inArray, or, like, ne } from "drizzle-orm";
 import { z } from "zod";
 import { getRateLimitViolations, whitelistIdentifier, resetRateLimit, getRateLimitStats } from "../rate-limit-logger";
 import speakeasy from "speakeasy";
 import QRCode from "qrcode";
-import { totpSecrets, totp2faAuditLog } from "../../drizzle/schema";
+
 
 /**
  * Admin router for managing client submissions, configurations, and analytics
@@ -1164,6 +1164,74 @@ export const adminRouter = router({
           totpSetupCompleted: false,
           isFirstLogin: false,
           requiresTOTP: false,
+        };
+      }
+    }),
+
+  /**
+   * Get audit trail logs with filtering and pagination
+   */
+  getAuditLogs: adminProcedure
+    .input(z.object({
+      limit: z.number().default(50),
+      offset: z.number().default(0),
+      actionType: z.string().optional(),
+      phoneUserId: z.number().optional(),
+      startDate: z.date().optional(),
+      endDate: z.date().optional(),
+      searchQuery: z.string().optional(),
+    }))
+    .query(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+      
+      try {
+        let query = db.select().from(userManagementAuditLog);
+        const conditions = [];
+        
+        if (input.actionType) {
+          conditions.push(eq(userManagementAuditLog.actionType, input.actionType as any));
+        }
+        
+        if (input.phoneUserId) {
+          conditions.push(eq(userManagementAuditLog.phoneUserId, input.phoneUserId));
+        }
+        
+        if (input.searchQuery) {
+          conditions.push(
+            or(
+              like(userManagementAuditLog.targetUserEmail, `%${input.searchQuery}%`),
+              like(userManagementAuditLog.targetUserName, `%${input.searchQuery}%`),
+              like(userManagementAuditLog.actionByEmail, `%${input.searchQuery}%`)
+            )
+          );
+        }
+        
+        if (conditions.length > 0) {
+          query = query.where(and(...conditions));
+        }
+        
+        const logs = await query
+          .orderBy(desc(userManagementAuditLog.createdAt))
+          .limit(input.limit)
+          .offset(input.offset);
+        
+        const totalResult = await db.select({ count: userManagementAuditLog.id }).from(userManagementAuditLog);
+        const total = totalResult.length;
+        
+        return {
+          logs,
+          total,
+          limit: input.limit,
+          offset: input.offset,
+        };
+      } catch (error: any) {
+        console.error("[Audit] Failed to get audit logs:", error);
+        return {
+          logs: [],
+          total: 0,
+          limit: input.limit,
+          offset: input.offset,
         };
       }
     }),

@@ -1986,3 +1986,19 @@
 - [ ] Add restore user functionality for admins
 - [ ] Test soft-delete preserves audit trail
 - [ ] Test restore functionality works correctly
+
+
+## Audit Trail Implementation
+
+- [ ] Create userManagementAuditLog table in database schema
+- [ ] Add backend query to fetch audit logs with filtering
+- [ ] Create AuditTrail.tsx page component
+- [ ] Implement search functionality for audit logs
+- [ ] Add date range filtering
+- [ ] Add action type filtering (Create, Edit, Delete, Restore)
+- [ ] Implement CSV export functionality
+- [ ] Integrate audit logging into createUser procedure
+- [ ] Integrate audit logging into updateUser procedure
+- [ ] Integrate audit logging into deleteUser procedure
+- [ ] Integrate audit logging into restoreUser procedure
+- [ ] Test complete audit trail workflow
