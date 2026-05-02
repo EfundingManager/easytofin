@@ -36,9 +36,11 @@ export default function UserManagement() {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserRole, setNewUserRole] = useState<UserRole>("staff");
   const [deleteConfirmUser, setDeleteConfirmUser] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<"active" | "deleted">("active");
 
   // Fetch users
   const usersQuery = trpc.admin.listUsers.useQuery();
+  const deletedUsersQuery = trpc.admin.listDeletedUsers.useQuery();
 
   // Mutations
   const assignRolesMutation = trpc.admin.assignRoles.useMutation({
@@ -72,6 +74,27 @@ export default function UserManagement() {
     },
     onError: (error: any) => {
       toast.error(error.message || "Failed to create user");
+    },
+  });
+
+  const restoreUserMutation = trpc.admin.restoreUser.useMutation({
+    onSuccess: () => {
+      toast.success("User restored successfully");
+      deletedUsersQuery.refetch();
+      usersQuery.refetch();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to restore user");
+    },
+  });
+
+  const permanentlyDeleteUserMutation = trpc.admin.permanentlyDeleteUser.useMutation({
+    onSuccess: () => {
+      toast.success("User permanently deleted");
+      deletedUsersQuery.refetch();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to permanently delete user");
     },
   });
 

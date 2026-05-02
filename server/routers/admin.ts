@@ -658,6 +658,108 @@ export const adminRouter = router({
   }),
 
   /**
+   * Get all soft-deleted users
+   */
+  listDeletedUsers: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+
+    try {
+      // Fetch all soft-deleted users
+      let deletedUsers: any[] = [];
+      try {
+        deletedUsers = await db.select().from(phoneUsers).where(eq(phoneUsers.isDeleted, "true"));
+      } catch (error: any) {
+        console.debug(`[Admin] isDeleted column not available, no deleted users to fetch`);
+        deletedUsers = [];
+      }
+      
+      const usersWithRoles = await Promise.all(
+        deletedUsers.map(async (user: any) => {
+          let primaryRole = user.role || "user";
+          let allRoles = [primaryRole];
+          
+          try {
+            const roles = await db.select().from(userRoles).where(eq(userRoles.phoneUserId, user.id));
+            if (roles.length > 0) {
+              primaryRole = roles[0].role;
+              allRoles = roles.map((r: any) => r.role);
+            }
+          } catch (roleError: any) {
+            console.debug(`[Admin] userRoles table not available for deleted user ${user.id}`);
+          }
+          
+          return {
+            id: user.id,
+            email: user.email,
+            phone: user.phone,
+            name: user.name,
+            role: primaryRole,
+            allRoles: allRoles,
+            status: user.status,
+            createdAt: user.createdAt,
+            deletedAt: user.deletedAt,
+            deletedBy: user.deletedBy,
+          };
+        })
+      );
+      return usersWithRoles;
+    } catch (error: any) {
+      console.error("[Admin] Failed to list deleted users:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Permanently delete a soft-deleted user (hard delete)
+   * This is only available for already soft-deleted users
+   */
+  permanentlyDeleteUser: adminProcedure
+    .input(z.object({ phoneUserId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        // Get user details
+        const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+        if (!user || user.length === 0) {
+          throw new Error("User not found");
+        }
+
+        // Verify user is actually soft-deleted
+        if (user[0].isDeleted !== "true") {
+          throw new Error("User is not deleted. Only soft-deleted users can be permanently deleted.");
+        }
+
+        // Hard delete user from phoneUsers table
+        await db.delete(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+
+        // Try to delete user roles (if table exists)
+        try {
+          await db.delete(userRoles).where(eq(userRoles.phoneUserId, input.phoneUserId));
+        } catch (roleError: any) {
+          console.debug(`[Admin] userRoles table not available for permanent deletion`);
+        }
+
+        // Try to delete first login tracking (if table exists)
+        try {
+          await db.delete(firstLoginTracking).where(eq(firstLoginTracking.phoneUserId, input.phoneUserId));
+        } catch (trackingError: any) {
+          console.debug(`[Admin] firstLoginTracking table not available for permanent deletion`);
+        }
+
+        return {
+          success: true,
+          message: `User ${user[0].name} permanently deleted`,
+        };
+      } catch (error: any) {
+        console.error("[Admin] Failed to permanently delete user:", error);
+        throw new Error(error.message || "Failed to permanently delete user");
+      }
+    }),
+
+  /**
    * Get user details with roles
    */
   getUserDetails: adminProcedure
