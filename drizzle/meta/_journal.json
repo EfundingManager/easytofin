@@ -190,6 +190,13 @@
       "when": 1777656530862,
       "tag": "0026_bouncy_leper_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "5",
+      "when": 1777720141853,
+      "tag": "0027_rich_zzzax",
+      "breakpoints": true
     }
   ]
 }

@@ -1967,3 +1967,22 @@
 - [ ] List all fixes applied
 - [ ] Confirm all functions work end-to-end
 - [ ] Provide summary report to user
+
+
+## Delete Functionality & Soft-Delete Implementation
+
+### Phase 1: Delete Functionality Testing
+- [ ] Test delete confirmation dialog appears
+- [ ] Test user is removed from database
+- [ ] Test user list updates immediately after deletion
+- [ ] Test deleted user cannot log in
+
+### Phase 2: Soft-Delete Implementation
+- [ ] Add isDeleted field to users/phoneUsers table
+- [ ] Add deletedAt timestamp field
+- [ ] Add deletedBy field to track who deleted the user
+- [ ] Update deleteUser procedure to implement soft-delete
+- [ ] Update listUsers query to exclude soft-deleted users
+- [ ] Add restore user functionality for admins
+- [ ] Test soft-delete preserves audit trail
+- [ ] Test restore functionality works correctly

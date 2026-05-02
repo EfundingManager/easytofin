@@ -598,7 +598,16 @@ export const adminRouter = router({
     if (!db) return [];
 
     try {
-      const allUsers = await db.select().from(phoneUsers);
+      // Fetch all active (non-deleted) users
+      // Handle case where isDeleted column doesn't exist yet
+      let allUsers: any[] = [];
+      try {
+        allUsers = await db.select().from(phoneUsers).where(eq(phoneUsers.isDeleted, "false"));
+      } catch (error: any) {
+        // Fallback if isDeleted column doesn't exist yet
+        console.debug(`[Admin] isDeleted column not available, fetching all users`);
+        allUsers = await db.select().from(phoneUsers);
+      }
       const usersWithRoles = await Promise.all(
         allUsers.map(async (user: any) => {
           let primaryRole = user.role || "user";
@@ -710,16 +719,60 @@ export const adminRouter = router({
           console.debug(`[Admin] firstLoginTracking table not available for deletion`);
         }
 
-        // Delete user from phoneUsers table
-        await db.delete(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+        // Soft-delete user from phoneUsers table
+        // Instead of deleting, mark as deleted with metadata
+        await db
+          .update(phoneUsers)
+          .set({
+            isDeleted: "true",
+            deletedAt: new Date(),
+            deletedBy: ctx.user.email,
+          })
+          .where(eq(phoneUsers.id, input.phoneUserId));
 
         return {
           success: true,
-          message: `User ${user[0].name} deleted successfully`,
+          message: `User ${user[0].name} deleted successfully (soft-delete)`,
         };
       } catch (error: any) {
         console.error("[Admin] Failed to delete user:", error);
         throw new Error(error.message || "Failed to delete user");
+      }
+    }),
+
+  /**
+   * Restore a soft-deleted user
+   */
+  restoreUser: adminProcedure
+    .input(z.object({ phoneUserId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      try {
+        // Get user details
+        const user = await db.select().from(phoneUsers).where(eq(phoneUsers.id, input.phoneUserId));
+        if (!user || user.length === 0) {
+          throw new Error("User not found");
+        }
+
+        // Restore user by clearing soft-delete fields
+        await db
+          .update(phoneUsers)
+          .set({
+            isDeleted: "false",
+            deletedAt: null,
+            deletedBy: null,
+          })
+          .where(eq(phoneUsers.id, input.phoneUserId));
+
+        return {
+          success: true,
+          message: `User ${user[0].name} restored successfully`,
+        };
+      } catch (error: any) {
+        console.error("[Admin] Failed to restore user:", error);
+        throw new Error(error.message || "Failed to restore user");
       }
     }),
 
