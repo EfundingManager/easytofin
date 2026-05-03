@@ -2123,3 +2123,19 @@
 - [ ] Prevent redirect loops between /auth-selection and dashboards
 - [ ] Test all role-based login scenarios (User, Admin, Manager, Staff, Support)
 - [ ] Verify back button doesn't break session after login
+
+
+## Critical Bug: Google Login Redirect
+- [ ] Fix Google OAuth callback to properly redirect to /user/dashboard instead of /auth-selection
+- [ ] Verify session cookie is properly set after Google authentication
+- [ ] Test complete Google login flow in fresh incognito window
+- [ ] Ensure user alexlin202lin@gmail.com is redirected to /user/dashboard after login
+
+
+## Phase 35: Critical Google Login Redirect Bug Fix
+- [x] Implement production-grade cookie configuration (SameSite=none for production domains)
+- [x] Replace frontend timer-based redirect with session verification via auth.me query
+- [ ] Fix database migration to create missing totpSecrets table
+- [ ] Resolve remaining TypeScript errors in Drizzle ORM schema
+- [ ] Test complete Google login flow end-to-end in production domain
+- [ ] Verify users are redirected to correct role-based dashboard after login

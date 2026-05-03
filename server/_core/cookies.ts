@@ -67,11 +67,18 @@ export function getSessionCookieOptions(
   // For localhost/development, use the actual protocol
   const secure = !LOCAL_HOSTS.has(hostname) && !isIpAddress(hostname) ? true : isSecure;
 
+  // For production domains with SameSite=none, we must use Secure=true
+  // For localhost/development, use SameSite=lax
+  const sameSite: "lax" | "strict" | "none" = 
+    (!LOCAL_HOSTS.has(hostname) && !isIpAddress(hostname) && !isPreviewDomain)
+      ? "none"
+      : "lax";
+
   console.log("[Cookie Config]", {
     hostname,
     domain,
     secure,
-    sameSite: "lax",
+    sameSite,
     protocol: req.protocol,
     xForwardedHost: forwardedHost,
     hostHeader: hostHeader,
@@ -83,7 +90,7 @@ export function getSessionCookieOptions(
     domain,
     httpOnly: true,
     path: "/",
-    sameSite: "lax",
+    sameSite,
     secure,
   };
 }

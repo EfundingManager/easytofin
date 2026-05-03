@@ -1547,10 +1547,15 @@ export const adminRouter = router({
         const submissionData = submission[0];
 
         // Get client details for email notification
+        // Use phoneUserId if available, otherwise use userId
+        const clientId = submissionData.phoneUserId || submissionData.userId;
+        if (!clientId) {
+          throw new Error("No client ID found in submission");
+        }
         const clientResult = await db
           .select()
           .from(phoneUsers)
-          .where(eq(phoneUsers.id, submissionData.userId))
+          .where(eq(phoneUsers.id, clientId as number))
           .limit(1);
 
         if (clientResult.length > 0) {
@@ -1612,10 +1617,15 @@ export const adminRouter = router({
         const submissionData = submission[0];
 
         // Get client details for email notification
+        // Use phoneUserId if available, otherwise use userId
+        const clientId = submissionData.phoneUserId || submissionData.userId;
+        if (!clientId) {
+          throw new Error("No client ID found in submission");
+        }
         const clientResult = await db
           .select()
           .from(phoneUsers)
-          .where(eq(phoneUsers.id, submissionData.userId))
+          .where(eq(phoneUsers.id, clientId as number))
           .limit(1);
 
         if (clientResult.length > 0) {
