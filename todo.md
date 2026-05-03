@@ -2154,3 +2154,66 @@
 - [ ] Redirect to VerifyTwoFA on subsequent logins for privileged roles
 - [ ] Test TOTP setup and verification with real authenticator app
 - [ ] Test backup code usage for account recovery
+
+## Phase 37: Complete TOTP 2FA Management System Implementation
+
+### Step 1: Database Schema Fixes
+- [ ] Fix firstLoginTracking table schema to match Drizzle ORM definitions
+- [ ] Migrate database to use correct column names
+- [ ] Re-enable TOTP status checks in SDK
+- [ ] Verify TOTP checks work in authentication flow
+
+### Step 2: TOTP Management Dashboard
+- [ ] Create TOTP status list component with user table
+- [ ] Implement role-based visibility (Super Admin sees all, Admin sees subordinates)
+- [ ] Create TOTP action buttons (Disable, Reset, Regenerate, Unlock, View Codes)
+- [ ] Implement search and filter by role/status
+- [ ] Add CSV export functionality
+- [ ] Create TOTP audit log viewer (Super Admin + Admin only)
+- [ ] Create account lockout management interface
+
+### Step 3: Server-Side Permission Enforcement
+- [ ] Create TOTP management API endpoints with strict permission checks
+- [ ] Implement GET /api/totp/status endpoint
+- [ ] Implement GET /api/totp/audit-log endpoint
+- [ ] Implement POST /api/totp/disable/:userId endpoint
+- [ ] Implement POST /api/totp/reset/:userId endpoint
+- [ ] Implement POST /api/totp/regenerate-backup/:userId endpoint
+- [ ] Implement POST /api/totp/unlock/:userId endpoint
+- [ ] Implement GET /api/totp/backup-codes/:userId endpoint
+- [ ] Add role hierarchy validation for all endpoints
+
+### Step 4: Email Notifications
+- [ ] Implement email for TOTP setup completion
+- [ ] Implement email for TOTP reset notification
+- [ ] Implement email for account lockout alert
+- [ ] Implement email for account unlock notification
+- [ ] Implement email for backup codes generation
+- [ ] Test all email notifications
+
+### Step 5: Account Lockout System
+- [ ] Implement failed attempt tracking
+- [ ] Implement 3-strike account lockout
+- [ ] Implement unlock functionality
+- [ ] Implement lockout duration settings
+- [ ] Send admin notifications on lockout
+
+### Step 6: End-to-End Testing
+- [ ] Test TOTP QR code generation and scanning
+- [ ] Test TOTP verification with valid code
+- [ ] Test TOTP verification with invalid code
+- [ ] Test 3 failed attempts locks account
+- [ ] Test backup codes as alternative to TOTP
+- [ ] Test Super Admin full access to all users
+- [ ] Test Admin access restrictions (cannot modify other Admins)
+- [ ] Test Manager/Staff/Support read-only access
+- [ ] Test User/Customer cannot access TOTP management
+- [ ] Test all API endpoints return correct 403 errors
+- [ ] Test email notifications for all events
+- [ ] Test Google login redirects for all 7 roles
+
+### Step 7: Deployment
+- [ ] Save checkpoint with all changes
+- [ ] Redeploy to www.easytofin.com
+- [ ] Verify deployment successful
+- [ ] Run final end-to-end test on live site
