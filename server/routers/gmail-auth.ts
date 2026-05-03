@@ -12,7 +12,7 @@ import { getSessionCookieOptions } from "../_core/cookies";
  * Gmail OAuth Authentication Router
  * Handles Google Sign-in for client registration and login.
  *
- * For privileged roles (admin, manager, staff), login is NOT completed here.
+ * For privileged roles (admin, manager, staff, super_admin), login is NOT completed here.
  * Instead a short-lived pendingToken is returned and the frontend must redirect
  * the user to /2fa for phone OTP verification before a real session is issued.
  */
@@ -196,23 +196,4 @@ export const gmailAuthRouter = router({
         });
       }
     }),
-
-  /**
-   * Get Google OAuth configuration for frontend
-   */
-  getGoogleConfig: publicProcedure.query(() => {
-    const clientId = process.env.VITE_GOOGLE_CLIENT_ID;
-
-    if (!clientId) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Google OAuth not configured",
-      });
-    }
-
-    return {
-      clientId,
-      redirectUri: `${process.env.VITE_APP_URL || "http://localhost:3000"}/auth/google/callback`,
-    };
-  }),
 });

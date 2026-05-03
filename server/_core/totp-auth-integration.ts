@@ -48,24 +48,43 @@ export async function getTOTPAuthStatus(
       .where(eq(totpSecrets.phoneUserId, phoneUserId))
       .limit(1);
 
-    const totpEnabled = totpRecord.length > 0 && totpRecord[0].isEnabled === "true";
+    // TOTP is enabled if a secret exists and is verified
+    const totpEnabled = totpRecord.length > 0 && totpRecord[0]?.verified === "true";
 
-    // Check first login tracking
-    const trackingRecord = await db
+    // Check first login tracking - create if doesn't exist
+    let trackingRecord = await db
       .select()
       .from(firstLoginTracking)
       .where(eq(firstLoginTracking.phoneUserId, phoneUserId))
       .limit(1);
+    
+    // If no tracking record exists, create one
+    if (trackingRecord.length === 0) {
+      try {
+        await db.insert(firstLoginTracking).values({
+          phoneUserId,
+          hasCompletedFirstLogin: "false",
+          requiresTOTP2FA: "false",
+        });
+        trackingRecord = await db
+          .select()
+          .from(firstLoginTracking)
+          .where(eq(firstLoginTracking.phoneUserId, phoneUserId))
+          .limit(1);
+      } catch (insertError) {
+        console.warn("[TOTP] Could not create first login tracking record:", insertError);
+      }
+    }
 
     const isFirstLogin =
       trackingRecord.length === 0 ||
-      trackingRecord[0].hasCompletedFirstLogin === "false";
+      (trackingRecord[0] && trackingRecord[0].hasCompletedFirstLogin === "false");
     const requiresTOTP =
       trackingRecord.length > 0 &&
-      trackingRecord[0].requiresTOTP2FA === "true";
+      (trackingRecord[0] && trackingRecord[0].requiresTOTP2FA === "true");
     const totpSetupCompleted =
       trackingRecord.length > 0 &&
-      trackingRecord[0].totpSetupCompletedAt !== null;
+      (trackingRecord[0] && totpRecord.length > 0);
 
     return {
       requiresTOTP,

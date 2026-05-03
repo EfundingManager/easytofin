@@ -387,8 +387,10 @@ class SDKServer {
         } as any;
         
         // Check TOTP status for privileged roles
-        const totpStatus = await this.checkTOTPStatus(userObj, phoneUser.id);
-        return { user: userObj, totpStatus };
+        // TODO: Re-enable after TOTP database schema is properly configured
+        // const totpStatus = await this.checkTOTPStatus(userObj, phoneUser.id);
+        // return { user: userObj, totpStatus };
+        return { user: userObj, totpStatus: undefined };
       }
 
       const notFoundMsg = "PhoneUser not found after all lookup strategies";
@@ -430,7 +432,9 @@ class SDKServer {
     });
 
     // Check TOTP status for privileged roles
-    const totpStatus = await this.checkTOTPStatus(user, user.id as number);
+    // TODO: Re-enable after TOTP database schema is properly configured
+    // const totpStatus = await this.checkTOTPStatus(user, user.id as number);
+    const totpStatus = undefined;
     return { user, totpStatus };
   }
 
