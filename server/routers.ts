@@ -23,6 +23,7 @@ import { emailCampaignRouter } from "./routers/email-campaign";
 import { recipientUploadRouter } from "./routers/recipient-upload";
 import { deviceRegistrationRouter } from "./routers/device-registration";
 import { deviceLoginRouter } from "./routers/device-login";
+import { totpRouter } from "./routers/totp";
 
 import { pdfExportRouter } from "./routers/pdf-export";
 import { authLockoutRouter } from "./routers/auth-lockout";
@@ -85,6 +86,7 @@ export const appRouter = router({
   recipientUpload: recipientUploadRouter,
   deviceRegistration: deviceRegistrationRouter,
   deviceLogin: deviceLoginRouter,
+  totp: totpRouter,
 
   pdfExport: pdfExportRouter,
   authLockout: authLockoutRouter,

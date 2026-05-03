@@ -2139,3 +2139,18 @@
 - [ ] Resolve remaining TypeScript errors in Drizzle ORM schema
 - [ ] Test complete Google login flow end-to-end in production domain
 - [ ] Verify users are redirected to correct role-based dashboard after login
+
+
+## Phase 36: TOTP 2FA Implementation for Privileged Roles
+
+- [x] TOTP service with QR code generation (server/_core/totp-service.ts)
+- [x] Backend TOTP router with setup/verify/login flows (server/routers/totp.ts)
+- [x] SetupTwoFA page with QR code and backup codes (client/src/pages/SetupTwoFA.tsx)
+- [x] VerifyTwoFA page for login verification (client/src/pages/VerifyTwoFA.tsx)
+- [x] Backup code generation and download functionality
+- [x] TOTP audit logging to totp2faAuditLog table
+- [ ] Integration with login flow for privileged roles (admin, manager, staff, super_admin)
+- [ ] Redirect to SetupTwoFA on first login for privileged roles
+- [ ] Redirect to VerifyTwoFA on subsequent logins for privileged roles
+- [ ] Test TOTP setup and verification with real authenticator app
+- [ ] Test backup code usage for account recovery
