@@ -79,9 +79,13 @@ export const emailAuthRouter = router({
           console.log(`[OTP] Login OTP for ${input.email}: ${code}`);
 
           // Send OTP email for login
+          // NOTE: We don't fail if email sending fails - OTP is still created and can be verified
+          // This allows the OTP page to load even if SendGrid has temporary issues
           const emailSent1 = await sendOtpEmail(input.email, existingUser.name || "User", code, false);
           if (!emailSent1) {
-            console.warn(`[OTP] Failed to send email to ${input.email}, but OTP was created`);
+            console.warn(`[OTP] Failed to send email to ${input.email}, but OTP was created. Dev code: ${code}`);
+          } else {
+            console.log(`[OTP] Login OTP sent via email to ${input.email}`);
           }
 
           return {
@@ -113,9 +117,13 @@ export const emailAuthRouter = router({
           console.log(`[OTP] Registration OTP for ${input.email}: ${code}`);
 
           // Send OTP email
+          // NOTE: We don't fail if email sending fails - OTP is still created and can be verified
+          // This allows the OTP page to load even if SendGrid has temporary issues
           const emailSent2 = await sendOtpEmail(input.email, "New User", code, true);
           if (!emailSent2) {
-            console.warn(`[OTP] Failed to send email to ${input.email}, but OTP was created`);
+            console.warn(`[OTP] Failed to send email to ${input.email}, but OTP was created. Dev code: ${code}`);
+          } else {
+            console.log(`[OTP] Registration OTP sent via email to ${input.email}`);
           }
 
           return {

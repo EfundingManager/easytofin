@@ -77,16 +77,15 @@ export const phoneAuthRouter = router({
           });
 
           // Send SMS verification using Twilio
+          // NOTE: We don't fail if SMS sending fails - OTP is still created and can be verified
+          // This allows the OTP page to load even if SMS delivery has temporary issues
           const smsResult = await sendSMSVerification(input.phone);
           if (!smsResult.success) {
-            console.error(`[SMS] Failed to send SMS to ${input.phone}:`, smsResult.error);
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Failed to send verification SMS",
-            });
+            console.warn(`[SMS] Failed to send SMS to ${input.phone}:`, smsResult.error);
+            console.log(`[OTP] OTP created but SMS delivery failed. Dev code for testing: ${code}`);
+          } else {
+            console.log(`[OTP] Login OTP sent via SMS to ${input.phone}`);
           }
-
-          console.log(`[OTP] Login OTP sent via SMS to ${input.phone}`);
 
           return {
             success: true,
@@ -115,16 +114,15 @@ export const phoneAuthRouter = router({
           });
 
           // Send SMS verification using Twilio
+          // NOTE: We don't fail if SMS sending fails - OTP is still created and can be verified
+          // This allows the OTP page to load even if SMS delivery has temporary issues
           const smsResult = await sendSMSVerification(input.phone);
           if (!smsResult.success) {
-            console.error(`[SMS] Failed to send SMS to ${input.phone}:`, smsResult.error);
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Failed to send verification SMS",
-            });
+            console.warn(`[SMS] Failed to send SMS to ${input.phone}:`, smsResult.error);
+            console.log(`[OTP] OTP created but SMS delivery failed. Dev code for testing: ${code}`);
+          } else {
+            console.log(`[OTP] Registration OTP sent via SMS to ${input.phone}`);
           }
-
-          console.log(`[OTP] Registration OTP sent via SMS to ${input.phone}`);
 
           return {
             success: true,

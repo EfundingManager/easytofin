@@ -59,35 +59,14 @@ export default function AuthSelection() {
         if (result.userId) localStorage.setItem("phoneUserId", result.userId.toString());
         if (result.user) localStorage.setItem("phoneUserData", JSON.stringify(result.user));
 
-        // CRITICAL: Verify session is actually set before redirecting
-        // Use auth.me query to verify session is established on the server
-        console.log("[Google Sign-In] Verifying session via auth.me query...");
+        // CRITICAL: Session cookie is set by backend via Set-Cookie header
+        // Redirect immediately using the redirectUrl from backend response
+        // The browser will automatically send the cookie on the next request
+        const redirectUrl = result.redirectUrl || "/user/dashboard";
+        console.log("[Google Sign-In] Session established. Redirecting to:", redirectUrl);
         
-        const verifyAndRedirect = async () => {
-          try {
-            // Refetch auth to verify session is established
-            const authResult = await refetchAuth();
-            console.log("[Google Sign-In] Auth verification result:", authResult);
-            
-            if (authResult.data?.user) {
-              // Session verified - use the redirectUrl from backend which handles role-based routing
-              const redirectUrl = result.redirectUrl || "/user/dashboard";
-              console.log("[Google Sign-In] Session verified. Redirecting to:", redirectUrl);
-              window.location.href = redirectUrl;
-            } else {
-              console.warn("[Google Sign-In] Session verification failed, user not found in auth.me");
-              toast.error("Session verification failed. Please try again.");
-              setLoading(false);
-            }
-          } catch (error) {
-            console.error("[Google Sign-In] Error verifying session:", error);
-            toast.error("Failed to verify session. Please try again.");
-            setLoading(false);
-          }
-        };
-        
-        // Add a small delay to ensure cookie is processed before verification
-        setTimeout(verifyAndRedirect, 100);
+        // Use window.location.href for hard redirect to ensure fresh page load with session cookie
+        window.location.href = redirectUrl;
       }
     } catch (error: any) {
       toast.error(error.message || "Google Sign-in failed");
